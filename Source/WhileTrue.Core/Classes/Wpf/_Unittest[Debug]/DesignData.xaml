@@ -1,0 +1,8 @@
+﻿<m:SampleModel 
+    xmlns:m="clr-namespace:WhileTrue.Classes.Wpf._Unittest_Debug_" 
+ IntProperty="42">
+    <m:SampleModel.SubProperty>
+        <m:SubModel SubStringProperty="[SSP]"/>
+    </m:SampleModel.SubProperty>
+</m:SampleModel>
+

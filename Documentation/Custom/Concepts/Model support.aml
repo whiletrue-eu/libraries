@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="30d819d7-3161-41fc-b431-fd4e319d6d80" revisionNumber="1">
+  <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <introduction>
+      <para>
+      For a modular approach of an application, especially when using data binding, the base model takes a big part 
+      in a clean application structure.
+      </para>
+      <para>
+      For the event driven cosntructs of data binding, the <codeEntityReference qualifyHint="false">T:System.ComponentModel.INotifyPropertyChanged</codeEntityReference>
+      interface takes a central role. To implement this interface, the WhileTrue library includes some utility and base classes.
+      </para>
+    </introduction>
+    <section address="ModelSupport">
+      <title>Model support</title>
+      <content>
+        <para>
+        For model support, there are some base and utility classes to ease the creation of 
+        powerful event driven models and model adapter layers.
+        </para>
+        <autoOutline />
+      </content>
+      <sections>
+          <section address="ObservableObject">
+              <title>ObservableObject base class</title>
+              <content>
+                  <para>
+                  The <codeEntityReference qualifyHint="false">T:WhileTrue.Classes.Framework.ObservableObject</codeEntityReference> 
+                  base class implements the <codeEntityReference qualifyHint="false">T:System.ComponentModel.INotifyPropertyChanged</codeEntityReference>
+                  interface and exposes some internal methods that can be used in the model
+                  to easily publish changes to the model.
+                  </para>
+                  <para>
+                  There are two sets of methods:
+                  </para>
+                  <para>
+					<legacyBold>InvokePropertyChanged / Changing</legacyBold>
+                  </para>
+                  <para>
+                  The <codeEntityReference qualifyHint="false" autoUpgrade="true">M:WhileTrue.Classes.Framework.ObservableObject.InvokePropertyChanged``1(System.Linq.Expressions.Expression{System.Func{``0}})</codeEntityReference>
+                  and <codeEntityReference qualifyHint="false" autoUpgrade="true">M:WhileTrue.Classes.Framework.ObservableObject.InvokePropertyChanging``1(System.Linq.Expressions.Expression{System.Func{``0}})</codeEntityReference>
+                  methods can be used to invoke the <codeEntityReference qualifyHint="false">E:System.ComponentModel.INotifyPropertyChanged.PropertyChanged</codeEntityReference> 
+                  and <codeEntityReference qualifyHint="false">E:System.ComponentModel.INotifyPropertyChanging.PropertyChanging</codeEntityReference> 
+                  events. They can be used to freely control,when a changed event shall be fired.
+                  </para>
+                  <code source="Examples\ObservableObject.cs" region="Invoke" lang="cs"/>
+                  <para>
+                  As you can see, the methods do not use a string to identify the property, but an expression
+                  instead. Even though this might cost a bit of perfomance,it makes the code refactoring-safe, as
+                  the property in the expression will be renamed with the original property.
+                  </para>
+                  <para>
+					<legacyBold>SetAndInvoke</legacyBold>
+                  </para>
+                  <para>
+                  The <codeEntityReference qualifyHint="false" autoUpgrade="true">M:WhileTrue.Classes.Framework.ObservableObject.SetAndInvoke``2(System.Linq.Expressions.Expression{System.Func{``1}},``0@,``0)</codeEntityReference>
+                  methods can be used to set a backing field and invoke the <codeEntityReference qualifyHint="false">E:System.ComponentModel.INotifyPropertyChanged.PropertyChanged</codeEntityReference> 
+                  and <codeEntityReference qualifyHint="false">E:System.ComponentModel.INotifyPropertyChanging.PropertyChanging</codeEntityReference> 
+                  events, but only if the value really changed.
+                  </para>
+                  <code source="Examples\ObservableObject.cs" region="SetAndInvoke" lang="cs"/>
+                  <para>
+                  Optionally, some custom <quoteInline>...Changed</quoteInline> or <quoteInline>...Changing</quoteInline> events
+                  can be given that are called in addition to the <quoteInline>INotify...</quoteInline> ones.
+                  </para>
+                  <code source="Examples\ObservableObject.cs" region="SetAndInvokeWithCustomEvents" lang="cs"/>
+              </content>
+          </section>
+          <section address="NotifyPropertyChanged">
+              <title>Notify property changed</title>
+              <content>
+                  <para>Sub-section content.</para>
+              </content>
+          </section>
+          <section address="ModelValidation">
+              <title>Model validation</title>
+              <content>
+                  <para>Sub-section content.</para>
+              </content>
+          </section>
+      </sections>
+    </section>
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID"/>
+      <link xlink:href="Other Topic's ID">Link inner text</link>
+
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8270" />
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

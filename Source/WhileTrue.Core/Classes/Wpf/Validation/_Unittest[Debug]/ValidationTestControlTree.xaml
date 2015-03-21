@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="WhileTrue.Classes._Unittest.ValidationTestControlTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:_Unittest1="clr-namespace:WhileTrue.Classes._Unittest"
+             xmlns:Controls="clr-namespace:WhileTrue.Controls" 
+             xmlns:Validation="clr-namespace:WhileTrue.Classes.Wpf" 
+             mc:Ignorable="d" 
+             d:DesignHeight="350"
+             d:DesignWidth="516"
+             d:DataContext="{d:DesignInstance Type={x:Type _Unittest1:BackingData},IsDesignTimeCreatable=True}">
+    <UserControl.DataContext>
+        <_Unittest1:BackingData/>
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/WhileTrue.Core;component/Resources/ErrorTemplates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ErrorTemplate}"/>
+                        <Style.Triggers>
+                            <Trigger Property="Validation.HasError" Value="True">
+                                <Setter Property="ToolTipService.ToolTip" Value="{StaticResource ValidationErrorCollectionToolTip}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel Orientation="Vertical">
+        <Label>Direct XAML:</Label>
+        <Controls:DialogPanel InnerColumnMargin="5">
+        <Controls:DialogPanel.CaptionTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding}" Margin="5,3,0,0"/>
+            </DataTemplate>
+        </Controls:DialogPanel.CaptionTemplate>
+        <StackPanel Controls:DialogPanel.Caption="File">
+        <TextBox Name="FileControl" Text="{Validation:ValidatingBinding File}"/>
+        <Controls:ValidationResultBanner ValidationResults="{Binding (Validation.Errors), ElementName=FileControl}"/>
+        </StackPanel>
+        <StackPanel Controls:DialogPanel.Caption="Int">
+        <TextBox Name="IntControl" Text="{Validation:ValidatingBinding Int}"/>
+        <Controls:ValidationResultBanner ValidationResults="{Binding (Validation.Errors), ElementName=IntControl}"/>
+        </StackPanel>
+        <StackPanel Controls:DialogPanel.Caption="String">
+        <TextBox Name="StringControl" Text="{Validation:ValidatingBinding String}"/>
+        <Controls:ValidationResultBanner ValidationResults="{Binding (Validation.Errors), ElementName=StringControl}"/>
+        </StackPanel>
+        <Border/>
+        </Controls:DialogPanel>
+        <Label>Templated:</Label>
+        <TabControl DataContext="{Binding}">
+            <TabItem Header="One">
+                <ContentControl Content="{Binding}"/>
+            </TabItem>
+            <TabItem Header="Two">
+                <ContentControl Content="{Binding}"/>
+            </TabItem>
+            <TabControl.Resources>
+                <DataTemplate DataType="{x:Type _Unittest1:BackingData}">
+                    <Controls:DialogPanel InnerColumnMargin="5">
+                        <Controls:DialogPanel.CaptionTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Margin="5,3,0,0"/>
+                            </DataTemplate>
+                        </Controls:DialogPanel.CaptionTemplate>
+                        <StackPanel Controls:DialogPanel.Caption="Int">
+                            <TextBox Name="IntControl" Text="{Validation:ValidatingBinding Int}"/>
+                            <Controls:ValidationResultBanner ValidationResults="{Binding (Validation.Errors), ElementName=IntControl}"/>
+                        </StackPanel>
+                        <StackPanel Controls:DialogPanel.Caption="String">
+                            <TextBox Name="StringControl" Text="{Validation:ValidatingBinding String}"/>
+                            <Controls:ValidationResultBanner ValidationResults="{Binding (Validation.Errors), ElementName=StringControl}"/>
+                        </StackPanel>
+                        <Border/>
+                    </Controls:DialogPanel>
+                </DataTemplate>
+            </TabControl.Resources>
+        </TabControl>
+    </StackPanel>
+</UserControl>

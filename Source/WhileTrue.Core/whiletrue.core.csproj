@@ -1,0 +1,651 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">v4.5_Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{79135144-F37C-44E2-8CA6-B8742820E09A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WhileTrue</RootNamespace>
+    <AssemblyName>WhileTrue.Core</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Properties\whiletrue.snk</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkProfile />
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\Projects\Projects\Source\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'v4.0_Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\v4.0_Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET4x;NET40</DefineConstants>
+    <DocumentationFile>bin\v4.0_Debug\WhileTrue.Core.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\WhileTrue.Core.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'v4.0_Release|AnyCPU'">
+    <OutputPath>bin\v4.0_Release\</OutputPath>
+    <DefineConstants>TRACE;NET4x;NET40;Release</DefineConstants>
+    <DocumentationFile>bin\v4.0_Release\WhileTrue.Core.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\WhileTrue.Core.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkVersion Condition="'$(Configuration.Substring(0,1))'=='v'">$(Configuration.Substring(0,4))</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'v4.5_Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\v4.5_Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET4x;NET45</DefineConstants>
+    <DocumentationFile>bin\v4.0_Debug\WhileTrue.Core.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'v4.5_Release|AnyCPU'">
+    <OutputPath>bin\v4.5_Release\</OutputPath>
+    <DefineConstants>TRACE;NET4x;NET45;Release</DefineConstants>
+    <DocumentationFile>bin\v4.0_Release\WhileTrue.Core.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Moq, Version=4.2.1502.911, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Moq.4.2.1502.0911\lib\net40\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\CodeInspection\CodeInspection.cs" />
+    <Compile Include="Classes\CodeInspection\ExcludeFromCodeCoverage[NET35].cs" />
+    <Compile Include="Classes\Commanding\CommandKey.cs" />
+    <Compile Include="Classes\Commanding\_Unittest[Debug]\RoutedCommandFactoryTest.cs" />
+    <Compile Include="Classes\Commanding\_Unittest[Debug]\RoutedCommandExtensionTest.cs" />
+    <Compile Include="Classes\Commanding\_Unittest[Debug]\CommandBindingHelperTest.cs" />
+    <Compile Include="Classes\Commanding\DelegateCommand.cs" />
+    <Compile Include="Classes\Commanding\_Unittest[Debug]\TestWindow.xaml.cs">
+      <DependentUpon>TestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Commanding\_Unittest[Debug]\DelegateCommandTest.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentContainer.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentInstance.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentInstanceCollection.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentInstanceEvent.cs" />
+    <Compile Include="Classes\Components\Instances\ResolveComponentException.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentInstanceScope.cs" />
+    <Compile Include="Classes\Components\Instances\SingletonComponentInstance.cs" />
+    <Compile Include="Classes\Components\Instances\SimpleComponentInstance.cs" />
+    <Compile Include="Classes\Components\Instances\SharedComponentInstance.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentBindingPropertyAttribute.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentConfigurationException.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentDescriptorCollection.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentInterfaceAttribute.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentAttribute.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentRepository.cs" />
+    <Compile Include="Classes\Components\Repository\SingletonComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\Repository\SimpleComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\Repository\SharedComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\ComponentsTest.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Config.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\ConfigTest1.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\ConfigTest2.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\DelegatedTest.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Disposable.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\DisposeWithDependencyTest.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\INoComponentInterfaceFacade.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\NoComponent.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\NoSuitableConstructor.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\RecursionTest1.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\RecursionTest2.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Test1And2.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Test2a.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\DisposeTest.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\RepositoryParameterTest1.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\ITestFacade1.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\ITestFacade2.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Test1.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Test2.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Test2b.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Test2C.cs" />
+    <Compile Include="Classes\Components\_Unittest[Debug]\TestComponents\Test2Lazy.cs" />
+    <Compile Include="Classes\Commanding\CommandBindingHelper.cs" />
+    <Compile Include="Classes\Commanding\RoutedCommandExtension.cs" />
+    <Compile Include="Classes\Commanding\RoutedCommandFactory.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropHelperAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropObjectWrapper.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\DummyUIHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\FrameworkElementDragDropUIHelper.cs" />
+    <Compile Include="Classes\DragNDrop\SystemDragDropTypes\FileDropDataTypeConverter.cs" />
+    <Compile Include="Classes\DragNDrop\SystemDragDropTypes\FileDropDataType.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\TabControlDragDropHelper.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\TabControlDragDropUIHandler.cs" />
+    <Compile Include="Classes\Framework\EnumerationAdapter.cs" />
+    <Compile Include="Classes\Framework\ObservableExpressionFactory.cs" />
+    <Compile Include="Classes\Framework\ReflectionHelper.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\ObservableExpressionFactoryTest.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\ObservableObjectTest_PropertyAdapter_Instance.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\DynamicObservableObjectTest_PropertyAdapter_Static.cs" />
+    <Compile Include="Classes\Models\ZoomModel.cs" />
+    <Compile Include="Classes\Timple\TimpleEngine.cs" />
+    <Compile Include="Classes\Timple\_UnitTest[Debug]\TimpleEngineTest.cs" />
+    <Compile Include="Classes\Utilities\FileHelper.cs" />
+    <Compile Include="Classes\Utilities\LimitedConcurrencyLevelTaskScheduler[Net4x].cs" />
+    <Compile Include="Classes\Utilities\Resources.cs" />
+    <Compile Include="Classes\Utilities\ThreadPoolEx.cs" />
+    <Compile Include="Classes\Utilities\ThreadPoolWaiter.cs" />
+    <Compile Include="Classes\Utilities\XmlUrlResolverEx.cs" />
+    <Compile Include="Classes\Win32\DwmWindowHelper.cs" />
+    <Compile Include="Classes\Win32\NonClientArea.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CommandWrapper.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CrossThreadCommandWrapper.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\_Unittest[Debug]\CommandWrapperTest.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\_Unittest[Debug]\CrossThreadCollectionWrapperTest.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\_Unittest[Debug]\CrossThreadCollectionWrapperWindow.xaml.cs">
+      <DependentUpon>CrossThreadCollectionWrapperWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\DoubleToGridLengthConverter.cs" />
+    <Compile Include="Classes\Wpf\HexAsciiConverter.cs" />
+    <Compile Include="Classes\Wpf\IconConverter.cs" />
+    <Compile Include="Classes\Wpf\LinearGradientBrushAnimation.cs" />
+    <Compile Include="Classes\Wpf\NegateBoolConverter.cs" />
+    <Compile Include="Classes\Wpf\OuterGlowEffect.cs" />
+    <Compile Include="Classes\Wpf\PropertyChangedEvent.cs" />
+    <Compile Include="Classes\Wpf\PropertyChangedEventExtension.cs" />
+    <Compile Include="Classes\Wpf\PropertyChangedRoutedEventFactory.cs" />
+    <Compile Include="Classes\Wpf\ValidationMessageConverter.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropAdornerTemplate.cs" />
+    <Compile Include="Classes\DragNDrop\DragPosition.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\StackPanelDragDropUIHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\ItemsControlDragDropUIHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragDrop.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropEffect.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropSourceAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropTarget.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropTargetAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropTargetFactory.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropSource.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropSourceAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropTarget.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropTargetAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropUIHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\ElementDragDropUIHandler.cs" />
+    <Compile Include="Classes\Framework\CircularDependencyException.cs" />
+    <Compile Include="Classes\Framework\ObservableObject.Interfaces.cs" />
+    <Compile Include="Classes\Framework\EnumerablePropertyAdapter.cs" />
+    <Compile Include="Classes\Framework\EventBindingMode.cs" />
+    <Compile Include="Classes\Framework\ExpressionVisitor.cs" />
+    <Compile Include="Classes\Framework\IObjectValidation.cs" />
+    <Compile Include="Classes\Framework\NotifyChangeExpression.cs" />
+    <Compile Include="Classes\Framework\PropertyAdapter.cs" />
+    <Compile Include="Classes\Framework\PropertyAdapterBase.cs" />
+    <Compile Include="Classes\Framework\PropertyInfoReflector.cs" />
+    <Compile Include="Classes\Framework\ReadOnlyPropertyAdapter.cs" />
+    <Compile Include="Classes\Framework\ValidationMessage.cs" />
+    <Compile Include="Classes\Framework\ValidationSeverity.cs" />
+    <Compile Include="Classes\Framework\ValueRetrievalMode.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\ObservableObjectTest.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\ObservableObjectTest_ModelValidation.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\NotifyChangeExpressionTest.cs" />
+    <Compile Include="Classes\Framework\WeakDelegate.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\ObservableObjectTest_PropertyAdapter_Static.cs" />
+    <Compile Include="Classes\Framework\_Unittest[Debug]\WeakDelegateTest.cs" />
+    <Compile Include="Classes\Logging\DebugLogger.cs" />
+    <Compile Include="Classes\Logging\_Unittest[Debug]\DebugLoggerTest.cs" />
+    <Compile Include="Classes\SettingStorage\IFileSettingStore.cs" />
+    <Compile Include="Classes\SettingStorage\ITagValueSettingStore.cs" />
+    <Compile Include="Classes\UIFeatures\FeatureEnabledExtension.cs" />
+    <Compile Include="Classes\UIFeatures\FeatureReadOnlyExtension.cs" />
+    <Compile Include="Classes\UIFeatures\UIFeatureBindingExtensionBase.cs" />
+    <Compile Include="Classes\UIFeatures\_Unittest[Debug]\UIFeatureManagementControlTree.xaml.cs">
+      <DependentUpon>UIFeatureManagementControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\UIFeatures\_Unittest[Debug]\UIFeatureManagementTest.cs" />
+    <Compile Include="Classes\UnitTesting[Debug]\AutoIndex.cs" />
+    <Compile Include="Classes\Utilities\PrivateAccess.cs" />
+    <Compile Include="Classes\Utilities\ObjectCache.cs" />
+    <Compile Include="Classes\Utilities\UserCancelException.cs" />
+    <Compile Include="Classes\Utilities\VisualTreeHelperEx.cs" />
+    <Compile Include="Classes\Utilities\_Unittest[Debug]\ObjectCacheTest.cs" />
+    <Compile Include="Classes\Wpf\ComponentApplication.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PropertyAdapter.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PropertyStoreAdapter.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\_Unittest[Debug]\PersistentPropertyControlTree.xaml.cs">
+      <DependentUpon>PersistentPropertyControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\PersistentProperties\_Unittest[Debug]\PersistentPropertyTest.cs" />
+    <Compile Include="Classes\Wpf\TemplatedAdorner.cs" />
+    <Compile Include="Classes\Wpf\Validation\ValidatingBinding.cs" />
+    <Compile Include="Classes\Wpf\Validation\_Unittest[Debug]\BackingData.cs" />
+    <Compile Include="Classes\Wpf\Validation\_Unittest[Debug]\ValidationTest.cs" />
+    <Compile Include="Classes\Wpf\Validation\_Unittest[Debug]\ValidationTestControlTree.xaml.cs">
+      <DependentUpon>ValidationTestControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\WpfUtils.cs" />
+    <Compile Include="Classes\Wpf\_Unittest[Debug]\CollectionViewBackingData.cs" />
+    <Compile Include="Classes\Wpf\_Unittest[Debug]\CollectionViewTest.cs" />
+    <Compile Include="Classes\Wpf\_Unittest[Debug]\CollectionViewControlTree.xaml.cs">
+      <DependentUpon>CollectionViewControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\CollectionViewConverter.cs" />
+    <Compile Include="Classes\XTransformer\FileExtensionMethods.cs" />
+    <Compile Include="Classes\XTransformer\StylesheetExtensionMethods.cs" />
+    <Compile Include="Classes\XTransformer\TimpleExtensionMethods.cs" />
+    <Compile Include="Classes\XTransformer\XmlExtensionMethods.cs" />
+    <Compile Include="Classes\XTransformer\XTransformer.cs" />
+    <Compile Include="Classes\XTransformer\_UnitTest[Debug]\XTransformerTest.cs" />
+    <Compile Include="Components\SystemDialogs\SystemDialogsProvider.cs" />
+    <Compile Include="Components\UIFeatures\_Unittest[Debug]\UIFeatureManagerTest.cs" />
+    <Compile Include="Components\WebServer\SimpleWebServer.cs" />
+    <Compile Include="Components\WebServer\SimpleWebserverOptions.cs" />
+    <Compile Include="Controls\ContentUnavailableControl\ContentAvailability.cs" />
+    <Compile Include="Controls\ContentUnavailableControl\ContentAvailabilityConverter.cs" />
+    <Compile Include="Controls\ContentUnavailableControl\_Unittest[Debug]\ContentUnavailableTestContainer.xaml.cs">
+      <DependentUpon>ContentUnavailableTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DialogPanel\_Unittest[Debug]\DialogPanelTestContainer.xaml.cs">
+      <DependentUpon>DialogPanelTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Progress\_Unittest[Debug]\ProgressTestWindow.xaml.cs">
+      <DependentUpon>ProgressTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SpecializedWindows\NonClientAreaRegion.cs" />
+    <Compile Include="Controls\SpecializedWindows\NonClientResizeBorder.cs" />
+    <Compile Include="Controls\SpecializedWindows\SystemPropertiesEx.cs" />
+    <Compile Include="Controls\SpecializedWindows\Window.cs" />
+    <Compile Include="Controls\SpecializedWindows\WindowBorder.cs" />
+    <Compile Include="Controls\SpecializedWindows\_UnitTest[Debug]\DialogWindowTest.cs" />
+    <Compile Include="Controls\SpecializedWindows\_UnitTest[Debug]\DialogWindowTestWindow.xaml.cs">
+      <DependentUpon>DialogWindowTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SpecializedWindows\_UnitTest[Debug]\WindowTest.cs" />
+    <Compile Include="Controls\SpecializedWindows\_UnitTest[Debug]\WindowTestWindow.xaml.cs">
+      <DependentUpon>WindowTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SplashScreen\SplashScreenWindow.cs" />
+    <Compile Include="Controls\SplashScreen\SplashScreenEx.cs" />
+    <Compile Include="Controls\TablePanel\TablePanelRow.cs" />
+    <Compile Include="Controls\TablePanel\TablePanelRoot.cs" />
+    <Compile Include="Controls\TablePanel\_Unittest[Debug]\TablePanelTestContainer.xaml.cs">
+      <DependentUpon>TablePanelTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DialogPanel\DialogPanel.SynchronisationRoot.cs" />
+    <Compile Include="Controls\NotificationLabel\NotificationTypeTypeConverter.cs" />
+    <Compile Include="Controls\NotificationLabel\ValidationResultBanner.cs" />
+    <Compile Include="Controls\NotificationLabel\_Unittest[Debug]\BannerTestContainer.xaml.cs">
+      <DependentUpon>BannerTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Progress\Progress.cs" />
+    <Compile Include="Facades\ApplicationLoader\IMainModule.cs" />
+    <Compile Include="Facades\SplashScreen\_UnittestHelper[Debug]\SplashScreenMock.cs" />
+    <Compile Include="Controls\AnimatedImage\AnimatedImage.cs" />
+    <Compile Include="Controls\ContentUnavailableControl\ContentUnavailableControl.cs" />
+    <Compile Include="Controls\DialogPanel\DialogPanelModeStyle.cs" />
+    <Compile Include="Controls\NotificationLabel\NotificationBanner.cs" />
+    <Compile Include="Controls\NotificationLabel\NotificationType.cs" />
+    <Compile Include="Controls\SpecializedWindows\WindowCloseBehaviour.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupItem.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupItemBase.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupOtherwiseItem.cs" />
+    <Compile Include="Classes\Framework\DependencyPropertyEventManager.cs" />
+    <Compile Include="Controls\NotifyIcon\INotifyIconCallback.cs" />
+    <Compile Include="Controls\NotifyIcon\NotifyIconInteropWrapper.cs" />
+    <Compile Include="Controls\SpecializedWindows\PopupNotificationMessageWindow.cs" />
+    <Compile Include="Controls\SpecializedWindows\NotificationMessageWindow.cs" />
+    <Compile Include="Controls\NotifyIcon\NotifyIcon.cs">
+    </Compile>
+    <Compile Include="Controls\NotifyIcon\NotifyIconInteropHelper.cs" />
+    <Compile Include="Classes\Framework\ObservableCollectionFilter.cs" />
+    <Compile Include="Classes\Framework\ObservableObjectHelper.cs" />
+    <Compile Include="Classes\Utilities\IpcChannelHelper.cs" />
+    <Compile Include="Classes\SettingStorage\FileSettingStore.cs" />
+    <Compile Include="Classes\SettingStorage\IsolatedSettingStorage.cs" />
+    <Compile Include="Classes\SettingStorage\TagValueSettingStore.cs" />
+    <Compile Include="Controls\SpecializedWindows\DataBoundGlassMargin.cs" />
+    <Compile Include="Controls\SpecializedWindows\GlassMarginTypeConverter.cs" />
+    <Compile Include="Classes\Utilities\CodingUtils.cs" />
+    <Compile Include="Classes\Utilities\AttributeUtils.cs" />
+    <Compile Include="Classes\Utilities\Screen.cs" />
+    <Compile Include="Classes\Utilities\TaskbarLocation.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateKey.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoDataTemplateSelector.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateSelectorExtension.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateSelectorKeyExtension.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CrossThreadCollectionWrapper.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CollectionWrapper.cs" />
+    <Compile Include="Controls\DialogPanel\DialogPanel.cs" />
+    <Compile Include="Controls\SpecializedWindows\DialogWindow.cs" />
+    <Compile Include="Controls\FocusHelper.cs" />
+    <Compile Include="Controls\FormEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\FormsOwnerThread.cs" />
+    <Compile Include="Classes\Win32\Win32.cs" />
+    <Compile Include="Controls\Menu\AutoSeparator.cs" />
+    <Compile Include="Classes\Wpf\FormatStringConverter.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupConverter.cs" />
+    <Compile Include="Classes\Framework\ObservableObject.cs" />
+    <Compile Include="Classes\Framework\ObservableReadOnlyCollection.cs" />
+    <Compile Include="Controls\SpecializedWindows\GlassMargin.cs" />
+    <Compile Include="Classes\Utilities\ArrayUtils.cs" />
+    <Compile Include="Classes\Utilities\Conversion.cs" />
+    <Compile Include="Classes\Utilities\ThreadBase.cs" />
+    <Compile Include="Classes\Utilities\DbC.cs" />
+    <Compile Include="Classes\Win32\DwmAPI.cs" />
+    <Compile Include="Classes\Utilities\WeakReference.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentProperty.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyExtension.cs" />
+    <Compile Include="Classes\UIFeatures\UIFeatureManagement.cs" />
+    <Compile Include="Classes\UIFeatures\FeatureVisibleExtension.cs" />
+    <Compile Include="Components\ApplicationLoading\ApplicationLoader.cs" />
+    <Compile Include="Components\ApplicationLoading\_Unittest[Debug]\ApplicationLoaderTest.cs" />
+    <Compile Include="Components\ApplicationLoading\_Unittest[Debug]\TestComponents\ITestFacade1.cs" />
+    <Compile Include="Components\ApplicationLoading\_Unittest[Debug]\TestComponents\ITestFacade2.cs" />
+    <Compile Include="Components\ApplicationLoading\_Unittest[Debug]\TestComponents\Test1.cs" />
+    <Compile Include="Components\ApplicationLoading\_Unittest[Debug]\TestComponents\Test2.cs" />
+    <Compile Include="Components\ApplicationLoading\_Unittest[Debug]\TestComponents\Test3.cs" />
+    <Compile Include="Components\UIFeatures\UIFeatureManager.cs" />
+    <Compile Include="Controls\Progress\ProgressControl.cs" />
+    <Compile Include="Facades\ApplicationLoader\IApplicationLoader.cs" />
+    <Compile Include="Facades\ApplicationLoader\IApplicationMain.cs" />
+    <Compile Include="Facades\ApplicationLoader\IModule.cs" />
+    <Compile Include="Facades\ProgressOutput\IProgress.cs" />
+    <Compile Include="Facades\SplashScreen\ISplashScreen.cs" />
+    <Compile Include="Facades\SystemDialogs\ISystemDialogsProvider.cs" />
+    <Compile Include="Facades\SystemDialogs\OpenFileDialogResult.cs" />
+    <Compile Include="Facades\SystemDialogs\SaveFileDialogResult.cs" />
+    <Compile Include="Facades\UIFeatures\IUIFeatureManager.cs" />
+    <Compile Include="Facades\UIFeatures\IUIFeatureManagerSource.cs" />
+    <Compile Include="Facades\WebServer\ISimpleWebServer.cs" />
+    <Compile Include="Facades\WebServer\ISimpleWebServerContentRetriever.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyVersionInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyVersionInfo.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Classes\Wpf\OuterGlow.fx" />
+    <None Include="Properties\whiletrue.snk" />
+    <Resource Include="Classes\Wpf\OuterGlow.ps" />
+    <None Include="packages.config" />
+    <None Include="Properties\AssemblyVersionInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyVersionInfo.cs</LastGenOutput>
+    </None>
+    <None Include="Themes\Generic_V3.5.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Generic_V3.5.xaml</LastGenOutput>
+    </None>
+    <None Include="Themes\Generic_V4.0.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Generic_V4.0.xaml</LastGenOutput>
+    </None>
+    <None Include="Themes\Generic_V4.5.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Generic_V4.5.xaml</LastGenOutput>
+    </None>
+    <None Include="whiletrue.core.csproj.resharper" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\FormEx.resx">
+      <DependentUpon>FormEx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+      <Type>Resx</Type>
+      <WithCulture>false</WithCulture>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Type>Resx</Type>
+      <WithCulture>false</WithCulture>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Classes\Commanding\_Unittest[Debug]\TestWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <None Include="Classes\DragNDrop\Templates.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <Page Include="Classes\UIFeatures\_Unittest[Debug]\UIFeatureManagementControlTree.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Classes\Wpf\CrossThreadCollectionWrapper\_Unittest[Debug]\CrossThreadCollectionWrapperWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Classes\Wpf\PersistentProperties\_Unittest[Debug]\PersistentPropertyControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\Validation\_Unittest[Debug]\ValidationTestControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\_Unittest[Debug]\CollectionViewControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="Controls\AnimatedImage\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\ContentUnavailableControl\Templates.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <Page Include="Controls\ContentUnavailableControl\_Unittest[Debug]\ContentUnavailableTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\DialogPanel\_Unittest[Debug]\DialogPanelTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="Controls\SpecializedWindows\Templates\DialogWindow.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\SpecializedWindows\Templates\NonClientResizeBorder.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\SpecializedWindows\Templates\NotificationMessageWindow.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\SpecializedWindows\Templates\WindowSupplements.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\SpecializedWindows\Templates\Window.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\SpecializedWindows\Templates\WindowBorder.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\Progress\Templates_V3.5.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <Page Include="Controls\SpecializedWindows\_UnitTest[Debug]\DialogWindowTestWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\_UnitTest[Debug]\WindowTestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="Controls\SplashScreen\Templates.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\TablePanel\Templates.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <Page Include="Controls\TablePanel\_Unittest[Debug]\TablePanelTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\NotificationLabel\_Unittest[Debug]\BannerTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Progress\_Unittest[Debug]\ProgressTestWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <None Include="Controls\SpecializedWindows\Templates\PopupNotificationMessageWindow.xaml">
+      <SubType>Designer</SubType>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\NotifyIcon\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\Templates.xaml">
+      <SubType>Designer</SubType>
+    </None>
+    <Page Include="Resources\Drawings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\ErrorTemplates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <None Include="Themes\Generic_V3.5.xaml">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Generic_V3.5.tt</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Themes\Generic_V4.0.xaml">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Generic_V4.0.tt</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Themes\Generic_V4.5.xaml">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Generic_V4.5.tt</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Controls\NotificationLabel\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Controls\Progress\Templates_V4.x.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Diagnostics\" />
+    <Folder Include="Properties\Resources\" />
+    <Folder Include="System\Diagnostics\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Controls\SpecializedWindows\_UnitTest[Debug]\info.png" />
+    <Resource Include="Controls\Progress\_Unittest[Debug]\1403_Globe.png" />
+    <Content Include="Classes\XTransformer\_UnitTest[Debug]\include.xml" />
+    <Content Include="Classes\XTransformer\_UnitTest[Debug]\Main.xslt" />
+    <Content Include="Classes\XTransformer\_UnitTest[Debug]\Second.xslt" />
+    <Content Include="Resources\waitcursor.gif" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\..\Tools\Source\Build\Custom.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) EQU Release "$(ProjectDir)..\..\..\Tools\Source\Build\sign" "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>set Config=$(ConfigurationName)
+copy "$(ProjectDir)Themes\Generic_%25Config:~0,4%25.xaml" "$(ProjectDir)Themes\Generic.xaml"</PreBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+</Project>

@@ -1,0 +1,22 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:wt="http://schemas.whiletrue.eu/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/WhileTrue.Core;component/Resources/Drawings.xaml"/>
+        <ResourceDictionary>
+            <!-- 
+            You can use the drawings defined in the xaml file above by using static resource references:
+            e.g.{StaticResource DrawingErrorExclamationMark}
+            
+            Resources available:
+            * DrawingErrorExclamationMark   : Red exclamation mark
+            * DrawingWarningExclamationMark : Yellow exclamation mark
+            * DrawingInfoExclamationMark    : Silver/white exclamation mark
+            * DrawingErrorSign              : Round red sign with silver/white 'x'
+            * DrawingWarningSign            : Triangular yellow sign with black exclamation mark
+            * DrawingInformationSign        : Round blue sign with silver/white 'i'
+            -->
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

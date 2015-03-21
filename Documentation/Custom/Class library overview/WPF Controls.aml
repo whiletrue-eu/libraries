@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="ab4fead2-3849-48dd-81b6-9fc31aecf03e" revisionNumber="1">
+  <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--
+    <summary>
+      <para>Optional summary abstract</para>
+    </summary>
+    -->
+    <introduction>
+      <!-- Uncomment this to generate an outline of the section and sub-section
+           titles.  Specify a numeric value as the inner text to limit it to
+           a specific number of sub-topics when creating the outline.  Specify
+           zero (0) to limit it to top-level sections only.  -->
+      <!-- <autoOutline /> -->
+      <para>Required introduction</para>
+    </introduction>
+    <!-- Add one or more top-level section elements.  These are collapsible.
+         If using <autoOutline />, add an address attribute to identify it
+         and specify a title so that it can be jumped to with a hyperlink. -->
+    <section address="Section1">
+      <title>WPF Controls</title>
+      <content>
+        <autoOutline />
+        <para>* Controls
+        * Glass Window
+        * Dialog Window
+        * ContentUnavailable control
+        * Validation results</para>
+      </content>
+      <sections>
+          <section address="ValidationResults">
+              <title>Using ValidationResultBanner control to visualize model error messages in-place</title>
+              <content>
+                  <para>...</para>
+                  <code source="Examples\ValidationResults.xaml" lang="XAML"/>
+              </content>
+          </section>
+          <section address="ErrorTemplates">
+              <title>Defining default control templates with error templates</title>
+              <content>
+                  <para>...</para>
+                  <code source="Examples\ErrorTemplates.xaml" lang="XAML"/>
+              </content>
+          </section>
+      </sections>
+    </section>
+    <section address="WPFHelper">
+      <title>WPF Little Helpers</title>
+      <content>
+        <autoOutline />
+        <para>* PropertyChangedEvent RoutedEvent connector
+        </para>
+      </content>
+      <sections>
+      	<section>
+      	  <title>PropertyChangedEvent RoutedEvent connector</title>
+      	  <content>
+      	  <para>
+      	  What if we want to play a nice animation when a certain event occurs. Perhaps, 
+      	  we want to catch the users attention when a value changes. 
+      	  </para>
+      	  <para>
+      	  OK, we think, that sould not be too hard, as we already have the NotifyPropertyChanged
+      	  event for our model bindings. But - wait a minute: we canno use the DataTrigger, as
+      	  it only fires when the value changes <legacyItalic>to a certain value</legacyItalic>.
+      	  That's not want we want. And we also cannot use an EventTrigger, as it only works on
+      	  RoutedEvents, not on model events.
+      	  </para>
+      	  <para>
+      	  That's where the PropertyChangedEvent classes drop in. They consist of three classes,
+      	  PropertyChangedEvent tha defines an AttachedProperty to wire up an RoutedEvent on a
+      	  UI element to the PropertyChanged events of the model, the PropertyChangedEventExtension
+      	  that can be used on an EventTrigger to bind that to a certain Changed event, and a Factory,
+      	  that works in the background to create the RoutedEvent instances needed.
+      	  </para>
+      	  <para>
+      	  TODO: add usage
+      	  </para>
+      	  </content>
+     	</section>
+      </sections>
+    </section>
+    <section address="Converters">
+      <title>WPF Converter</title>
+      <content>
+        <autoOutline />
+        <para>
+        </para>
+      </content>
+      <sections>
+      	<section>
+      	  <title>CollectionViewConverter</title>
+      	  <content>
+      	  <para>
+      	  Collection View converter allows to create a view source that supports
+      	  grouping and sorting with giving a simple string as group and sort descriptions
+      	  
+      	  ItemsSource="{Binding Collection, Converter={StaticResource CollectionViewConverter}, ConverterParameter=[Groupname]/Groupname+/Name-}
+      	  
+      	  Groups the 'Collection' by property 'Groupname' and sorts first by 'Groupname' ascending and then 'Name' descending
+      	  Additonally, it adds magic to the CollectionView, that refreshes the view autoamtically when a group name or sort property changes. This is not 
+      	  supported by the standard implementation.
+      	  </para>
+      	  </content>
+     	</section>
+      	<section>
+      	  <title>CrossThread...Wrapper</title>
+      	  <content>
+      	  <para>
+      	  CrossThreadCollectionWrapper
+      	  </para>
+      	  <para>
+      	  CrossThreadCommandWrapper
+      	  </para>
+      	  </content>
+     	</section>
+      	<section>
+      	  <title>ObjectLookupConverter</title>
+      	  <content>
+      	  <para>
+      	  </para>
+      	  </content>
+     	</section>
+      </sections>
+    </section>
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID"/>
+      <link xlink:href="Other Topic's ID">Link inner text</link>
+
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8270" />
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

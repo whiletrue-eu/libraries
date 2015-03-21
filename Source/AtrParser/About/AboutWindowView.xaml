@@ -1,0 +1,59 @@
+﻿<wt:DialogWindow x:Class="AtrEditor.About.AboutWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:wt="http://schemas.whiletrue.eu/xaml"
+                  Height="250" Width="450" DialogTitle="ATRinaline" DialogSubtitle="In-depth ATR editing"
+                 EnableNonClientAreaDrawing="True">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/WhileTrue.Core;component/Resources/Drawings.xaml"/>
+                <ResourceDictionary>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <wt:DialogWindow.DialogTitleImage>
+        <DrawingImage>
+            <DrawingImage.Drawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Brush>
+                        <VisualBrush>
+                            <VisualBrush.Visual>
+                                <Image Source="{StaticResource DrawingInformationSign}"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </GeometryDrawing.Brush>
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,32,32"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+    </wt:DialogWindow.DialogTitleImage>
+    <wt:DialogWindow.Buttons>
+        <Button IsCancel="True" IsDefault="True" Content="Close"/>
+    </wt:DialogWindow.Buttons>
+
+    <Grid ClipToBounds="True">
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint=".1,1">
+                    <GradientStop Offset="0" Color="WhiteSmoke"/>
+                    <GradientStop Offset="1" Color="AntiqueWhite"/>
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20">
+            <TextBlock Text="© 2013-2014 Michael Zimdars"/>
+            <TextBlock Text="All rights reserved"/>
+            <TextBlock Margin="0,10,0,0" Text="Uses WhileTrue libraries © 2006-2014"/>
+        </StackPanel>
+        <Image RenderTransformOrigin="0,1" Margin="0,0,-11,-11" Source="/application.ico" Width="128" Height="128" HorizontalAlignment="Right" VerticalAlignment="Bottom" >
+            <Image.LayoutTransform>
+                <RotateTransform Angle="5"/>
+            </Image.LayoutTransform>
+        </Image>
+        <TextBlock FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Foreground="Red" Text="BETA" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+    </Grid>
+</wt:DialogWindow>

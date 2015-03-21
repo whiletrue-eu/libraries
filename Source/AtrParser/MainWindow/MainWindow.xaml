@@ -1,0 +1,30 @@
+﻿<Window x:Class="AtrEditor.MainWindow.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wt="http://schemas.whiletrue.eu/xaml" Title="ATRinaline" Icon="/application.ico"
+        Height="600" Width="1024" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="/WhileTrue.Core;component/Resources/Drawings.xaml"/>
+            <ResourceDictionary>
+            </ResourceDictionary>
+        </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem HorizontalAlignment="Left">
+                <TextBlock>ATRinaline ATR Editor <TextBlock Foreground="Red" FontWeight="Bold">BETA</TextBlock>, <TextBlock Text="{Binding DaysLeft}" /> days left</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Stretch"/>
+            <StatusBarItem HorizontalAlignment="Right">
+                <DockPanel>
+                <Image Source="{StaticResource DrawingInformationSign}" Height="16" Width="16" Margin="0,0,3,0" MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp" ToolTip="About ATRinaline"/>
+                    <TextBlock>© 2013/2014 Michael Zimdars. Uses whiletrue libraries.</TextBlock>
+                </DockPanel>
+            </StatusBarItem>
+        </StatusBar>
+        <wt:ATRViewer Atr="{Binding Atr}" Name="AtrEditor"/>
+    </DockPanel>
+</Window>

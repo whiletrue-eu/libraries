@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="a7172370-5cb5-45e5-a737-d89104f23ae0" revisionNumber="1">
+  <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <introduction>
+      <para>
+      When creating a modular application based on models, there is often the need to create different views on the model data, 
+      for some program parts that process data or for View Models as part of the MVVM pattern.
+      </para>
+      </introduction>
+    <section address="ModelSupport">
+      <title>Model adapter support</title>
+      <content>
+      <para>
+      For this, 'model adapters' are needed. These are a special type of models, that look like a regular model to the user, but does not cantain
+      data for itself. Instead, it references other models (or model adapters) and 'just' convert the data from the into the needed structure
+      </para>
+      <para>
+      OK, this doesn't seem too hard, but there are three major issues with this:
+      </para>
+		<list class="bullet">
+		  <listItem><para>
+		  Events have to be forwarded. 
+		  </para>
+		  <para>
+		  This may seem simple for one-to-one forwards, but what if the model adapter aims for coplete restructuring
+		  of the base model? then, maybe events of several objects have to be monitored to recalculate the model adapter property content
+		  </para>
+		  <para>
+		  The WhileTrue library has inbuilt functionality to handle event forwarding automatically for all objects that implement 
+			<codeEntityReference qualifyHint="false">T:System.ComponentModel.INotifyPropertyChanged</codeEntityReference> and 
+			<codeEntityReference qualifyHint="false">T:System.Collections.Specialized.INotifyCollectionChanged</codeEntityReference>.
+		  </para></listItem>
+		  <listItem><para>
+		  Creation of wrapper classes.
+		  </para>
+		  <para>
+		  On first sight, it may seem promising to just forward objects from the base models through the properties of the model adapter. As this may be a
+		  way to go for provision of read-only data, in most cases the data should also be editable or the structure has to be changed.
+		  </para>
+		  <para>
+		  But if this happens, simply forwarding the data is not enough. Unfortunately, at this time, the quickest solution seems to be to do the editing
+		  functionality or data restructuring in the UI layer instead of extending the model adapter. because of that, it's generally a good idea to wrap the data
+		  in the first place.
+		  </para>
+		  <para>
+		  The WhileTrue library aims to do this wrapping with lowest amount of effort possible
+		  </para></listItem>
+		  <listItem><para>
+		  Performance considerations
+		  </para>
+		  <para>
+		  When monitoring and forwarding events, often events are forwarded even though the effective content of the (calculated) properties were not changed
+		  </para>
+		  <para>
+		  To optimize the performance, the WhileTrue implementation only forwards events if the content was really cahnged
+		  </para></listItem>
+		</list>
+        <autoOutline />
+      </content>
+      <sections>
+          <section address="ObservableObject">
+              <title>ObservableObject base class and CreatePropertyAdapter</title>
+              <content>
+                  <para>
+                  The <codeEntityReference qualifyHint="false">T:WhileTrue.Classes.Framework.ObservableObject</codeEntityReference> 
+                  base class provides functionality that allows a declarative-style creation of properties that receive their data from a base model and
+                  provides them as new types with (or without) changing the content or structure of the data according to the needs of the model adapter.
+                  </para>
+                  <para>
+					<legacyBold>CreatePropertyAdapter</legacyBold>
+                  </para>
+                  <para>
+                  To create a property that shall reflect data from a base model, you can use the <see cref="M:WhileTrue.Classes.Framework.ObservableObject.CreatePropertyAdapter``2(System.Linq.Expressions.Expression{System.Func{``1}},System.Linq.Expressions.Expression{System.Func{``0}})" />
+                  method. This method will create a <see cref="T:WhileTrue.Classes.Framework.ReadOnlyPropertyAdapter`1" />, <see cref="T:WhileTrue.Classes.Framework.PropertyAdapter`1" /> or 
+                  <see cref="T:WhileTrue.Classes.Framework.EnumerablePropertyAdapter`2" />, depending on the input types and number of parameters given. In most cases, the input and output types are inferred by the compiler.
+                  </para>
+                  <para>
+                  There are three types of property adapters:
+                  </para>
+                  <table>
+					  <row>
+					    <entry><para>ReadOnlyPropertyAdapter</para></entry>
+					    <entry><para>Exposes data from the base model as a 'get' only property</para></entry>
+					  </row>
+					  <row>
+					    <entry><para>PropertyAdapter</para></entry>
+					    <entry><para>Exposes data from the base model as a 'get/set' property</para></entry>
+					  </row>
+					  <row>
+					    <entry><para>EnumerablePropertyAdapter</para></entry>
+					    <entry><para>Exposes data from the base model as a 'get' only, Enumerable property. The implementation internally uses an ObservableCollection, even
+					    if the source is not observable (e.g. an IEnumerable generated by a LINQ expression)</para></entry>
+					  </row>
+					</table>
+
+                  <para>
+					<legacyBold>ReadOnlyPropertyAdapter (get)</legacyBold>
+                  </para>
+                  <para>
+                  With the readonly property adapter you can forward data through a Get only property.
+                  Note that the output can be different in type as the input.
+                  </para>
+                  <para>
+                  The event handling is injected automatically, as long as all objects implement the <see cref="T:System.ComponentModel.INotifyPropertyChanged" /> interface and
+                  all collections implement the <see cref="T:System.Collections.Specialized.INotifyCollectionChanged" /> interface. Also, all property accesses must be done in the
+                  expression provided as arguments to the <see cref="M:WhileTrue.Classes.Framework.ObservableObject.CreatePropertyAdapter``2(System.Linq.Expressions.Expression{System.Func{``1}},System.Linq.Expressions.Expression{System.Func{``0}})" />.
+                  Take care when calling functions, as the properties used within these functions will not be recognized for event handling.
+                  </para>
+                  <code source="Examples\ObservableObject.cs" region="ReadonlyPropertyAdapter" lang="cs"/>
+                  <para>
+                  The sample above takes the value of the SourceProperty property of the base model and publishes it as
+                  a string property with the hexadecimal value (using the handy <see cref="M:WhileTrue.Classes.Utilities.Conversion.ToHexString(System.Byte[],System.String)" />
+                  extension function). If the source property value changes, the value is automatically updated and an event is thrown on the
+                  ReadOnlyProperty.
+                  </para>
+                  <para>
+                  When events are registered by the property adapters, the default behaviour is to register them weak, means that they will not
+                  hinder the model adapter object to be thrown away by the garbage collection when it is not referenced elsewhere. Otherwise, the objects
+                  would be kept alive as long as the base model exists, which would lead to serious memory leaks.
+                  </para>
+                     <para>
+					<legacyBold>PropertyAdapter (get/set)</legacyBold>
+                  </para>
+                  <para>
+                  With the read/write property adapter you can forward data through a Get/Set property.
+                  Note that the output can be different in type as the input. The conversion is done within the expression provided to the 
+                  <see cref="M:WhileTrue.Classes.Framework.ObservableObject.CreatePropertyAdapter``2(System.Linq.Expressions.Expression{System.Func{``1}},System.Linq.Expressions.Expression{System.Func{``0}},System.Action{``0})" />
+                  method.
+                  </para>
+                  <code source="Examples\ObservableObject.cs" region="PropertyAdapter" lang="cs"/>
+                  <para>
+                  The sample above extends the first sample by the possibility to change the value on the model adapter using the string type (e.g. in a textbox in the UI).
+                  If this is done, the adapter converts the data back into an byte[] (using the also handy <see cref="M:WhileTrue.Classes.Utilities.Conversion.ToByteArray(System.String)" /> 
+                  extension function) and sets the value in the base model.
+                  </para>
+                     <para>
+					<legacyBold>EnumerablePropertyAdapter (get collection)</legacyBold>
+                  </para>
+                  <para>
+                  With the enumerable property adapter you can forward data through a Get only property that returns an IEnumerable 
+                  (with a backend implementation of ObservableCollection).
+                  To have a different type as the input, the method allows to provide a conversion function for each item.
+                  </para>
+                  <code source="Examples\ObservableObject.cs" region="EnumerablePropertyAdapter" lang="cs"/>
+                  <para>
+                  The sample above takes the value of the SourceProperty property of the base model and
+                  handles the byte[] as an enumeration. here it selects all bytes expect '0x00' and sorts them by their high nibble value
+                  (which does really makes sense but is a nice example).
+                  </para>
+                  <para>
+                  Enumerable adapters have the speciality that they are working on an 'item' basis rather than a 'collection' basis.
+                  This means, it will reevaluate the source property and generate the new enumeration, but then will check which changes
+                  occured. Only for the cahged items, a new wrapper object will be created.
+                  </para>
+              </content>
+          </section>
+           <section address="ObjectCache">
+      		<title>CreatePropertyAdapter and adapter model wrapper classes</title>
+      		<content>
+          	<para>
+          	When creating wrapper classes for items in an adapter model, you should take care to create only as much objects are needed.
+          	As objects are often created for items that already are provided (e.g. when an property is updated), the same wrapper object should
+          	be provided instead of creating a new one.
+          	</para>
+          	<para>
+          	This can be done easily by using the <see cref="T:WhileTrue.Classes.Utilities.ObjectCache`2" /> class in the WhileTrue framework.
+          	</para>
+          </content>
+        </section>
+      </sections>
+    </section>
+    <relatedTopics>
+      <!-- One or more of the following:
+           - A local link
+           - An external link
+           - A code entity reference
+
+      <link xlink:href="Other Topic's ID"/>
+      <link xlink:href="Other Topic's ID">Link inner text</link>
+
+      <externalLink>
+          <linkText>Link text</linkText>
+          <linkAlternateText>Optional alternate link text</linkAlternateText>
+          <linkUri>URI</linkUri>
+      </externalLink>
+
+      <codeEntityReference>API member ID</codeEntityReference>
+
+      Examples:
+
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8270" />
+      <link xlink:href="00e97994-e9e6-46e0-b420-5be86b2f8278">Some other topic</link>
+
+      <externalLink>
+          <linkText>SHFB on CodePlex</linkText>
+          <linkAlternateText>Go to CodePlex</linkAlternateText>
+          <linkUri>http://shfb.codeplex.com</linkUri>
+      </externalLink>
+
+      <codeEntityReference>T:TestDoc.TestClass</codeEntityReference>
+      <codeEntityReference>P:TestDoc.TestClass.SomeProperty</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.#ctor(System.String,System.Int32)</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.ToString</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.FirstMethod</codeEntityReference>
+      <codeEntityReference>M:TestDoc.TestClass.SecondMethod(System.Int32,System.String)</codeEntityReference>
+      -->
+    </relatedTopics>
+  </developerConceptualDocument>
+</topic>

@@ -1,0 +1,136 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:WhileTrue.Controls" 
+    xmlns:Wpf="clr-namespace:WhileTrue.Classes.Wpf">
+
+    <Style TargetType="MenuItem" x:Key="NonClientControls_ItemContainerStyle">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border BorderThickness="1,0,0,0" BorderBrush="#BB111111" Background="Transparent" Name="OuterBorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Border BorderThickness="1,0,1,1" BorderBrush="#55FFFFFF" Name="InnerBorder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#80FFFFFF" Offset="0"/>
+                                <GradientStop Color="#55FFFFFF" Offset="0.52"/>
+                                <GradientStop Color="#20111111" Offset="0.56"/>
+                                <GradientStop Color="#20444444" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>       
+                            <ContentPresenter Content="{Binding}" DataContext="{Binding DataContext, ElementName=NCControls, BindsDirectlyToSource=True}" Margin="4,0,4,0" SnapsToDevicePixels="True" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=PreviousData}}" Value="{x:Null}">
+                            <Setter TargetName="OuterBorder" Property="BorderThickness" Value="0"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}}" Value="False">
+                            <Setter TargetName="InnerBorder" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="Transparent"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="InnerBorder" Property="BorderBrush" Value="#30FFFFFF"/>
+                            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#60111111"/>
+                        </DataTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="Background.Color" To="#DD889BBB" Duration="0:0:0.3"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="OuterBorder" Storyboard.TargetProperty="Background.Color" Duration="0:0:0.3"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ItemsPanelTemplate x:Key="NonClientControls_ItemsPanelTemplate">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel.Resources>
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Margin" Value="-2"/>
+                        <Setter Property="Padding" Value="4,0,4,0"/>
+                        <Setter Property="BorderThickness" Value="1"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="HorizontalAlignment"  Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="SnapsToDevicePixels" Value="True"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border Name="Bd" Margin="{TemplateBinding Margin}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value=".3"/>
+                                <Setter Property="Background" Value="#42222222"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ResourceDictionary>
+            </StackPanel.Resources>
+        </StackPanel>
+    </ItemsPanelTemplate>
+
+
+    <ControlTemplate TargetType="{x:Type ItemsControl}" x:Key="NonClientControls">
+        <ControlTemplate.Resources>
+            <Wpf:ObjectLookupConverter x:Key="XToVisibilityConverter">
+                <Wpf:ObjectLookupItem Key="0" Value="Collapsed"/>
+                <Wpf:ObjectLookupOtherwiseItem Value="Visible"/>
+            </Wpf:ObjectLookupConverter>
+        </ControlTemplate.Resources>
+        <Border BorderThickness="1,0,1,1" BorderBrush="#55FFFFFF" CornerRadius="0,0,4,4" Name="NCControls" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Controls:NonClientAreaRegion.NonClientAreaType="HTCLIENT">
+            <Border BorderThickness="1,0,1,1" BorderBrush="#BB111111" CornerRadius="0,0,4,4" Name="Border" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Menu ItemsSource="{TemplateBinding ItemsSource}" Background="Transparent" ItemContainerStyle="{StaticResource NonClientControls_ItemContainerStyle}" ItemsPanel="{StaticResource NonClientControls_ItemsPanelTemplate}"/>
+            </Border>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="HasItems" Value="False">
+                <Setter TargetName="NCControls" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+            <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}}" Value="False">
+                <Setter TargetName="NCControls" Property="BorderBrush" Value="#30FFFFFF"/>
+                <Setter TargetName="Border" Property="BorderBrush" Value="#60111111"/>
+            </DataTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+
+    <DockPanel x:Key='NCTitleBarDefault'>
+        <DockPanel.Resources>
+            <Wpf:IconConverter x:Key="IconConverter"/>
+        </DockPanel.Resources>
+        <DockPanel HorizontalAlignment="Stretch" Name="StandardTitle" Margin="0,-1,0,0">
+            <Image Source="{Binding Icon, Converter={StaticResource IconConverter}, ConverterParameter=16, BindsDirectlyToSource=True, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Controls:Window}}}" Name="Icon" Height="16" Stretch="Uniform" DockPanel.Dock="Left" Controls:NonClientAreaRegion.NonClientAreaType="HTSYSMENU" />
+            <TextBlock Text="{Binding Title, BindsDirectlyToSource=True, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Controls:Window}}}" Name="Title" Margin="5,-1,5,0" SnapsToDevicePixels="True" Controls:NonClientAreaRegion.NonClientAreaType="HTCAPTION">
+                    <TextBlock.Effect>
+                        <Wpf:OuterGlowEffect GlowColor="#66FFFFFF" Radius="10" Intensity="6" />
+                    </TextBlock.Effect>
+            </TextBlock>
+        </DockPanel>
+    </DockPanel>
+
+</ResourceDictionary>

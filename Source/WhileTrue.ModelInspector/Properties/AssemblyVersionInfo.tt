@@ -1,0 +1,11 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+
+<# 
+short Major=0;
+short Minor=9;
+short Revision=10;
+System.DateTime StartOfRevision = System.DateTime.Parse("2015-03-21 12:00");
+#>
+
+<#@ include file="..\..\..\..\Tools\Source\Build\AssemblyVersionInfo.tt" #>

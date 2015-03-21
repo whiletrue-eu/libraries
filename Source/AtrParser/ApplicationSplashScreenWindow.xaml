@@ -1,0 +1,59 @@
+﻿<wt:SplashScreenWindow x:Class="AtrEditor.ApplicationSplashScreenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wt="http://schemas.whiletrue.eu/xaml"
+        Title="ATRinaline"
+        Background="{x:Null}"
+                       Name="Window">
+    <wt:SplashScreenWindow.SplashAnimation>
+        <Storyboard>
+            <DoubleAnimation Storyboard.TargetName="Window" Storyboard.TargetProperty="Opacity" From="0" Duration="0:0:0.0"/>
+            <DoubleAnimation Storyboard.TargetName="Title" Storyboard.TargetProperty="RenderTransform.Angle" From="-15" AccelerationRatio="0" DecelerationRatio=".9" Duration="0:0:5.0"/>
+            <DoubleAnimation Storyboard.TargetName="Subtitle" Storyboard.TargetProperty="RenderTransform.Y" From="-20" AccelerationRatio="0" DecelerationRatio=".9" Duration="0:0:5.0"/>
+            <DoubleAnimation Storyboard.TargetName="Image" Storyboard.TargetProperty="RenderTransform.Angle" From="15" AccelerationRatio="0" DecelerationRatio=".9" Duration="0:0:5.0"/>
+        </Storyboard>
+    </wt:SplashScreenWindow.SplashAnimation>
+    <wt:SplashScreenWindow.EndSplashAnimation>
+        <Storyboard>
+            <DoubleAnimation Storyboard.TargetName="Window" Storyboard.TargetProperty="Opacity" To="0" BeginTime="0:0:1.0" Duration="0:0:1.0"/>
+        </Storyboard>
+    </wt:SplashScreenWindow.EndSplashAnimation>
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="250" Width="500">
+        <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="6" ShadowDepth="2" Opacity=".7"/>
+            </Border.Effect>
+        </Border>
+        <Grid>
+            <Grid.Clip>
+                <RectangleGeometry Rect="0,0,500,250" RadiusX="5" RadiusY="5"/>
+            </Grid.Clip>
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint=".1,1">
+                        <GradientStop Offset="0" Color="WhiteSmoke"/>
+                        <GradientStop Offset="1" Color="AntiqueWhite"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <TextBlock Name="Title" Margin="20,20,0,0" RenderTransformOrigin=".5,.5" Text="ATRinaline" FontSize="30" FontFamily="Segoe Script" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="-3"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+            <TextBlock Name="Subtitle" Margin="60,60,0,0" FontSize="15" LineHeight="5" FontFamily="Segoe UI" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TextBlock.RenderTransform>
+                    <TranslateTransform Y="0"/>
+                </TextBlock.RenderTransform>
+                In-depth ATR editing.<LineBreak/>complete control - no frippery
+            </TextBlock>
+            <Image Name="Image" RenderTransformOrigin="0,1" Source="application.ico" Width="180" Height="180" HorizontalAlignment="Right" VerticalAlignment="Bottom" >
+                <Image.RenderTransform>
+                    <RotateTransform Angle="5"/>
+                </Image.RenderTransform>
+            </Image>
+            <TextBlock FontFamily="Segoe UI" FontSize="12" FontWeight="Bold" Foreground="Red" Text="BETA" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5"/>
+            </Grid>
+    </Grid>
+</wt:SplashScreenWindow>

@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="WhileTrue.Controls._Unittest.ContentUnavailableTestContainer" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:Controls="clr-namespace:WhileTrue.Controls" xmlns:System="clr-namespace:System;assembly=mscorlib" xmlns:_Unittest="clr-namespace:WhileTrue.Controls._Unittest" mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="400" Padding="10"
+             d:DataContext="{d:DesignInstance Type={x:Type _Unittest:DialogPanelTestContainerValues},IsDesignTimeCreatable=True}"
+             >
+    <StackPanel>
+        <Controls:ContentUnavailableControl ContentAvailable="false">
+            <!--Controls:ContentUnavailableControl.DefaultContent>
+                <TextBlock>Unavailable</TextBlock>
+            </Controls:ContentUnavailableControl.DefaultContent-->
+            <Label>Available</Label>
+        </Controls:ContentUnavailableControl>
+    </StackPanel>
+</UserControl>

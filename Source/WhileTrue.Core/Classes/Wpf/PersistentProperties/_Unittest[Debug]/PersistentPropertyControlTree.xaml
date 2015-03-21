@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="WhileTrue.Classes._Unittest.PersistentPropertyControlTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wt="clr-namespace:WhileTrue.Classes.Wpf" xmlns:_Unittest="clr-namespace:WhileTrue.Classes.UIFeatures._Unittest" xmlns:System="clr-namespace:System;assembly=mscorlib" mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="300">
+    <UserControl.Resources>
+        <_Unittest:TestValueStore x:Key="PersistentProperties"/>
+        <DataTemplate DataType="{x:Type System:Int32}">
+            <TextBox Name="DataTemplate" wt:PersistentProperty.ID="ThreeTemplated" Opacity="{wt:PersistentProperty Opacity,.7}" Text="{wt:PersistentProperty Text,'DataTemplate'}"/>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ContentControl wt:PersistentProperty.ID="One" Name="One" Opacity="{wt:PersistentProperty Opacity,.9}">
+        <ItemsControl wt:PersistentProperty.ID="Two" Name="Two" Opacity="{wt:PersistentProperty Opacity,.8}">
+            <TextBox wt:PersistentProperty.ID="Three"  Name="Three" Text="{wt:PersistentProperty Text,'Hello world'}"/>
+            <TextBox wt:PersistentProperty.ID="Three"  Name="Three2" Text="{wt:PersistentProperty Text,'Hello world'}"/>
+            <ContentControl Name="Templated">
+                <System:Int32>1</System:Int32>
+            </ContentControl>
+        </ItemsControl>
+    </ContentControl>
+</UserControl>
