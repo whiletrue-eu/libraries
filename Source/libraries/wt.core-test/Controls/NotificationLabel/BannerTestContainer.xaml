@@ -1,0 +1,62 @@
+﻿<wt:Window x:Class="WhileTrue.Controls.BannerTestContainer" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:wt="http://schemas.whiletrue.eu/xaml"
+                 xmlns:controls="clr-namespace:WhileTrue.Controls"
+                 mc:Ignorable="d" 
+             d:DesignWidth="400"
+             d:DataContext="{d:DesignInstance Type={x:Type controls:BannerTestValues},IsDesignTimeCreatable=True}"
+             GlassMargin="{Binding ElementName=TheContent}" Background="Transparent">
+    <wt:Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/wt.core.win;component/Resources/ErrorTemplates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ErrorTemplate}"/>
+                    <Style.Triggers>
+                        <Trigger Property="Validation.HasError" Value="True">
+                            <Setter Property="ToolTipService.ToolTip" Value="{StaticResource ValidationErrorCollectionToolTip}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+        </ResourceDictionary>
+    </wt:Window.Resources>
+    <Grid IsHitTestVisible="True" MouseLeftButtonDown="BannerTestContainer_OnMouseDown" Background="Transparent">
+    <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Margin="10">
+        <TabControl.Effect>
+            <DropShadowEffect BlurRadius="10" Color="White" Opacity="1" ShadowDepth="2"/>
+        </TabControl.Effect>
+        <TabItem Header="Test">
+            <StackPanel Name="TheContent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <StackPanel.DataContext>
+                    <controls:BannerTestValues/>
+                </StackPanel.DataContext>
+                    <wt:NotificationBanner NotificationType="Info" Content="Hello, World"/>
+                    <TextBox Text="{wt:ValidatingBinding X}" Name="X"/>
+                    <wt:ValidationResultBanner ValidationResults="{Binding (Validation.Errors),ElementName=X}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Severities:</Label>
+                        <Image Source="{StaticResource DrawingErrorExclamationMark}"/>
+                        <Image Source="{StaticResource DrawingWarningExclamationMark}"/>
+                        <Image Source="{StaticResource DrawingInfoExclamationMark}"/>
+                        <Image Source="{StaticResource DrawingErrorSign}"/>
+                        <Image Source="{StaticResource DrawingWarningSign}"/>
+                        <Image Source="{StaticResource DrawingInformationSign}"/>
+                    </StackPanel>
+                    <TextBox Text="{wt:ValidatingBinding Error}" Name="Error"/>
+                    <wt:ValidationResultBanner ValidationResults="{Binding (Validation.Errors),ElementName=Error}"/>
+                    <TextBox Text="{wt:ValidatingBinding Warning}" Name="Warning"/>
+                    <wt:ValidationResultBanner ValidationResults="{Binding (Validation.Errors),ElementName=Warning}"/>
+                    <TextBox Text="{wt:ValidatingBinding Info}" Name="Info"/>
+                    <wt:ValidationResultBanner ValidationResults="{Binding (Validation.Errors),ElementName=Info}"/>
+                </StackPanel>
+        </TabItem>
+    </TabControl>
+    </Grid>
+</wt:Window>
+
+
+

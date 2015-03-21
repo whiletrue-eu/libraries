@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">v4.5_Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B6D64C2A-11D9-44E7-909C-CD0C4C34ADC2}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WhileTrue</RootNamespace>
+    <AssemblyName>wt.samples</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkVersion Condition="'$(Configuration.Substring(0,1))'=='v'">$(Configuration.Substring(0,4))</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\v4.5_Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET4x;NET45</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\v4.5_Release\</OutputPath>
+    <DefineConstants>TRACE;NET4x;NET45</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Common\Components\CommonDialogs\WpfCommonDialogProvider.cs" />
+    <Compile Include="Common\Modules\CommonDialogs\WpfCommonDialogsModule.cs" />
+    <Compile Include="Common\Facades\CommonDialogs\ICommonDialogProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SmartCard\Modules\APDUSender\APDUSenderModel.cs" />
+    <Compile Include="SmartCard\Modules\APDUSender\APDUSenderModule.cs" />
+    <Compile Include="SmartCard\Modules\APDUSender\APDUSenderPresenter.cs" />
+    <Compile Include="SmartCard\Modules\APDUSender\APDUSenderProxy.cs" />
+    <Compile Include="SmartCard\Modules\APDUSender\APDUSenderView.xaml.cs">
+      <DependentUpon>APDUSenderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SmartCard\Facades\APDUSender\IAPDUSender.cs" />
+    <Compile Include="SmartCard\Modules\APDUSender\IAPDUSenderModel.cs" />
+    <Compile Include="SmartCard\Modules\APDUSender\IAPDUSenderView.cs" />
+    <Compile Include="SmartCard\SmartCardSample.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="SmartCard\Modules\APDUSender\APDUSenderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="SmartCard\Modules\APDUSender\APDUSender.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">
+      <Project>{4b85d721-9148-4bc5-933b-84e6c51e3f86}</Project>
+      <Name>wt.core.pcl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\wt.core.win\wt.core.win.csproj">
+      <Project>{79135144-f37c-44e2-8ca6-b8742820e09a}</Project>
+      <Name>wt.core.win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\wt.modelinspector\wt.modelinspector.csproj">
+      <Project>{9ec4f49e-0201-4e00-9506-d5008b874d3b}</Project>
+      <Name>wt.modelinspector</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\wt.smartcard.win\wt.smartcard.win.csproj">
+      <Project>{0769e54c-4e6c-4bc3-8559-4bc0770d91fe}</Project>
+      <Name>wt.smartcard.win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

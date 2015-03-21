@@ -1,0 +1,225 @@
+﻿<wt:DialogWindow x:Class="WhileTrue.Components.WPFSmartCardUI.SmartCardSelectionView"
+                 x:ClassModifier="internal"
+                 Name="Window"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wt="http://schemas.whiletrue.eu/xaml"
+             xmlns:smartCardUi="clr-namespace:WhileTrue.Components.SmartCardUI"
+             xmlns:wpfSmartCardUi="clr-namespace:WhileTrue.Components.WPFSmartCardUI"
+             mc:Ignorable="d" Width="640" Height="320"
+             DialogTitle="{Binding Title}"
+             DialogSubtitle="{Binding Subtitle}"
+             GlassMargin="Sheet"
+             Background="Transparent"
+             EnableNonClientAreaDrawing="True"
+                 CustomWindowTitle="{x:Null}"
+                 Title="{Binding Title}"
+             >
+    <wt:DialogWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/wt.core.win;component/Resources/Drawings.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <wt:CrossThreadCollectionWrapper x:Key="CrossThreadCollectionWrapper" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <DataTemplate DataType="{x:Type wpfSmartCardUi:CardReaderAdapter}">
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Center" DockPanel.Dock="Bottom" Text="{Binding CardName}"/>
+                    <TextBlock HorizontalAlignment="Center" DockPanel.Dock="Bottom" Text="{Binding Name}"/>
+                    <Image Source="CardReader.png" Width="128" HorizontalAlignment="Center" Stretch="Uniform"/>
+                </DockPanel>
+            </DataTemplate>
+        </ResourceDictionary>
+    </wt:DialogWindow.Resources>
+    <!--wt:DialogWindow.CustomWindowTitle>
+        <TextBlock>CustomTitle</TextBlock>
+    </wt:DialogWindow.CustomWindowTitle-->
+    <wt:DialogWindow.Buttons>
+        <Button wt:DialogWindow.Result="Select" IsDefault="True" Content="Select" IsEnabled="{Binding AllowClose}"/>
+        <Button wt:DialogWindow.Result="Cancel" IsCancel="True"  Content="Cancel"/>
+    </wt:DialogWindow.Buttons>
+    <wt:DialogWindow.ExtraInformation>
+        <wt:NotificationBanner NotificationType="Info" Content="There is no smart card inserted. Insert a card into select the reader" Visibility="{Binding SmartCardMustBeInserted, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+    </wt:DialogWindow.ExtraInformation>
+    <DockPanel>
+        <Border BorderThickness="0,1,0,1" Margin="-6,0,-6,0">
+        <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="White" Offset=".5"/>
+                    <GradientStop Color="WhiteSmoke" Offset="1"/>
+                </LinearGradientBrush>
+                <!--SolidColorBrush Color="White" Opacity="0.5"/-->
+        </Border.Background>
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="Gray" Offset=".5"/>
+                    <GradientStop Color="Silver" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <wt:ContentUnavailableControl ContentAvailable="{Binding CardReaders.Count}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <wt:ContentUnavailableControl.DefaultContent>
+                <wt:NotificationBanner NotificationType="Info" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                    <TextBlock Text="There are no card readers connected to your system. Please plug in a card reader."/>
+                    <wt:NotificationBanner.Style>
+                        <Style TargetType="{x:Type wt:NotificationBanner}">
+                            <Style.Triggers>
+                                <EventTrigger RoutedEvent="Unloaded" />
+                                <Trigger Property="IsVisible" Value="True">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:1"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                    <Trigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:1"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.ExitActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                        </wt:NotificationBanner.Style>
+                </wt:NotificationBanner>
+            </wt:ContentUnavailableControl.DefaultContent>
+            <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <ListBox ItemsSource="{Binding CardReaders,Converter={StaticResource CrossThreadCollectionWrapper}}" wt:CrossThreadCollectionWrapper.EnableItemFadeAnimations="True"  SelectedItem="{Binding SelectedCardReader}" BorderThickness="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" ScrollViewer.CanContentScroll="False" >
+            <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <!--Setter Property="Template">
+                            <Setter.Value>
+                            <ControlTemplate>
+                                <Border BorderThickness="1" CornerRadius="5" BorderBrush="White" Padding="5">
+                                    <ContentControl/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                        </Setter-->
+
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <Border SnapsToDevicePixels="true" x:Name="BackgroundBorder" BorderBrush="White" BorderThickness="1" Padding="5" CornerRadius="5" Margin="5" Opacity="1">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0.5,1" Opacity="0">
+                                            <LinearGradientBrush.GradientStops>
+                                                <GradientStop Color="LightSteelBlue" Offset="0"/>
+                                                <GradientStop Color="LightSkyBlue" Offset="1"/>
+                                            </LinearGradientBrush.GradientStops>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                        <Border.LayoutTransform>
+                                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                        </Border.LayoutTransform>
+                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" x:Name="contentPresenter"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <!--Trigger Property="IsHitTestVisible" Value="True">
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="LayoutTransform.ScaleX" From="0" Duration="0:0:0.2"/>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="LayoutTransform.ScaleY" From="0" Duration="0:0:0.2"/>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Opacity" From="0" To="0" Duration="0:0:0.2"/>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Opacity" From="0" BeginTime="0:0:0.2" Duration="0:0:0.5"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.5"/>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Opacity" From="0" To="0" BeginTime="0:0:0.5" Duration="0:0:0.2"/>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="LayoutTransform.ScaleX" To="0" BeginTime="0:0:0.5" Duration="0:0:0.2"/>
+                                                        <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="LayoutTransform.ScaleY" To="0" BeginTime="0:0:0.5" Duration="0:0:0.2"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
+                                        </Trigger-->
+                                    <Trigger Property="IsSelected" Value="true">
+                                        <Setter Property="OpacityMask" TargetName="contentPresenter" Value="{x:Null}"/>
+                                        <Setter Property="BorderBrush" TargetName="BackgroundBorder">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Background.Opacity" To="0.7" Duration="0:0:0.1"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Background.Opacity" To="0" Duration="0:0:0.1"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="false">
+                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Background.Opacity" To="0.3" AccelerationRatio=".2" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetName="BackgroundBorder" Storyboard.TargetProperty="Background.Opacity" DecelerationRatio=".2" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                                <Setter Property="LayoutTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                    </Setter.Value>
+                                </Setter>
+                                    <Setter Property="wt:CrossThreadCollectionWrapper.FadeInAnimation">
+                                    <Setter.Value>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="LayoutTransform.ScaleX" From="0" Duration="0:0:0.2"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="LayoutTransform.ScaleY" From="0" Duration="0:0:0.2"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="0" Duration="0:0:0.2"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" BeginTime="0:0:0.2" Duration="0:0:0.5"/>
+                                            </Storyboard>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="wt:CrossThreadCollectionWrapper.FadeOutAnimation">
+                                    <Setter.Value>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.5"/>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="0" BeginTime="0:0:0.5" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetProperty="LayoutTransform.ScaleX" To="0" BeginTime="0:0:0.5" Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetProperty="LayoutTransform.ScaleY" To="0" BeginTime="0:0:0.5" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+            </ScrollViewer>
+        </wt:ContentUnavailableControl>
+    </Border>
+</DockPanel></wt:DialogWindow>

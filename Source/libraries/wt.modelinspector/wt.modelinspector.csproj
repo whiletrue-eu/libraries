@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">v4.5_Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9EC4F49E-0201-4E00-9506-D5008B874D3B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WhileTrue</RootNamespace>
+    <AssemblyName>wt.modelinspector</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\Projects\Projects\Source\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkVersion Condition="'$(Configuration.Substring(0,1))'=='v'">$(Configuration.Substring(0,4))</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\v4.5_Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\v4.5_Release\</OutputPath>
+    <DefineConstants>TRACE;NET4x;NET45</DefineConstants>
+    <DocumentationFile>bin\v4.0_Release\WhileTrue.ModelInspector.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Properties\whiletrue.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Modules\ModelInspectorWindow\DesignData.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\IModelInspectorWindow.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\IModelInspectorWindowView.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\ModelInspectorWindow.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\ModelInspectorWindowNotifyIcon.xaml.cs">
+      <DependentUpon>ModelInspectorWindowNotifyIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ModelInspectorWindow\ModelInspectorWindowView.xaml.cs">
+      <DependentUpon>ModelInspectorWindowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ModelInspectorWindow\Model\IModelInspectorWindowModel.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelComplexNodeAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelEnumerableNodeAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelEnumerationItemNodeAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelGroupAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelInfoAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelInspectorWindowModel.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelNodeBaseAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelPropertyNodeAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ModelValueNodeAdapter.cs" />
+    <Compile Include="Modules\ModelInspectorWindow\Model\ZoomModel.cs" />
+    <Compile Include="Modules\ModelInspector\EnumerationItemNode.cs" />
+    <Compile Include="Modules\ModelInspector\IModelComplexNode.cs" />
+    <Compile Include="Modules\ModelInspector\IModelEnumerableNode.cs" />
+    <Compile Include="Modules\ModelInspector\IModelGroup.cs" />
+    <Compile Include="Modules\ModelInspector\IModelGroupCollection.cs" />
+    <Compile Include="Modules\ModelInspector\IModelInfo.cs" />
+    <Compile Include="Modules\ModelInspector\IModelInfoCollection.cs" />
+    <Compile Include="Modules\ModelInspector\IModelInspector.cs" />
+    <Compile Include="Modules\ModelInspector\IModelInspectorModel.cs" />
+    <Compile Include="Modules\ModelInspector\IModelNodeBase.cs" />
+    <Compile Include="Modules\ModelInspector\IModelValueNode.cs" />
+    <Compile Include="Modules\ModelInspector\IPropertyNode.cs" />
+    <Compile Include="Modules\ModelInspector\ModelComplexNode.cs" />
+    <Compile Include="Modules\ModelInspector\ModelEnumerableNode.cs" />
+    <Compile Include="Modules\ModelInspector\ModelGroup.cs" />
+    <Compile Include="Modules\ModelInspector\ModelGroupCollection.cs" />
+    <Compile Include="Modules\ModelInspector\ModelInfo.cs" />
+    <Compile Include="Modules\ModelInspector\ModelInfoCollection.cs" />
+    <Compile Include="Modules\ModelInspector\ModelInspector.cs" />
+    <Compile Include="Modules\ModelInspector\ModelInspectorModel.cs" />
+    <Compile Include="Modules\ModelInspector\ModelInspectorModule.cs" />
+    <Compile Include="Modules\ModelInspector\ModelNodeBase.cs" />
+    <Compile Include="Modules\ModelInspector\ModelValueNode.cs" />
+    <Compile Include="Modules\ModelInspector\PropertyNode.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Modules\ModelInspectorWindow\delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Modules\ModelInspectorWindow\ModelInspector.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Modules\ModelInspectorWindow\ModelInspectorWindowNotifyIcon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Modules\ModelInspectorWindow\ModelInspectorWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Properties\whiletrue.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">
+      <Project>{4b85d721-9148-4bc5-933b-84e6c51e3f86}</Project>
+      <Name>wt.core.pcl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\wt.core.win\wt.core.win.csproj">
+      <Project>{79135144-f37c-44e2-8ca6-b8742820e09a}</Project>
+      <Name>wt.core.win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

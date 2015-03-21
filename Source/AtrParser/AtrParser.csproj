@@ -133,7 +133,7 @@
       <Project>{9ec4f49e-0201-4e00-9506-d5008b874d3b}</Project>
       <Name>whiletrue.modelinspector</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Modules\whiletrue.smartcard\source\whiletrue.smartcard.csproj">
+    <ProjectReference Include="..\WhileTrue.SmartCard\whiletrue.smartcard.csproj">
       <Project>{0769e54c-4e6c-4bc3-8559-4bc0770d91fe}</Project>
       <Name>whiletrue.smartcard</Name>
     </ProjectReference>

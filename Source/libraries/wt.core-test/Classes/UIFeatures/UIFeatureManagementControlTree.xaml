@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="WhileTrue.Classes.UIFeatures.UiFeatureManagementControlTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wt="http://schemas.whiletrue.eu/xaml" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="300"
+             wt:UiFeatureManagement.Context="One" Name="One" >
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type system:Int32}">
+            <TextBox Name="TemplatedThree" wt:UiFeatureManagement.Context="TemplatedThree" Visibility="{wt:FeatureVisible}" IsEnabled="{wt:FeatureEnabled}"/>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ItemsControl wt:UiFeatureManagement.Context="Two" Name="Two">
+        <Button wt:UiFeatureManagement.Context="Three" Visibility="{wt:FeatureVisible}" IsEnabled="{wt:FeatureEnabled}" Name="Three" />
+        <Button wt:UiFeatureManagement.Context="OtherThree" Visibility="{wt:FeatureVisible}" IsEnabled="{wt:FeatureEnabled}" Name="OtherThree" />
+        <TextBox wt:UiFeatureManagement.Context="ReadonlyThree" IsReadOnly="{wt:FeatureReadOnly}" Name="ReadonlyThree" Text="NotADependencyProperty"/>
+        <ContentControl Name="Templated">
+            <system:Int32>1</system:Int32>
+        </ContentControl>
+        <TextBlock><Hyperlink Name="Hyperlink" IsEnabled="{wt:FeatureEnabled}" wt:UiFeatureManagement.Context="Hyperlink"/></TextBlock>
+    </ItemsControl>
+</UserControl>

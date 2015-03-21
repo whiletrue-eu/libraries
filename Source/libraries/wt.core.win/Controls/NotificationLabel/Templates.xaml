@@ -1,0 +1,80 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:WhileTrue.Controls"
+    xmlns:Wpf="clr-namespace:WhileTrue.Classes.Wpf"
+    xmlns:wtpcl="clr-namespace:WhileTrue.Classes.Framework;assembly=wt.core.pcl">
+    <Style TargetType="{x:Type Controls:NotificationBanner}">
+        <Setter Property='Template'>
+            <Setter.Value>
+                <ControlTemplate TargetType='{x:Type Controls:NotificationBanner}'>
+                    <Border Name="Border" BorderThickness="1" Padding="2">
+                        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                            <Image VerticalAlignment="Top" DockPanel.Dock="Left" Name="Icon" Stretch="Uniform" Height="16" Margin="1,1,4,1"/>
+                            <ContentPresenter x:Name="Content" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="NotificationType" Value="Info">
+                            <Setter TargetName="Border" Property="Background" Value="LightYellow"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="SkyBlue"/>
+                            <Setter TargetName="Icon" Property="Source" Value="{StaticResource DrawingInformationSign}"/>
+                        </Trigger>
+                        <Trigger Property="NotificationType" Value="Warning">
+                            <Setter TargetName="Border" Property="Background" Value="LightGoldenrodYellow"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="Gray"/>
+                            <Setter TargetName="Icon" Property="Source" Value="{StaticResource DrawingWarningSign}"/>
+                        </Trigger>
+                        <Trigger Property="NotificationType" Value="Error">
+                            <Setter TargetName="Border" Property="Background" Value="LightPink"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="DarkGray"/>
+                            <Setter TargetName="Icon" Property="Source" Value="{StaticResource DrawingErrorSign}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Controls:ValidationResultBanner}">
+        <Setter Property='Template'>
+            <Setter.Value>
+                <ControlTemplate TargetType='{x:Type Controls:ValidationResultBanner}'>
+                    <ControlTemplate.Resources>
+                        <Wpf:ValidationMessageSeverityConverter x:Key="ValidationMessageSeverityConverter"/>
+                    </ControlTemplate.Resources>
+                    <Border
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                        Background="{TemplateBinding Background}"
+                        Name="Results">
+                        <Border Focusable="False" Name="Border" BorderBrush="Red" Background="LightPink" BorderThickness="1,0,1,1" CornerRadius="0,0,3,3" Margin="2,0,2,2" Padding="2">
+                            <ContentControl Name="Content_musthaveanamethatisreallyunique" IsTabStop="False" Focusable="False" Content="{TemplateBinding ValidationResults}" ContentTemplate="{StaticResource ValidationErrorCollection}"/>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Content, ElementName=Content_musthaveanamethatisreallyunique, Converter={StaticResource ValidationMessageSeverityConverter}}" Value="{x:Static wtpcl:ValidationSeverity.Error}">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="Red"/>
+                            <Setter TargetName="Border" Property="Background" Value="LightPink"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Content, ElementName=Content_musthaveanamethatisreallyunique, Converter={StaticResource ValidationMessageSeverityConverter}}" Value="{x:Static wtpcl:ValidationSeverity.ImplicitError}">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="Red"/>
+                            <Setter TargetName="Border" Property="Background" Value="LightPink"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Content, ElementName=Content_musthaveanamethatisreallyunique, Converter={StaticResource ValidationMessageSeverityConverter}}" Value="{x:Static wtpcl:ValidationSeverity.Warning}">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="Yellow"/>
+                            <Setter TargetName="Border" Property="Background" Value="LightGoldenrodYellow"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Content, ElementName=Content_musthaveanamethatisreallyunique, Converter={StaticResource ValidationMessageSeverityConverter}}" Value="{x:Static wtpcl:ValidationSeverity.Info}">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="Gray"/>
+                            <Setter TargetName="Border" Property="Background" Value="LightYellow"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Content, ElementName=Content_musthaveanamethatisreallyunique, Converter={StaticResource ValidationMessageSeverityConverter}}" Value="{x:Static wtpcl:ValidationSeverity.None}">
+                            <Setter TargetName="Results" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

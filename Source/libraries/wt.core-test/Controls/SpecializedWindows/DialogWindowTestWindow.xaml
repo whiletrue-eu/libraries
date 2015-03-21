@@ -1,0 +1,30 @@
+﻿<wt:DialogWindow x:Class="WhileTrue.Controls.DialogWindowTestWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                       xmlns:wt="http://schemas.whiletrue.eu/xaml"
+                       mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="300" x:Name="Window"
+                       DialogTitle="My Test Dialog"
+                       DialogSubtitle="This is a sample Dialog created to test the functionality of the DialogWindow class"
+                       DialogTitleImage="info.png">
+    <wt:DialogWindow.Buttons>
+        <Button Content="SetImage" Click="Button_Click"/>
+        <Button Content="Close" wt:DialogWindow.Result="Result" IsCancel="True" />
+    </wt:DialogWindow.Buttons>
+    <Border>
+    <wt:DialogPanel InnerColumnMargin="5" InnerRowMargin="5" VerticalAlignment="Top" Margin="5">
+        <TextBox wt:DialogPanel.Caption="Title" Text="{Binding DialogTitle, ElementName=Window, BindsDirectlyToSource=True}"/>
+        <TextBox wt:DialogPanel.Caption="Subtitle" Text="{Binding DialogSubtitle, ElementName=Window, BindsDirectlyToSource=True}"/>
+        <Button Content="Set title to null" Click="ButtonBase_OnClick"/>
+    </wt:DialogPanel>
+    </Border>
+</wt:DialogWindow>
+
+
+
+
+
+
+
