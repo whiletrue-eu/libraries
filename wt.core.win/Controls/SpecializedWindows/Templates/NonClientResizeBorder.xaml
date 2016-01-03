@@ -1,0 +1,49 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:WhileTrue.Controls" 
+    xmlns:Wpf='clr-namespace:WhileTrue.Classes.Wpf'>
+
+    <Style TargetType="{x:Type Controls:NonClientResizeBorder}">
+        <Setter Property="BorderHeight" Value="{DynamicResource {x:Static SystemParameters.ResizeFrameHorizontalBorderHeightKey}}"/>
+        <Setter Property="BorderWidth" Value="{DynamicResource {x:Static SystemParameters.ResizeFrameVerticalBorderWidthKey}}"/>
+        <Setter Property='Template'>
+            <Setter.Value>
+                <ControlTemplate TargetType='{x:Type Controls:NonClientResizeBorder}'>
+                    <Grid HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                        <Grid.Resources>
+                            <Wpf:DoubleToGridLengthConverter x:Key="GridLengthConverter"/>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Name="ResizeBorderTop" Height="{TemplateBinding BorderHeight, Converter={StaticResource GridLengthConverter}}"/>
+                            <RowDefinition/>
+                            <RowDefinition Name="ResizeBorderBottom" Height="{TemplateBinding BorderHeight, Converter={StaticResource GridLengthConverter}}"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Name="ResizeBorderLeft" Width="{TemplateBinding BorderWidth, Converter={StaticResource GridLengthConverter}}"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Name="ResizeBorderRight" Width="{TemplateBinding BorderWidth, Converter={StaticResource GridLengthConverter}}"/>
+                        </Grid.ColumnDefinitions>
+                        <Controls:NonClientAreaRegion Grid.Row="0" Grid.Column="0" NonClientAreaType="HTTOPLEFT"/>
+                        <Controls:NonClientAreaRegion Grid.Row="0" Grid.Column="1" NonClientAreaType="HTTOP"/>
+                        <Controls:NonClientAreaRegion Grid.Row="0" Grid.Column="2" NonClientAreaType="HTTOPRIGHT"/>
+                        <Controls:NonClientAreaRegion Grid.Row="1" Grid.Column="0" NonClientAreaType="HTLEFT"/>
+                        <Controls:NonClientAreaRegion Grid.Row="1" Grid.Column="2" NonClientAreaType="HTRIGHT"/>
+                        <Controls:NonClientAreaRegion Grid.Row="2" Grid.Column="0" NonClientAreaType="HTBOTTOMLEFT"/>
+                        <Controls:NonClientAreaRegion Grid.Row="2" Grid.Column="1" NonClientAreaType="HTBOTTOM"/>
+                        <Controls:NonClientAreaRegion Grid.Row="2" Grid.Column="2" NonClientAreaType="HTBOTTOMRIGHT"/>
+                        <ContentControl Content="{TemplateBinding Content}" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ResizeActivated" Value="False">
+                            <Setter TargetName="ResizeBorderTop" Property="Height" Value="0"/>
+                            <Setter TargetName="ResizeBorderBottom" Property="Height" Value="0"/>
+                            <Setter TargetName="ResizeBorderLeft" Property="Width" Value="0"/>
+                            <Setter TargetName="ResizeBorderRight" Property="Width" Value="0"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

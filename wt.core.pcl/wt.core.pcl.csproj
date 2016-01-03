@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4B85D721-9148-4BC5-933B-84E6C51E3F86}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WhileTrue</RootNamespace>
+    <AssemblyName>wt.core.pcl</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\wt.core.pcl.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Properties\SignKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Classes\Commands\DelegateCommand.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentContainer.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentInstance.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentInstanceCollection.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentInstanceEvent.cs" />
+    <Compile Include="Classes\Components\Instances\ResolveComponentException.cs" />
+    <Compile Include="Classes\Components\Instances\SharedComponentInstance.cs" />
+    <Compile Include="Classes\Components\Instances\SimpleComponentInstance.cs" />
+    <Compile Include="Classes\Components\Instances\SingletonComponentInstance.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentAttribute.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentBindingPropertyAttribute.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentConfigurationException.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentInstanceScope.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentInterfaceAttribute.cs" />
+    <Compile Include="Classes\Components\Repository\ComponentRepository.cs" />
+    <Compile Include="Classes\Components\Repository\SharedComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\Repository\SimpleComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\Repository\SingletonComponentDescriptor.cs" />
+    <Compile Include="Classes\Framework\EnumerablePropertyAdapter.cs" />
+    <Compile Include="Classes\Framework\EnumerationAdapter.cs" />
+    <Compile Include="Classes\Framework\IObjectValidation.cs" />
+    <Compile Include="Classes\Framework\NotifyChangeExpression.cs" />
+    <Compile Include="Classes\Framework\ObjectCache.cs" />
+    <Compile Include="Classes\Framework\ObjectCacheKey.cs" />
+    <Compile Include="Classes\Framework\ObservableCollectionFilter.cs" />
+    <Compile Include="Classes\Framework\ObservableExpressionFactory.cs" />
+    <Compile Include="Classes\Framework\ObservableObject.cs" />
+    <Compile Include="Classes\Framework\ObservableObject.Interfaces.cs" />
+    <Compile Include="Classes\Framework\ObservableObjectHelper.cs" />
+    <Compile Include="Classes\Framework\ObservableReadOnlyCollection.cs" />
+    <Compile Include="Classes\Framework\PropertyAdapter.cs" />
+    <Compile Include="Classes\Framework\PropertyAdapterBase.cs" />
+    <Compile Include="Classes\Framework\ReadOnlyPropertyAdapter.cs" />
+    <Compile Include="Classes\Framework\ReflectionHelper.cs" />
+    <Compile Include="Classes\Framework\ValidationEventArgs.cs" />
+    <Compile Include="Classes\Framework\ValidationMessage.cs" />
+    <Compile Include="Classes\Framework\ValidationSeverity.cs" />
+    <Compile Include="Classes\Framework\WeakDelegate.cs" />
+    <Compile Include="Classes\Logging\DebugLogger.cs" />
+    <Compile Include="Classes\Utilities\ArrayUtils.cs" />
+    <Compile Include="Classes\Utilities\Conversion.cs" />
+    <Compile Include="Classes\Utilities\DbC.cs" />
+    <Compile Include="Classes\Utilities\ReflectionHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Properties\SignKey.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations.PCL328, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\JetBrains.Annotations.PCL328.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

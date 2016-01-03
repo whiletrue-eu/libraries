@@ -1,0 +1,139 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:WhileTrue.Controls" 
+    xmlns:Wpf="clr-namespace:WhileTrue.Classes.Wpf">
+
+
+    <ControlTemplate TargetType='{x:Type Controls:DialogWindow}' x:Key="DialogWindow_DWM">
+        <AdornerDecorator>
+            <Controls:WindowBorder x:Name="WindowBorder" ResizeActivated="{TemplateBinding EnableNonClientAreaDrawing}">
+                <Controls:WindowBorder.Header>
+                    <Controls:NonClientAreaRegion NonClientAreaType="HTCAPTION">
+                        <ContentPresenter Content="{TemplateBinding CustomWindowTitle}"/>
+                    </Controls:NonClientAreaRegion>
+                </Controls:WindowBorder.Header>
+                <Controls:WindowBorder.NonClientControls>
+                    <ItemsControl ItemsSource="{Binding NonClientControls, BindsDirectlyToSource=True, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Controls:Window}}}" Template="{StaticResource NonClientControls}" />
+                </Controls:WindowBorder.NonClientControls>
+                <DockPanel>
+                    <Controls:NonClientAreaRegion NonClientAreaType="HTCAPTION" DockPanel.Dock="Top">
+                        <Border>
+                            <Border.Effect>
+                                <Wpf:OuterGlowEffect GlowColor="#99FFFFFF" Radius="5" Intensity="2" />
+                            </Border.Effect>
+                            <DockPanel HorizontalAlignment="Stretch">
+                                <Image DockPanel.Dock="Left" Source="{Binding DialogTitleImage, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}" Stretch="None" Margin="5,5,0,5" Name="DialogTitleImage"/>
+                                <TextBlock Text="{Binding DialogTitle, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=''}" DockPanel.Dock="Top" FontSize="15" FontWeight="Bold" Margin="10,2,0,5" Name="DialogTitle"/>
+                                <TextBlock Text="{Binding DialogSubtitle, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=''}" TextWrapping="Wrap" Margin="15,0,5,15" Name="DialogSubtitle"/>
+                            </DockPanel>
+                        </Border>
+                    </Controls:NonClientAreaRegion>
+                    <DockPanel DockPanel.Dock='Bottom' HorizontalAlignment="Stretch" Name="ButtonBar">
+                        <ContentControl Content="{TemplateBinding ExtraInformation}" DockPanel.Dock="Left" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Name="ExtraInfo"/>
+                        <ItemsControl Focusable="False" ItemsSource='{TemplateBinding Buttons}' Margin="0,10,0,5" HorizontalAlignment='Stretch' VerticalAlignment="Center" Name="Buttons">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation='Horizontal' HorizontalAlignment="Right">
+                                        <StackPanel.Resources>
+                                            <ResourceDictionary>
+                                                <Style TargetType="{x:Type Button}">
+                                                    <Setter Property="Margin" Value="5,0,0,0"/>
+                                                    <Setter Property="Padding" Value="5,2"/>
+                                                    <Setter Property="MinWidth" Value="75"/>
+                                                    <Setter Property="MinHeight" Value="25"/>
+                                                </Style>
+                                            </ResourceDictionary>
+                                        </StackPanel.Resources>
+                                    </StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </DockPanel>
+                    <Border x:Name="Border" Background='{Binding Background, RelativeSource={RelativeSource Mode=TemplatedParent}, TargetNullValue={x:Static SystemColors.WindowBrush}}' HorizontalAlignment='Stretch' VerticalAlignment="Stretch" Margin="{TemplateBinding Padding}">
+                        <ContentPresenter Content='{TemplateBinding Content}'/>
+                    </Border>
+                </DockPanel>
+            </Controls:WindowBorder>
+        </AdornerDecorator>
+        <ControlTemplate.Triggers>
+            <Trigger Property="DialogTitle" Value="{x:Null}" >
+                <Setter TargetName="DialogTitle" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="DialogSubtitle" Value="{x:Null}" >
+                <Setter TargetName="DialogSubtitle" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="DialogTitleImage" Value="{x:Null}" >
+                <Setter TargetName="DialogTitleImage" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="GlassMargin" Value="{x:Static Controls:GlassMargin.Sheet}">
+                <Setter TargetName="Border" Property="Background" Value="Transparent"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <ControlTemplate TargetType='{x:Type Controls:DialogWindow}' x:Key="DialogWindow_NonDWM">
+        <AdornerDecorator>
+            <DockPanel>
+                <Controls:NonClientAreaRegion NonClientAreaType="HTCAPTION" DockPanel.Dock="Top">
+                    <Border Name="Title" Background="WhiteSmoke" Padding="5,5,5,0">
+                        <DockPanel HorizontalAlignment="Stretch">
+                            <Image DockPanel.Dock="Left" Source="{Binding DialogTitleImage, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}" Stretch="None" Margin="5,5,0,5" Name="DialogTitleImage"/>
+                            <TextBlock Text="{Binding DialogTitle, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=''}" DockPanel.Dock="Top" FontSize="15" FontWeight="Bold" Margin="10,2,0,5" Name="DialogTitle"/>
+                            <TextBlock Text="{Binding DialogSubtitle, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=''}" TextWrapping="Wrap" Margin="15,0,5,15" Name="DialogSubtitle"/>
+                        </DockPanel>
+                    </Border>
+                </Controls:NonClientAreaRegion>
+                <DockPanel DockPanel.Dock='Bottom' HorizontalAlignment="Stretch" Name="ButtonBar" Background="WhiteSmoke">
+                    <ContentControl Content="{TemplateBinding ExtraInformation}" DockPanel.Dock="Left" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Left" Name="ExtraInfo"/>
+                    <ItemsControl Focusable="False" ItemsSource='{TemplateBinding Buttons}' Margin="10" HorizontalAlignment='Stretch' VerticalAlignment="Center" Name="Buttons">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation='Horizontal' HorizontalAlignment="Right">
+                                    <StackPanel.Resources>
+                                        <ResourceDictionary>
+                                            <Style TargetType="{x:Type Button}">
+                                                <Setter Property="Margin" Value="5,0,0,0"/>
+                                                <Setter Property="Padding" Value="5,2"/>
+                                            </Style>
+                                        </ResourceDictionary>
+                                    </StackPanel.Resources>
+                                </StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </DockPanel>
+                <Border Background='{TemplateBinding Background}'>
+                    <ContentPresenter Content='{TemplateBinding Content}'/>
+                </Border>
+            </DockPanel>
+        </AdornerDecorator>
+        <ControlTemplate.Triggers>
+            <Trigger Property="DialogTitle" Value="{x:Null}" >
+                <Setter TargetName="DialogTitle" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="DialogSubtitle" Value="{x:Null}" >
+                <Setter TargetName="DialogSubtitle" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="DialogTitleImage" Value="{x:Null}" >
+                <Setter TargetName="DialogTitleImage" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type Controls:DialogWindow}">
+        <Setter Property='Template' Value="{StaticResource DialogWindow_DWM}"/>
+        <Setter Property='CustomWindowTitle' Value="{StaticResource NCTitleBarDefault}"/>
+        <Setter Property='GlassMargin' Value='sheet'/>
+        <Setter Property='BlurClientArea' Value='False'/>
+        <Setter Property='ResizeMode' Value='CanResize'/>
+        <Setter Property="ShowInTaskbar" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+        <Style.Triggers>
+            <Trigger Property="IsDwmEnabled" Value="False">
+                <Setter Property="Template" Value="{StaticResource DialogWindow_NonDWM}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

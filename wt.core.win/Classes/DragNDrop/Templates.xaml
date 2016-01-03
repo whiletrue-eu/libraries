@@ -1,0 +1,104 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:Dnd="clr-namespace:WhileTrue.Classes.DragNDrop"
+    xmlns:System="clr-namespace:System;assembly=mscorlib">
+    <Dnd:DragDropAdornerTemplate x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type Dnd:DragDrop},ResourceId={x:Type System:Object}}" TargetType="{x:Type System:Object}"/>
+    <Dnd:DragDropAdornerTemplate x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type Dnd:DragDrop},ResourceId={x:Type VirtualizingStackPanel}}" TargetType="{x:Type VirtualizingStackPanel}">
+        <Canvas>
+            <Path Name="StartMarker" Canvas.Left="{Binding DropMarker.Left}" Canvas.Top="{Binding DropMarker.Top}" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill ="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="1"/>
+            <Path Name="EndMarker" Canvas.Left="{Binding DropMarker.Right}" Canvas.Top="{Binding DropMarker.Bottom}" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill ="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="1"/>
+            <Path Name="Line" Canvas.Left="{Binding DropMarker.Left}" Canvas.Top="{Binding DropMarker.Top}" Height="{Binding DropMarker.Height}" MinHeight="2" Width="{Binding DropMarker.Width}" MinWidth="2" Data="M 0,0 L 1,1" Stretch="Fill" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="2"/>
+        </Canvas>
+        <Dnd:DragDropAdornerTemplate.Triggers>
+            <DataTrigger Binding="{Binding Orientation}" Value="{x:Static Orientation.Horizontal}">
+                <Setter TargetName="StartMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M -5,0 L 5,0 L 0,5 L -5,0</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="EndMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M -5,0 L 5,0 L 0,-5 L -5,0</StreamGeometry>
+                    </Setter.Value>
+                </Setter> 
+                <Setter TargetName="Line" Property="Margin" Value="-1,0,0,0"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Orientation}" Value="{x:Static Orientation.Vertical}">
+                <Setter TargetName="StartMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M 0,-5 L 0,5 L 5,0 L 0,-5</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="EndMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M 0,-5 L 0,5 L -5,0 L 0,-5</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="Line" Property="Margin" Value="0,-1,0,0"/>
+            </DataTrigger>
+        </Dnd:DragDropAdornerTemplate.Triggers>
+    </Dnd:DragDropAdornerTemplate>
+    <Dnd:DragDropAdornerTemplate x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type Dnd:DragDrop},ResourceId={x:Type StackPanel}}" TargetType="{x:Type StackPanel}">
+        <Canvas>
+            <Path Name="StartMarker" Canvas.Left="{Binding DropMarker.Left}" Canvas.Top="{Binding DropMarker.Top}" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill ="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="1"/>
+            <Path Name="EndMarker" Canvas.Left="{Binding DropMarker.Right}" Canvas.Top="{Binding DropMarker.Bottom}" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill ="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="1"/>
+            <Path Name="Line" Canvas.Left="{Binding DropMarker.Left}" Canvas.Top="{Binding DropMarker.Top}" Height="{Binding DropMarker.Height}" MinHeight="2" Width="{Binding DropMarker.Width}" MinWidth="2" Data="M 0,0 L 1,1" Stretch="Fill" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="2"/>
+        </Canvas>
+        <Dnd:DragDropAdornerTemplate.Triggers>
+            <DataTrigger Binding="{Binding Orientation}" Value="{x:Static Orientation.Horizontal}">
+                <Setter TargetName="StartMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M -5,0 L 5,0 L 0,5 L -5,0</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="EndMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M -5,0 L 5,0 L 0,-5 L -5,0</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="Line" Property="Margin" Value="-1,0,0,0"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Orientation}" Value="{x:Static Orientation.Vertical}">
+                <Setter TargetName="StartMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M 0,-5 L 0,5 L 5,0 L 0,-5</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="EndMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M 0,-5 L 0,5 L -5,0 L 0,-5</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="Line" Property="Margin" Value="0,-1,0,0"/>
+            </DataTrigger>
+        </Dnd:DragDropAdornerTemplate.Triggers>
+    </Dnd:DragDropAdornerTemplate>
+    <Dnd:DragDropAdornerTemplate x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type Dnd:DragDrop},ResourceId={x:Type TabPanel}}" TargetType="{x:Type TabPanel}">
+        <Canvas>
+            <Path Name="EndMarker" Canvas.Left="{Binding DropMarker.Right}" Canvas.Top="{Binding DropMarker.Bottom}" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill ="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="1"/>
+            <Path Name="Line" Canvas.Left="{Binding DropMarker.Left}" Canvas.Top="{Binding DropMarker.Top}" Height="{Binding DropMarker.Height}" MinHeight="2" Width="{Binding DropMarker.Width}" MinWidth="2" Data="M 0,0 L 1,1" Stretch="Fill" Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" StrokeThickness="2"/>
+        </Canvas>
+        <Dnd:DragDropAdornerTemplate.Triggers>
+            <DataTrigger Binding="{Binding Orientation}" Value="{x:Static Orientation.Horizontal}">
+                <Setter TargetName="EndMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M -5,0 L 5,0 L 0,-5 L -5,0</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="Line" Property="Margin" Value="-1,0,0,0"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Orientation}" Value="{x:Static Orientation.Vertical}">
+                <Setter TargetName="EndMarker" Property="Data">
+                    <Setter.Value>
+                        <StreamGeometry>M 0,-5 L 0,5 L -5,0 L 0,-5</StreamGeometry>
+                    </Setter.Value>
+                </Setter>
+                <Setter TargetName="Line" Property="Margin" Value="0,-1,0,0"/>
+            </DataTrigger>
+        </Dnd:DragDropAdornerTemplate.Triggers>
+    </Dnd:DragDropAdornerTemplate>
+    <Dnd:DragDropAdornerTemplate x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type Dnd:DragDrop},ResourceId={x:Type FrameworkElement}}" TargetType="{x:Type FrameworkElement}">
+        <Border BorderBrush="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" BorderThickness="1" CornerRadius="1"/>
+    </Dnd:DragDropAdornerTemplate>
+</ResourceDictionary>

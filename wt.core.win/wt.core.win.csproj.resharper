@@ -1,0 +1,20 @@
+<Configuration>
+  <NamespaceFolders>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Classes/d:Components/d:Instances</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Classes/d:Components/d:Repository</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Classes/d:Wpf/d:AutoTemplateSelection</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Classes/d:Wpf/d:CrossThreadCollectionWrapper</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Classes/d:Wpf/d:ObjectLookupConverter</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Classes/d:Wpf/d:PersistentProperties</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Classes/d:Wpf/d:Validation</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:AnimatedImage</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:ContentUnavailableControl</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:DialogPanel</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:Menu</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:NotificationLabel</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:NotifyIcon</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:Progress</SkipFolder>
+    <SkipFolder>79135144-F37C-44E2-8CA6-B8742820E09A/d:Controls/d:SpecializedWindows</SkipFolder>
+  </NamespaceFolders>
+  <Localizable>No</Localizable>
+</Configuration>

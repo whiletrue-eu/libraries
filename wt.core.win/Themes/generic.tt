@@ -1,0 +1,68 @@
+﻿<#@ template Language="C#" debug="true" hostSpecific="true" #>
+<#@ output extension=".xaml" #>
+<#@ Assembly Name="System.Core.dll" #>
+<#@ Assembly Name="System.Xml.dll" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+
+
+<ResourceDictionary
+    xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+    xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml' 
+    xmlns:Controls='clr-namespace:WhileTrue.Controls'
+	xmlns:wtpcl='clr-namespace:WhileTrue.Classes.Framework;assembly=wt.core.pcl'
+	xmlns:System='clr-namespace:System;assembly=mscorlib'
+	xmlns:Wpf='clr-namespace:WhileTrue.Classes.Wpf'
+	xmlns:Dnd='clr-namespace:WhileTrue.Classes.DragNDrop'>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source='/wt.core.win;component/Resources/Drawings.xaml'/>
+        <ResourceDictionary Source='/wt.core.win;component/Resources/ErrorTemplates.xaml'/>
+    </ResourceDictionary.MergedDictionaries>
+		
+<# WriteContent(@"..\Controls\NotifyIcon\Templates.xaml"); #>
+<# WriteContent(@"..\Controls\AnimatedImage\Templates.xaml"); #>
+<# WriteContent(@"..\Controls\ContentUnavailableControl\Templates.xaml"); #>
+<# WriteContent(@"..\Controls\SpecializedWindows\Templates\NonClientResizeBorder.xaml"); #>
+<# WriteContent(@"..\Controls\SpecializedWindows\Templates\WindowBorder.xaml"); #>
+<# WriteContent(@"..\Controls\SpecializedWindows\Templates\WindowSupplements.xaml"); #>
+<# WriteContent(@"..\Controls\SpecializedWindows\Templates\Window.xaml"); #>
+<# WriteContent(@"..\Controls\SpecializedWindows\Templates\DialogWindow.xaml"); #>
+<# WriteContent(@"..\Controls\SpecializedWindows\Templates\NotificationMessageWindow.xaml"); #>
+<# WriteContent(@"..\Controls\SpecializedWindows\Templates\PopupNotificationMessageWindow.xaml"); #>
+<# WriteContent(@"..\Controls\SplashScreen\Templates.xaml"); #>
+<# WriteContent(@"..\Controls\Progress\Templates_V4.x.xaml"); #>
+<# WriteContent(@"..\Controls\NotificationLabel\Templates.xaml"); #>
+<# WriteContent(@"..\Controls\Templates.xaml"); #>
+<# WriteContent(@"..\Controls\TablePanel\Templates.xaml"); #>
+<# WriteContent(@"..\Classes\DragNDrop\Templates.xaml"); #>
+
+</ResourceDictionary>
+
+<#+
+	private void WriteContent(string path)
+    {
+#>
+
+
+<!-- 
+From: <#= path #>
+-->
+
+<#+
+    XmlDocument Doc = new XmlDocument();
+	Doc.Load(this.Host.ResolvePath(path));
+	
+    StringWriter StringWriter = new StringWriter();
+	XmlTextWriter Writer = new XmlTextWriter(StringWriter);
+	Writer.Formatting = Formatting.Indented;
+	
+	Doc.DocumentElement.WriteContentTo(Writer);
+	Writer.Flush();
+#>
+<#= Regex.Replace(StringWriter.ToString(), @"xmlns(:.*?)?=[""'].*?[""']", "") #>
+<#+
+}
+#>
