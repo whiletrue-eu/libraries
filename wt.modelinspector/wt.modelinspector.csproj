@@ -42,7 +42,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\v4.5_Release\</OutputPath>
     <DefineConstants>TRACE;NET4x;NET45</DefineConstants>
-    <DocumentationFile>bin\v4.0_Release\WhileTrue.ModelInspector.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>

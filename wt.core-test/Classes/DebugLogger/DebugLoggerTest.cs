@@ -20,7 +20,7 @@ namespace WhileTrue.Classes.DebugLogger
         {
             Logging.DebugLogger.DisableLogging();
         }
-
+#if DEBUG
         [Test]
         public void Log_if_logging_is_enabled_for_type()
         {
@@ -33,7 +33,7 @@ namespace WhileTrue.Classes.DebugLogger
 
             Assert.IsTrue(Regex.IsMatch(Listener.ToString(), $@"#(\d*): ID #\1 was assigned to {typeof(DebugLoggerTest).FullName}\n#\1: Test"));
         }
-
+#endif
         [Test(Description="Performance Test. To get real results: Set compiler options: [x] Optimize code, Advanced... | Debug info: [none]. Rebuild manually")]
         public void Logging_shall_not_have_performance_impact_if_not_enabled()
         {
@@ -101,7 +101,7 @@ namespace WhileTrue.Classes.DebugLogger
         private class TestListener : TraceListener
         {
             readonly StringBuilder message = new StringBuilder();
-            #region Overrides of TraceListener
+#region Overrides of TraceListener
 
             public override void Write(string message)
             {
@@ -118,7 +118,7 @@ namespace WhileTrue.Classes.DebugLogger
                 return this.message.ToString();
             }
 
-            #endregion
+#endregion
         }
     }
 }

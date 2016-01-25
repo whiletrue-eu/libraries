@@ -46,7 +46,9 @@ namespace WhileTrue.Classes.Utilities
             Cache.GetObject(1);
             Assert.AreEqual(1, CreateCalls);
 
-            GC.Collect(0, GCCollectionMode.Forced, true,true);
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true,true);
+            GC.GetTotalMemory(true);
+            
             
             //Object is recreated and chache is cleaned up
             Cache.GetObject(1);
@@ -54,8 +56,8 @@ namespace WhileTrue.Classes.Utilities
         }
 
         #region one parameter
-        [Test]
-        public void cache_shall_return_the_same_object_for_the_same_key_for_value_keys_and_one_parameter()
+
+        [Test] public void cache_shall_return_the_same_object_for_the_same_key_for_value_keys_and_one_parameter()
         {
             ObjectCache<int, object> Cache = new ObjectCache<int, object>(p1 => new object());
 
