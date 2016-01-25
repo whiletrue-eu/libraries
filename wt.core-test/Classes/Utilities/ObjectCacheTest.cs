@@ -43,16 +43,11 @@ namespace WhileTrue.Classes.Utilities
                                                                                  return new object();
                                                                              });
 
-            object Object = Cache.GetObject(1);
+            Cache.GetObject(1);
             Assert.AreEqual(1, CreateCalls);
 
-            WeakReference ObjectRef = new WeakReference(Object);
-            Object = null;
-            GC.Collect();
-            GC.WaitForFullGCComplete(10000);
-
-            Assert.IsFalse(ObjectRef.IsAlive);
-
+            GC.Collect(0, GCCollectionMode.Forced, true,true);
+            
             //Object is recreated and chache is cleaned up
             Cache.GetObject(1);
             Assert.AreEqual(2,CreateCalls);

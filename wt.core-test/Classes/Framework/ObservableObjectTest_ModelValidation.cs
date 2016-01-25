@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 
 namespace WhileTrue.Classes.Framework
@@ -112,23 +114,23 @@ namespace WhileTrue.Classes.Framework
         public void DataErrorInfo_shall_be_reevaluated_when_properties_change()
         {
             TestValidationObject Object = new TestValidationObject();
-            Assert.AreEqual(new[] { ""}, ((INotifyDataErrorInfo)Object).GetErrors("Property1"));
-            Assert.AreEqual(new[] { ""}, ((INotifyDataErrorInfo)Object).GetErrors("Property2"));
+            Assert.AreEqual(0, ((INotifyDataErrorInfo)Object).GetErrors("Property1").Cast<object>().Count());
+            Assert.AreEqual(0, ((INotifyDataErrorInfo)Object).GetErrors("Property2").Cast<object>().Count());
 
             Object.Property1 = 42;
 
-            Assert.AreEqual(new[] { "not equal"}, ((INotifyDataErrorInfo)Object).GetErrors("Property1"));
-            Assert.AreEqual(new[] { "not equal"}, ((INotifyDataErrorInfo)Object).GetErrors("Property2"));
+            Assert.AreEqual(new[] { "not equal"}, ((INotifyDataErrorInfo)Object).GetErrors("Property1").Cast<ValidationMessage>().Select(_=>_.Message));
+            Assert.AreEqual(new[] { "not equal"}, ((INotifyDataErrorInfo)Object).GetErrors("Property2").Cast<ValidationMessage>().Select(_ => _.Message));
 
             Object.MessagePart = ": must be both 42";
 
-            Assert.AreEqual(new[] { "not equal: must be both 42"}, ((INotifyDataErrorInfo)Object).GetErrors("Property1"));
-            Assert.AreEqual(new[] { "not equal: must be both 42"}, ((INotifyDataErrorInfo)Object).GetErrors("Property2"));
+            Assert.AreEqual(new[] { "not equal: must be both 42"}, ((INotifyDataErrorInfo)Object).GetErrors("Property1").Cast<ValidationMessage>().Select(_ => _.Message));
+            Assert.AreEqual(new[] { "not equal: must be both 42"}, ((INotifyDataErrorInfo)Object).GetErrors("Property2").Cast<ValidationMessage>().Select(_ => _.Message));
 
             Object.Property2 = 42;
 
-            Assert.AreEqual(new[] { ""}, ((INotifyDataErrorInfo)Object).GetErrors("Property1"));
-            Assert.AreEqual(new[] { ""}, ((INotifyDataErrorInfo)Object).GetErrors("Property2"));
+            Assert.AreEqual(0, ((INotifyDataErrorInfo)Object).GetErrors("Property1").Cast<object>().Count());
+            Assert.AreEqual(0, ((INotifyDataErrorInfo)Object).GetErrors("Property2").Cast<object>().Count());
         }
 
         [Test]
@@ -137,13 +139,13 @@ namespace WhileTrue.Classes.Framework
             TestValidationObject Object = new TestValidationObject();
             
             Object.ExceptionProperty = TestValidationObject.ExceptionTest.DontThrow;
-            Assert.AreEqual(new[] { "Message"}, ((INotifyDataErrorInfo)Object).GetErrors("ExceptionProperty"));
+            Assert.AreEqual(new[] { "Message"}, ((INotifyDataErrorInfo)Object).GetErrors("ExceptionProperty").Cast<ValidationMessage>().Select(_=>_.Message));
             
             Object.ExceptionProperty = TestValidationObject.ExceptionTest.ThrowInValidation;
-            Assert.AreEqual(new[] { ""}, ((INotifyDataErrorInfo)Object).GetErrors("ExceptionProperty"));
+            Assert.AreEqual(0, ((INotifyDataErrorInfo)Object).GetErrors("ExceptionProperty").Cast<object>().Count());
 
             Object.ExceptionProperty = TestValidationObject.ExceptionTest.ThrowInMessage;
-            Assert.AreEqual(new[] { ""}, ((INotifyDataErrorInfo)Object).GetErrors("ExceptionProperty"));
+            Assert.AreEqual(0, ((INotifyDataErrorInfo)Object).GetErrors("ExceptionProperty").Cast<object>().Count());
         }
 
     }
