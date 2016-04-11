@@ -9,14 +9,14 @@ namespace WhileTrue.Classes.Framework
 {
     ///<summary/>
     [PublicAPI]
-    public abstract class ObjectCacheBase<TObjectType> where TObjectType:class
+    public abstract class ObjectCacheBase<TKeyType, TObjectType> where TObjectType : class
     {
-        private readonly Dictionary<object, WeakReference<TObjectType>> objects = new Dictionary<object, WeakReference<TObjectType>>();
+        private readonly Dictionary<TKeyType, WeakReference<TObjectType>> objects = new Dictionary<TKeyType, WeakReference<TObjectType>>();
 
         /// <summary>
         /// Removes an object from the cache
         /// </summary>
-        public void ForgetObject(object key)
+        public void ForgetObject(TKeyType key)
         {
             lock (this.objects)
             {
@@ -30,7 +30,7 @@ namespace WhileTrue.Classes.Framework
         /// <summary>
         /// Looks up the object with the given key or creates one using the given delegate and adds it to the cache. The cache is cleaned up from objects that were collected.
         /// </summary>
-        protected TObjectType Lookup(object key, Func<TObjectType> createFunc )
+        protected TObjectType Lookup(TKeyType key, Func<TObjectType> createFunc)
         {
             //Clean up the cache...
             lock (this.objects)
@@ -40,7 +40,7 @@ namespace WhileTrue.Classes.Framework
                 {
                     lock (this.objects)
                     {
-                        object[] CollectedKeys = (from Entry in this.objects where Entry.Value.TryGetTarget(out Value) == false select Entry.Key).ToArray();
+                        TKeyType[] CollectedKeys = (from Entry in this.objects where Entry.Value.TryGetTarget(out Value) == false select Entry.Key).ToArray();
                         CollectedKeys.ForEach(collectedKey => this.objects.Remove(collectedKey));
                     }
                 });
@@ -64,6 +64,33 @@ namespace WhileTrue.Classes.Framework
                 return NewObject;
             }
         }
+
+
+
+    
+        /// <summary>
+        /// Returns an enumeration of all keys and objects in the cache that are still 'alive'
+        /// </summary>
+        public IEnumerator<KeyValuePair<TKeyType, TObjectType>> GetEnumerator()
+        {
+            KeyValuePair<TKeyType, WeakReference<TObjectType>>[] Objects;
+            lock (this.objects)
+            {
+                Objects = this.objects.ToArray();
+            }
+            foreach (KeyValuePair<TKeyType, WeakReference<TObjectType>> Item in Objects)
+            {
+                TObjectType Value;
+                if (Item.Value.TryGetTarget(out Value))
+                {
+                    yield return new KeyValuePair<TKeyType, TObjectType>(Item.Key, Value);
+                }
+                else
+                {
+                    //Ignore: already collected
+                }
+            }
+        }
     }
 
     ///<summary>
@@ -80,7 +107,7 @@ namespace WhileTrue.Classes.Framework
     /// </para>
     /// </remarks>
     [PublicAPI]
-    public sealed class ObjectCache<TKeyType,TObjectType>:ObjectCacheBase<TObjectType> where TObjectType:class
+    public sealed class ObjectCache<TKeyType,TObjectType>:ObjectCacheBase<TKeyType, TObjectType> where TObjectType:class
     {
         private readonly Func<TKeyType, TObjectType> createFunc;
 
@@ -117,7 +144,7 @@ namespace WhileTrue.Classes.Framework
     /// </para>
     /// </remarks>
     [PublicAPI]
-    public sealed class ObjectCache<TKeyType, TParam1Type, TObjectType> : ObjectCacheBase<TObjectType> where TObjectType : class
+    public sealed class ObjectCache<TKeyType, TParam1Type, TObjectType> : ObjectCacheBase<TKeyType, TObjectType> where TObjectType : class
     {
         private readonly Func<TKeyType, TParam1Type, TObjectType> createFunc;
                 
@@ -163,7 +190,7 @@ namespace WhileTrue.Classes.Framework
     /// </para>
     /// </remarks>
     [PublicAPI]
-    public class ObjectCache<TKeyType, TParam1Type, TParam2Type, TObjectType> : ObjectCacheBase<TObjectType> where TObjectType : class
+    public class ObjectCache<TKeyType, TParam1Type, TParam2Type, TObjectType> : ObjectCacheBase<TKeyType, TObjectType> where TObjectType : class
     {
         private readonly Func<TKeyType, TParam1Type, TParam2Type, TObjectType> createFunc;
                 
@@ -209,7 +236,7 @@ namespace WhileTrue.Classes.Framework
     /// </para>
     /// </remarks>
     [PublicAPI]
-    public class ObjectCache<TKeyType, TParam1Type, TParam2Type, TParam3Type, TObjectType> : ObjectCacheBase<TObjectType> where TObjectType : class
+    public class ObjectCache<TKeyType, TParam1Type, TParam2Type, TParam3Type, TObjectType> : ObjectCacheBase<TKeyType, TObjectType> where TObjectType : class
     {
         private readonly Func<TKeyType, TParam1Type, TParam2Type, TParam3Type, TObjectType> createFunc;
         
