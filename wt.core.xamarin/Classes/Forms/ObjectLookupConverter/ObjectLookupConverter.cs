@@ -97,7 +97,11 @@ namespace WhileTrue.Classes.Forms
                     }
                     else
                     {
-                        throw new NotImplementedException("TODO"); //TODO: implement dynamic casting
+                        if (object.Equals(Item.Key?.ToString(), value?.ToString()))
+                        {
+                            return LookupItem.Value;
+                        }
+                        //TODO: implement dynamic casting; it's hard here because TypeDescriptor infrastructure is not available
                     }
                 }
                 else

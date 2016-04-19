@@ -15,7 +15,7 @@ namespace WhileTrue.Classes.Framework
     /// </remarks>
     public class ValidationMessage
     {
-        public const string Separator="\f";
+        private const string Separator="\f";
 
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnusedMember.Global
