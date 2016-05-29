@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7E3DEAE4-7851-47C3-883E-72AAF92705BA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WhileTrue</RootNamespace>
+    <AssemblyName>wt.core-test</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.core, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.core.interfaces, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.core.interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.util, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.util.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NUnit.VisualStudio.TestAdapter, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4cb40d35494691ac, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\NUnit.VisualStudio.TestAdapter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+      </ItemGroup>
+    </When>
+    <Otherwise />
+  </Choose>
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Classes\Commands\DelegateCommandTest.cs" />
+    <Compile Include="Classes\Components\ComponentsTest.cs" />
+    <Compile Include="Classes\Components\TestComponents\Config.cs" />
+    <Compile Include="Classes\Components\TestComponents\ConfigTest1.cs" />
+    <Compile Include="Classes\Components\TestComponents\ConfigTest2.cs" />
+    <Compile Include="Classes\Components\TestComponents\DelegatedTest.cs" />
+    <Compile Include="Classes\Components\TestComponents\Disposable.cs" />
+    <Compile Include="Classes\Components\TestComponents\DisposeTest.cs" />
+    <Compile Include="Classes\Components\TestComponents\DisposeWithDependencyTest.cs" />
+    <Compile Include="Classes\Components\TestComponents\INoComponentInterfaceFacade.cs" />
+    <Compile Include="Classes\Components\TestComponents\ITestFacade1.cs" />
+    <Compile Include="Classes\Components\TestComponents\ITestFacade2.cs" />
+    <Compile Include="Classes\Components\TestComponents\NoComponent.cs" />
+    <Compile Include="Classes\Components\TestComponents\NoSuitableConstructor.cs" />
+    <Compile Include="Classes\Components\TestComponents\RecursionTest1.cs" />
+    <Compile Include="Classes\Components\TestComponents\RecursionTest2.cs" />
+    <Compile Include="Classes\Components\TestComponents\RepositoryParameterTest1.cs" />
+    <Compile Include="Classes\Components\TestComponents\Test1.cs" />
+    <Compile Include="Classes\Components\TestComponents\Test1And2.cs" />
+    <Compile Include="Classes\Components\TestComponents\Test2.cs" />
+    <Compile Include="Classes\Components\TestComponents\Test2a.cs" />
+    <Compile Include="Classes\Components\TestComponents\Test2b.cs" />
+    <Compile Include="Classes\Components\TestComponents\Test2C.cs" />
+    <Compile Include="Classes\Components\TestComponents\Test2Lazy.cs" />
+    <Compile Include="Classes\Framework\DynamicObservableObjectTest_PropertyAdapter_Static.cs" />
+    <Compile Include="Classes\Framework\NotifyChangeExpressionTest.cs" />
+    <Compile Include="Classes\Utilities\ObjectCacheTest.cs" />
+    <Compile Include="Classes\Framework\ObservableExpressionFactoryTest.cs" />
+    <Compile Include="Classes\Framework\ObservableObjectTest.cs" />
+    <Compile Include="Classes\Framework\ObservableObjectTest_ModelValidation.cs" />
+    <Compile Include="Classes\Framework\ObservableObjectTest_PropertyAdapter_Instance.cs" />
+    <Compile Include="Classes\Framework\ObservableObjectTest_PropertyAdapter_Static.cs" />
+    <Compile Include="Classes\Framework\WeakDelegateTest.cs" />
+    <Compile Include="Classes\DebugLogger\DebugLoggerTest.cs" />
+    <Compile Include="Classes\UIFeatures\UIFeatureManagementControlTree.xaml.cs">
+      <DependentUpon>UIFeatureManagementControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\UIFeatures\UIFeatureManagementTest.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyControlTree.xaml.cs">
+      <DependentUpon>PersistentPropertyControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyTest.cs" />
+    <Compile Include="Classes\Wpf\CrossThread\CrossThreadCollectionWrapperTest.cs" />
+    <Compile Include="Classes\Wpf\CrossThread\CrossThreadCollectionWrapperWindow.xaml.cs">
+      <DependentUpon>CrossThreadCollectionWrapperWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\Validation\BackingData.cs" />
+    <Compile Include="Classes\Wpf\Validation\ValidationTest.cs" />
+    <Compile Include="Classes\Wpf\Validation\ValidationTestControlTree.xaml.cs">
+      <DependentUpon>ValidationTestControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\XTransformer\XTransformerTest.cs" />
+    <Compile Include="Classes\Wpf\CollectionViewBackingData.cs" />
+    <Compile Include="Classes\Wpf\CollectionViewControlTree.xaml.cs">
+      <DependentUpon>CollectionViewControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\CollectionViewTest.cs" />
+    <Compile Include="Components\ApplicationLoading\ApplicationLoaderTest.cs" />
+    <Compile Include="Components\ApplicationLoading\TestComponents\ITestFacade1.cs" />
+    <Compile Include="Components\ApplicationLoading\TestComponents\ITestFacade2.cs" />
+    <Compile Include="Components\ApplicationLoading\TestComponents\Test1.cs" />
+    <Compile Include="Components\ApplicationLoading\TestComponents\Test2.cs" />
+    <Compile Include="Components\ApplicationLoading\TestComponents\Test3.cs" />
+    <Compile Include="Components\UIFeatures\UIFeatureManagerTest.cs" />
+    <Compile Include="Controls\ContentUnavailableControl\ContentUnavailableTestContainer.xaml.cs">
+      <DependentUpon>ContentUnavailableTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DialogPanel\DialogPanelTestContainer.xaml.cs">
+      <DependentUpon>DialogPanelTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NotificationLabel\BannerTestContainer.xaml.cs">
+      <DependentUpon>BannerTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Progress\ProgressTestWindow.xaml.cs">
+      <DependentUpon>ProgressTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SpecializedWindows\DialogWindowTest.cs" />
+    <Compile Include="Controls\SpecializedWindows\DialogWindowTestWindow.xaml.cs">
+      <DependentUpon>DialogWindowTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SpecializedWindows\WindowTest.cs" />
+    <Compile Include="Controls\SpecializedWindows\WindowTestWindow.xaml.cs">
+      <DependentUpon>WindowTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TablePanel\TablePanelTestContainer.xaml.cs">
+      <DependentUpon>TablePanelTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Facades\SplashScreen\SplashScreenMock.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">
+      <Project>{4B85D721-9148-4BC5-933B-84E6C51E3F86}</Project>
+      <Name>wt.core.pcl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\wt.core.win\wt.core.win.csproj">
+      <Project>{79135144-f37c-44e2-8ca6-b8742820e09a}</Project>
+      <Name>wt.core.win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Classes\UIFeatures\UIFeatureManagementControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\CollectionViewControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\PersistentProperties\PersistentPropertyControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\CrossThread\CrossThreadCollectionWrapperWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\Validation\ValidationTestControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ContentUnavailableControl\ContentUnavailableTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\DialogPanel\DialogPanelTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\NotificationLabel\BannerTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Progress\ProgressTestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\DialogWindowTestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\WindowTestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TablePanel\TablePanelTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Classes\XTransformer\include.xml" />
+    <Content Include="Classes\XTransformer\Main.xslt" />
+    <Content Include="Classes\XTransformer\Second.xslt" />
+    <Resource Include="Controls\SpecializedWindows\info.png" />
+    <Resource Include="Controls\Progress\1403_Globe.png" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITesting, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

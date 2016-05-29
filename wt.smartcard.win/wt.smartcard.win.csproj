@@ -1,0 +1,394 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">v4.5_Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0769E54C-4E6C-4BC3-8559-4BC0770D91FE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WhileTrue</RootNamespace>
+    <AssemblyName>wt.smartcard</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Properties\whiletrue.snk</AssemblyOriginatorKeyFile>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\Projects\Projects\Source\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkVersion Condition="'$(Configuration.Substring(0,1))'=='v'">$(Configuration.Substring(0,4))</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\v4.5_Release\</OutputPath>
+    <DefineConstants>TRACE;NET4x;NET45;Release</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Build.Engine" />
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Classes\ATR\AtrNoHistoricalCharacters.cs" />
+    <Compile Include="Classes\ATR\AtrParametersBase.cs" />
+    <Compile Include="Classes\ATR\AtrWriteStream.cs" />
+    <Compile Include="Classes\ATR\ClockStopSupport.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectApplicationIdentifier.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectCardCapabilities.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectCardIssuerData.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectCardServiceData.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectCountryCode.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectBase.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectInitialAccessData.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectIssuerIdentificationNumber.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectPreIssuingData.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectRFU.cs" />
+    <Compile Include="Classes\ATR\CompactTLVDataObjectStatusIndicator.cs" />
+    <Compile Include="Classes\ATR\CompactTLVTypes.cs" />
+    <Compile Include="Classes\ATR\Country.cs" />
+    <Compile Include="Classes\ATR\EtsiSpuSecureChannelSupport.cs" />
+    <Compile Include="Classes\ATR\FileIOServices.cs" />
+    <Compile Include="Classes\ATR\GlobalInterfaceBytes.cs" />
+    <Compile Include="Classes\ATR\KnownLifeCycle.cs" />
+    <Compile Include="Classes\ATR\LogicalChannelAssignment.cs" />
+    <Compile Include="Classes\ATR\OperatingConditions.cs" />
+    <Compile Include="Classes\ATR\ParameterByte.cs" />
+    <Compile Include="Classes\ATR\ParseError.cs" />
+    <Compile Include="Classes\ATR\ProtocolParametersBase.cs" />
+    <Compile Include="Classes\ATR\ProtocolType.cs" />
+    <Compile Include="Classes\ATR\RedundancyCodeType.cs" />
+    <Compile Include="Classes\ATR\RidValue.cs" />
+    <Compile Include="Classes\ATR\SpuType.cs" />
+    <Compile Include="Classes\ATR\SpuTypeEtsiCoding.cs" />
+    <Compile Include="Classes\ATR\SPUUse.cs" />
+    <Compile Include="Classes\ATR\StatusWordCoding.cs" />
+    <Compile Include="Classes\ATR\StatusWordIndication.cs" />
+    <Compile Include="Classes\ATR\T0ProtocolParameters.cs" />
+    <Compile Include="Classes\ATR\T1ProtocolParameters.cs" />
+    <Compile Include="Classes\ATR\Tokenized\AtrChecksumToken.cs" />
+    <Compile Include="Classes\ATR\AtrCompactTlvHistoricalCharacters.cs" />
+    <Compile Include="Classes\ATR\AtrDirDataReferenceHistoricalCharacters.cs" />
+    <Compile Include="Classes\ATR\Tokenized\AtrExtraBytesToken.cs" />
+    <Compile Include="Classes\ATR\AtrHistoricalCharactersBase.cs" />
+    <Compile Include="Classes\ATR\Tokenized\AtrHistoricalCharactersToken.cs" />
+    <Compile Include="Classes\ATR\Tokenized\ATRInterfaceByteGroupToken.cs" />
+    <Compile Include="Classes\ATR\AtrInvalidHistoricalCharacters.cs" />
+    <Compile Include="Classes\ATR\Tokenized\AtrInterfaceByteGroupTokenCollection.cs" />
+    <Compile Include="Classes\ATR\Tokenized\ATRPreambleToken.cs" />
+    <Compile Include="Classes\ATR\AtrReadStream.cs" />
+    <Compile Include="Classes\ATR\CodingConvention.cs" />
+    <Compile Include="Classes\ATR\Di.cs" />
+    <Compile Include="Classes\ATR\FiFmax.cs" />
+    <Compile Include="Classes\ATR\InvalidAtrCodingException.cs" />
+    <Compile Include="Classes\ATR\AtrProprietaryHistoricalCharacters.cs" />
+    <Compile Include="Classes\ATR\AtrRFUHistoricalCharacters.cs" />
+    <Compile Include="Classes\ATR\Tokenized\IAtrToken.cs" />
+    <Compile Include="Classes\ATR\Tokenized\InterfaceByteGroupType.cs" />
+    <Compile Include="Classes\ATR\Tokenized\NextInterfaceBytesIndicator.cs" />
+    <Compile Include="Classes\ATR\ReaderMode.cs" />
+    <Compile Include="Classes\ATR\Tokenized\TokenizedATR.cs" />
+    <Compile Include="Classes\ATR\UnknownProtocolParameters.cs" />
+    <Compile Include="Classes\ATR\VPPProgrammingCurrent.cs" />
+    <Compile Include="Classes\ATR\WriteFunctionsBehaviour.cs" />
+    <Compile Include="Classes\ATR\_Unittest[Debug]\AtrTest.cs" />
+    <Compile Include="Classes\ATR\_Unittest[Debug]\TestResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\SCard\SCardAPI.cs" />
+    <Compile Include="Classes\SCard\SCardAttributes.cs" />
+    <Compile Include="Classes\SCard\SCardCardReaderState.cs" />
+    <Compile Include="Classes\SCard\SCardCharacteristics.cs" />
+    <Compile Include="Classes\SCard\SCardDisposition.cs" />
+    <Compile Include="Classes\SCard\SCardError.cs" />
+    <Compile Include="Classes\SCard\SCardException.cs" />
+    <Compile Include="Classes\SCard\SCardProtocol.cs" />
+    <Compile Include="Classes\SCard\SCardReaderState.cs" />
+    <Compile Include="Classes\SCard\SCardScope.cs" />
+    <Compile Include="Classes\SCard\SCardShareMode.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\LowLevelError.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\SCAP.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\SCAP3Commands.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\SCAPCommands.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\SCPCardReader.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\SCPCommands.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\SCPException.cs" />
+    <Compile Include="Components\CardReaderSubsystem.SCP\SCPSmartCardSubsystem.cs" />
+    <Compile Include="Components\WPFSmartCardUI\CardReaderAdapter.cs" />
+    <Compile Include="Components\WPFSmartCardUI\ISmartCardSelection.cs" />
+    <Compile Include="Components\WPFSmartCardUI\ISmartCardSelectionModel.cs" />
+    <Compile Include="Components\WPFSmartCardUI\ISmartCardSelectionProvider.cs" />
+    <Compile Include="Components\WPFSmartCardUI\ISmartCardSelectionView.cs" />
+    <Compile Include="Components\WPFSmartCardUI\SmartCardSelection.cs" />
+    <Compile Include="Components\WPFSmartCardUI\SmartCardSelectionModel.cs" />
+    <Compile Include="Components\WPFSmartCardUI\SmartCardSelectionView.xaml.cs">
+      <DependentUpon>SmartCardSelectionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\WPFSmartCardUI\WPFSmartCardSelectionProvider.cs" />
+    <Compile Include="Controls\ATRViewer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\AtrEditorHelper.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\AtrChecksumTokenAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrCompactTlvHistoricalBytesAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrDirDataReferenceHistoricalBytesAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrExtraBytesAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrHistoricalBytesAdapterBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrHistoricalCharactersTokenAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrInterfaceByteGroupTokenAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrInvalidHistoricalBytesAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrNoHistoricalBytesAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\AtrPreambleTokenAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrProprietaryHistoricalBytesAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrRfuHistoricalBytesAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\AtrTokenAdapterBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\ATRViewerModel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectApplicationIdentifierAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectBaseAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectCardCapabilitiesAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectCardIssuerDataAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectCardServiceDataAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectCountryCodeAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectInitialAccessDataAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectIssuerIdentificationNumberAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectPreIssuingDataAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectRFUAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\DataObjectStatusIndicatorAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\GlobalInterfaceBytesAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\Helper.cs" />
+    <Compile Include="Classes\ATR\HistoricalCharacterTypes.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\InterpretedAtrAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\IrrelevantProtocolParameterByteAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\ProtocolParameterAdapterBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\ProtocolParameterByteAdapterBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\ProtocolParameterByteValueAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\SpuTypeEtsiCodingAdapter.cs" />
+    <Compile Include="Controls\ATRViewerControl\Model\T0ProtocolParameterAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\T1ProtocolParameterAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\TokenizedAtrAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\UnknownProtocolParameterAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ATRViewerControl\Model\UnsetProtocolParameterByteAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Facades\SmartCardUI\ISmartCardUIProvider.cs" />
+    <Compile Include="Components\SmartCardUI\SmartCardUIProvider.cs" />
+    <Compile Include="Facades\SmartCard\IVariableResolver.cs" />
+    <Compile Include="Facades\SmartCard\SmartCardInUseException.cs" />
+    <Compile Include="Modules\SmartCard\PCSCSmartCardServiceModule.cs" />
+    <Compile Include="Modules\SmartCardUI\WPFSmartCardUIModule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Facades\SmartCard\CardReaderChannel.cs" />
+    <Compile Include="Facades\SmartCard\CardReaderCollection.cs" />
+    <Compile Include="Facades\SmartCard\CardReaderEvent.cs" />
+    <Compile Include="Facades\SmartCard\CardReaderUnavailableException.cs" />
+    <Compile Include="Facades\SmartCardChannels\IAPDUChannel.cs" />
+    <Compile Include="Facades\SmartCardChannels\ISmartCardChannel.cs" />
+    <Compile Include="Facades\SmartCardChannels\ITPDUChannel.cs" />
+    <Compile Include="Facades\SmartCard\EBCEncoding.cs" />
+    <Compile Include="Facades\SmartCard\ICardReader.cs" />
+    <Compile Include="Facades\SmartCard\ICardReaderConnectionInformation.cs" />
+    <Compile Include="Facades\SmartCard\ICardReaderSubsystem.cs" />
+    <Compile Include="Facades\SmartCard\ISmartCard.cs" />
+    <Compile Include="Facades\SmartCard\ISmartCardConnectionInformation.cs" />
+    <Compile Include="Facades\SmartCard\ISmartCardService.cs" />
+    <Compile Include="Facades\SmartCard\Protocol.cs" />
+    <Compile Include="Facades\SmartCard\ProtocolNotSupportedException.cs" />
+    <Compile Include="Facades\SmartCard\SmartCardCollection.cs" />
+    <Compile Include="Facades\SmartCard\SmartCardEvent.cs" />
+    <Compile Include="Facades\SmartCard\SmartCardExceptionBase.cs" />
+    <Compile Include="Facades\SmartCard\SmartCardNotConnectedException.cs" />
+    <Compile Include="Facades\SmartCard\SmartCardUnavailableException.cs" />
+    <Compile Include="Facades\SmartCard\CardReaderState.cs" />
+    <Compile Include="Classes\ATR\Atr.cs" />
+    <Compile Include="Types\SmartCard\CardCommand.cs" />
+    <Compile Include="Types\SmartCard\CardResponse.cs" />
+    <Compile Include="Types\SmartCard\UnresolvedVariableException.cs" />
+    <Compile Include="Types\SmartCard\Variable.cs" />
+    <Compile Include="Types\SmartCard\VariableCardCommand.cs" />
+    <Compile Include="Types\SmartCard\VariableCollection.cs" />
+    <Compile Include="Types\SmartCard\VariableFormat.cs" />
+    <Compile Include="Facades\SmartCard\UnableToResolveVariableException.cs" />
+    <Compile Include="Components\CardReaderSubsystem.Base\CardReaderBase.cs" />
+    <Compile Include="Components\CardReaderSubsystem.Base\CardReaderSubsystemBase.cs" />
+    <Compile Include="Components\CardReaderSubsystem.Base\SmartCard.cs" />
+    <Compile Include="Components\CardReaderSubsystem.PCSC\ORGAMKT5CardReader.cs" />
+    <Compile Include="Components\CardReaderSubsystem.PCSC\PCSCCardReader.cs" />
+    <Compile Include="Components\CardReaderSubsystem.PCSC\PCSCSmartCardSubsystem.cs" />
+    <Compile Include="Components\SmartCardChannels\AutoResponseTrigger.cs" />
+    <Compile Include="Components\SmartCardChannels\AutoResponseTriggerCollection.cs" />
+    <Compile Include="Components\SmartCardChannels\CardCommandLogChannelBase.cs" />
+    <Compile Include="Components\SmartCardChannels\SmartCardTPDUChannel.cs" />
+    <Compile Include="Components\SmartCardChannels\T0APDUChannel.cs" />
+    <Compile Include="Components\SmartCardService\SmartCardService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Themes\Generic.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Generic.xaml</LastGenOutput>
+    </None>
+    <None Include="Properties\whiletrue.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Components\WPFSmartCardUI\SmartCardSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <None Include="Controls\ATRViewerControl\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Generic.tt</DependentUpon>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Components\WPFSmartCardUI\CardReader.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Classes\ATR\_Unittest[Debug]\ATRs.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Classes\ATR\_Unittest[Debug]\TestResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TestResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>WhileTrue.Classes.ATR</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">
+      <Project>{4b85d721-9148-4bc5-933b-84e6c51e3f86}</Project>
+      <Name>wt.core.pcl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\wt.core.win\wt.core.win.csproj">
+      <Project>{79135144-F37C-44E2-8CA6-B8742820E09A}</Project>
+      <Name>wt.core.win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Resources\Pen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Resources\PenLight.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+</Project>

@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="WhileTrue.Controls.ContentUnavailableTestContainer" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wt="http://schemas.whiletrue.eu/xaml"
+             xmlns:dialogPanel="clr-namespace:WhileTrue.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="400" Padding="10"
+             d:DataContext="{d:DesignInstance Type={x:Type dialogPanel:DialogPanelTestContainerValues},IsDesignTimeCreatable=True}"
+             >
+    <StackPanel>
+        <wt:ContentUnavailableControl ContentAvailable="false">
+            <!--Controls:ContentUnavailableControl.DefaultContent>
+                <TextBlock>Unavailable</TextBlock>
+            </Controls:ContentUnavailableControl.DefaultContent-->
+            <Label>Available</Label>
+        </wt:ContentUnavailableControl>
+    </StackPanel>
+</UserControl>
+

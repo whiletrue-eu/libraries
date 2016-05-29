@@ -1,0 +1,42 @@
+﻿<Window x:Class="WhileTrue.Controls.ProgressTestWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:controls="clr-namespace:WhileTrue.Controls"
+        xmlns:wt="http://schemas.whiletrue.eu/xaml"
+        mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="500">
+    <Window.Resources>
+        <wt:Progress x:Key="Progress" Status="Hello, World!" CurrentProgress=".6" CancelCommand="ApplicationCommands.Stop"/>
+    </Window.Resources>
+    <wt:ProgressControl x:Name="Progress" DataContext="{StaticResource Progress}" Styling="Window" Icon="1403_Globe.png"><!--Progress="{StaticResource Progress}"-->
+    	<DockPanel>
+            <Label DockPanel.Dock="Top" Content="Title"  Background="Silver"/>
+            <TextBox DockPanel.Dock="Bottom" Text="{Binding Status}"/>
+            <Button DockPanel.Dock="Bottom" Content="StartProgress" Click="StartProgress"/>
+            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinWidth="150" MinHeight="50">
+                <DockPanel.Background>
+                    <DrawingBrush Stretch="Fill">
+                        <DrawingBrush.Drawing>
+                            <GeometryDrawing Brush="Black">
+                                <GeometryDrawing.Pen>
+                                    <Pen Brush="Black" Thickness="1"/>
+                                </GeometryDrawing.Pen>
+                                <GeometryDrawing.Geometry>
+                                    <GeometryGroup>
+                                        <LineGeometry StartPoint="0,0" EndPoint="100,100" />
+                                        <LineGeometry StartPoint="0,100" EndPoint="100,0" />
+                                    </GeometryGroup>
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </DockPanel.Background>
+                
+            </DockPanel>
+        </DockPanel>
+    </wt:ProgressControl>
+    <Window.Triggers>
+    </Window.Triggers>
+</Window>
