@@ -35,6 +35,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Properties\whiletrue.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
@@ -104,6 +110,7 @@
     <Compile Include="Classes\Components\TestComponents\Test2Lazy.cs" />
     <Compile Include="Classes\Framework\DynamicObservableObjectTest_PropertyAdapter_Static.cs" />
     <Compile Include="Classes\Framework\NotifyChangeExpressionTest.cs" />
+    <Compile Include="Classes\Installer\InstallWindowModelTest.cs" />
     <Compile Include="Classes\Utilities\ObjectCacheTest.cs" />
     <Compile Include="Classes\Framework\ObservableExpressionFactoryTest.cs" />
     <Compile Include="Classes\Framework\ObservableObjectTest.cs" />
@@ -170,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Properties\whiletrue.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">

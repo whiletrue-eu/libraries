@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.IO.Compression;
 
 namespace WhileTrue.Classes.Installer
@@ -9,23 +10,26 @@ namespace WhileTrue.Classes.Installer
     [Serializable]
     public class ZipExtractPrerequisiteInstaller : PrerequisiteBase
     {
-        private readonly string zipFile;
-        private readonly string destinationPath;
+        public string ZipFile { get; }
+        public string DestinationPath { get; }
 
         /// <summary/>
         public ZipExtractPrerequisiteInstaller(string name, bool requiresAdmin, string downloadId, Func<bool> alreadyInstalled, string zipFile, string destinationPath) : base(name, requiresAdmin, alreadyInstalled, downloadId)
         {
-            this.zipFile = zipFile;
-            this.destinationPath = destinationPath;
+            this.ZipFile = zipFile;
+            this.DestinationPath = destinationPath;
         }
 
         /// <summary>
         /// Performs installation of the rperequisite
         /// </summary>
-        public override bool DoInstall()
+        public override void DoInstall()
         {
-            ZipFile.ExtractToDirectory(this.zipFile, this.destinationPath);
-            return true;
+            System.IO.Compression.ZipFile.ExtractToDirectory(this.ZipFile, this.DestinationPath);
+            if (Directory.Exists(this.DestinationPath) == false)
+            {
+                throw new DirectoryNotFoundException();
+            }
         }
     }
 }
