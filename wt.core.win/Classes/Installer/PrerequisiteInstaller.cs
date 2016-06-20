@@ -42,11 +42,19 @@ namespace WhileTrue.Classes.Installer
                     T Window = new T();
                     Window.DataContext = new InstallWindowModel(MissingPrerequisites, downloadFunc);
 
-                    Application Application = Application.Current ?? new Application();
-                    Application.Run(Window);
-                    Application.MainWindow = null; //Reset main window in case we are running within a WPF app
+                    if (Application.Current == null)
+                    {
+                        Application NewApplication = new Application();
+                        NewApplication.Run(Window);
+                        NewApplication.MainWindow = null; //Reset main window in case we are running within a WPF app
+                    }
+                    else
+                    {
+                        Window.ShowDialog();
+                        Application.Current.MainWindow = null; //Reset main window in case we are running within a WPF app
+                    }
 
-                    if( MissingPrerequisites.Any(_ => _.WasInstalled == false))
+                    if ( MissingPrerequisites.Any(_ => _.WasInstalled == false))
                     {
                         throw new PrerequisiteException();
                     }
