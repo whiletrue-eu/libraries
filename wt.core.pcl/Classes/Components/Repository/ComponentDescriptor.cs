@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -52,15 +53,26 @@ namespace WhileTrue.Classes.Components
         {
                 return
                     from Property in this.Type.GetRuntimeProperties()
-                    where Property.CanWrite && Property.SetMethod?.IsPublic == true && //must have a puzblic set method
+                    where Property.CanWrite && Property.SetMethod?.IsPublic == true && //must have a public set method
                           Property.PropertyType.IsInterface() &&
                           ComponentRepository.IsComponentInterface(Property.PropertyType) &&
                           ComponentBindingPropertyAttribute.IsSetFor(Property)
                     select Property;
 
         }
+        internal IEnumerable<PropertyInfo> GetManuallyInitializedProperties()
+        {
+            return
+                from Property in this.Type.GetRuntimeProperties()
+                where Property.CanWrite && (Property.SetMethod?.IsPublic == true || Property.SetMethod?.IsAssembly == true) && //must have a public or internal set method
+                      Property.PropertyType.IsInterface() &&
+                      ComponentRepository.IsComponentInterface(Property.PropertyType)&&
+                      ComponentBindingPropertyAttribute.IsSetFor(Property)==false 
+                select Property;
 
-        private IEnumerable<Type> GetProvidedInterfaces()
+        }
+
+        internal IEnumerable<Type> GetProvidedInterfaces()
         {
             return (
                        from InterfaceType in this.Type.GetInterfaces()
@@ -70,6 +82,23 @@ namespace WhileTrue.Classes.Components
                        from Property in this.GetProvidedDelegatedProperties()
                        select Property.PropertyType
                 );
+        }
+
+        internal IEnumerable<Type> GetRequiredInterfaces()
+        {
+            return (
+                       from Constructor in this.Type.GetConstructors()
+                       from ConstructorParameter in Constructor.GetParameters()
+                       let ParameterType = ConstructorParameter.ParameterType.IsArray ? ConstructorParameter.ParameterType.GetElementType() : ConstructorParameter.ParameterType
+                       where ComponentRepository.IsComponentInterface(ParameterType)
+                       select ParameterType
+                   ).Union(
+                       from Property in this.GetLazyInitializeProperties()
+                       select Property.PropertyType.IsArray ? Property.PropertyType.GetElementType() : Property.PropertyType
+                ).Union(
+                       from Property in this.GetManuallyInitializedProperties()
+                       select Property.PropertyType.IsArray ? Property.PropertyType.GetElementType() : Property.PropertyType
+                ).Distinct();
         }
 
         private IEnumerable<PropertyInfo> GetProvidedDelegatedProperties()
@@ -149,9 +178,15 @@ namespace WhileTrue.Classes.Components
             }
             else
             {
-                return Attributes[0].Name ?? type.Name;
+                if (type.IsGenericType())
+                {
+                    return Attributes[0].Name ?? type.Name.Substring(0, type.Name.IndexOf('`'));
+                }
+                else
+                {
+                    return Attributes[0].Name ?? type.Name;
+                }
             }
         }
-
     }
 }

@@ -47,6 +47,18 @@ namespace WhileTrue.Classes.Components
 
         private Expression CreateWithOptimalConstructor(ComponentContainer componentContainer, Expression progressCallback)
         {
+            ConstructorInfo OptimalConstructor = this.GetOptimalConstructor(componentContainer);
+
+            IEnumerable<Expression> ConstructorParameters = this.GetParametersFor(OptimalConstructor, componentContainer, progressCallback);
+            return Expression.Block(
+                Expression.Invoke(progressCallback, Expression.Constant(this.Descriptor.Name)),
+                Expression.New(OptimalConstructor, ConstructorParameters)
+                );
+
+        }
+
+        private ConstructorInfo GetOptimalConstructor(ComponentContainer componentContainer)
+        {
             ConstructorInfo OptimalConstructor = null;
             List<string> DiagnosisInformation = new List<string>();
 
@@ -66,11 +78,7 @@ namespace WhileTrue.Classes.Components
 
             if (OptimalConstructor != null)
             {
-                IEnumerable<Expression> ConstructorParameters = this.GetParametersFor(OptimalConstructor, componentContainer, progressCallback);
-                return Expression.Block(
-                    Expression.Invoke(progressCallback,Expression.Constant(this.Descriptor.Name)),
-                    Expression.New(OptimalConstructor,ConstructorParameters)
-                    );
+                return OptimalConstructor;
             }
             else
             {
