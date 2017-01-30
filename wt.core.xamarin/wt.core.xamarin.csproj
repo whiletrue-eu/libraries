@@ -36,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Classes\Forms\TransitionAnimationExtensionBase.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentAvailability.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentAvailabilityConverter.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentUnavailableControl.cs" />
