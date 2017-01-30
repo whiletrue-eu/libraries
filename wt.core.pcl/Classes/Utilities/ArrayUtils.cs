@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace WhileTrue.Classes.Utilities
 {
@@ -121,6 +122,17 @@ namespace WhileTrue.Classes.Utilities
             foreach (TArrayType Item in sequence)
             {
                 action(Item);
+            }
+        }
+
+        /// <summary>
+        /// Executes the given <c>actionAsync</c> on each item of the enumeration
+        /// </summary>
+        public static async Task ForEachAsync<TArrayType>(this IEnumerable<TArrayType> sequence, Func<TArrayType,Task> actionAsync)
+        {
+            foreach (TArrayType Item in sequence)
+            {
+                await actionAsync(Item);
             }
         }
 

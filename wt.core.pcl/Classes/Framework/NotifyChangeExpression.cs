@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -21,8 +22,8 @@ namespace WhileTrue.Classes.Framework
     /// <typeparam name="TYpeOfExpression">expression to be wrapped</typeparam>
     public class NotifyChangeExpression<TYpeOfExpression>
     {
-        private readonly Dictionary<CompareObjectByReferenceWrapper, List<string>> propertyNotifications = new Dictionary<CompareObjectByReferenceWrapper, List<string>>();
-        private readonly List<CompareObjectByReferenceWrapper> collectionNotifications = new List<CompareObjectByReferenceWrapper>();
+        private readonly Dictionary<object, List<MemberInfo>> propertyNotifications = new Dictionary<object, List<MemberInfo>>();
+        private readonly List<object> collectionNotifications = new List<object>();
         private readonly List<Action> deregistrations = new List<Action>();
 
         /// <summary>
@@ -36,13 +37,12 @@ namespace WhileTrue.Classes.Framework
 
         private void NotifyValueRetrieved(object value)
         {
-            CompareObjectByReferenceWrapper ValueAsKey = new CompareObjectByReferenceWrapper(value);
             if (value is INotifyCollectionChanged)
             {
                 INotifyCollectionChanged NotifyCollectionChanged = (INotifyCollectionChanged)value;
                 lock (this)
                 {
-                    if (this.collectionNotifications.Contains(ValueAsKey) == false)
+                    if (this.collectionNotifications.Contains(value) == false)
                     {
                         DebugLogger.WriteLine(this, LoggingLevel.Verbose, () => $"Attaching changing event on collection '{value}'");
                         NotifyCollectionChangedEventHandler Handler = WeakDelegate.Connect<NotifyChangeExpression<TYpeOfExpression>, INotifyCollectionChanged, NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
@@ -53,7 +53,7 @@ namespace WhileTrue.Classes.Framework
                             );
                         NotifyCollectionChanged.CollectionChanged += Handler;
                         this.deregistrations.Add(delegate { NotifyCollectionChanged.CollectionChanged -= Handler; });
-                        this.collectionNotifications.Add(ValueAsKey);
+                        this.collectionNotifications.Add(value);
                     }
                 }
             }
@@ -61,47 +61,33 @@ namespace WhileTrue.Classes.Framework
     
         private void NotifyMemberAccess(object value, MemberInfo memberInfo)
         {
-            CompareObjectByReferenceWrapper ValueAsKey = new CompareObjectByReferenceWrapper(value);
             if (memberInfo is PropertyInfo && value is INotifyPropertyChanged)
             {
-                string PropertyName = memberInfo.Name;
-            lock (this)
-			 {
-			     if (this.propertyNotifications.ContainsKey(ValueAsKey) == false)
-			     {
-			         DebugLogger.WriteLine(this, LoggingLevel.Verbose, () => $"Attaching changing event on value '{value}'");
-			         DebugLogger.WriteLine(this, LoggingLevel.Verbose, () => $"Adding property '{PropertyName}' to changing event of value '{value}'");
+                lock (this)
+                {
+                    List<MemberInfo> RegisteredProperties;
 
-			         INotifyPropertyChanged NotifyPropertyChanged = (INotifyPropertyChanged) value;
+                    if (this.propertyNotifications.TryGetValue(value, out RegisteredProperties) == false)
+                    {
+                        DebugLogger.WriteLine(this, LoggingLevel.Verbose, () => $"Attaching changing event on value '{value}'");
+                        DebugLogger.WriteLine(this, LoggingLevel.Verbose, () => $"Adding property '{memberInfo.Name}' to changing event of value '{value}'");
 
-			         PropertyChangedEventHandler Handler = WeakDelegate.Connect<NotifyChangeExpression<TYpeOfExpression>, INotifyPropertyChanged, PropertyChangedEventHandler, PropertyChangedEventArgs>(
-			             this,
-			             NotifyPropertyChanged,
-			             (target, sender, e) => target.NotifyPropertyChanged(sender, e),
-			             (source, handler) => source.PropertyChanged -= handler
-			             );
-			         NotifyPropertyChanged.PropertyChanged += Handler;
-			         this.deregistrations.Add(delegate { NotifyPropertyChanged.PropertyChanged -= Handler; });
+                        INotifyPropertyChanged NotifyPropertyChanged = (INotifyPropertyChanged) value;
 
-			         List<string> RegisteredPropertyNames = new List<string>();
-			         RegisteredPropertyNames.Add(PropertyName);
-			         this.propertyNotifications.Add(ValueAsKey, RegisteredPropertyNames);
-			     }
+                        PropertyChangedEventHandler Handler = WeakDelegate.Connect<NotifyChangeExpression<TYpeOfExpression>, INotifyPropertyChanged, PropertyChangedEventHandler, PropertyChangedEventArgs>(
+                            this,
+                            NotifyPropertyChanged,
+                            (target, sender, e) => target.NotifyPropertyChanged(sender, e),
+                            (source, handler) => source.PropertyChanged -= handler
+                            );
+                        NotifyPropertyChanged.PropertyChanged += Handler;
+                        this.deregistrations.Add(delegate { NotifyPropertyChanged.PropertyChanged -= Handler; });
 
-			     else
-			     {
-			         List<string> RegisteredPropertyNames = this.propertyNotifications[ValueAsKey];
-			         if (RegisteredPropertyNames.Contains(PropertyName) == false)
-			         {
-			             DebugLogger.WriteLine(this, LoggingLevel.Verbose, () => $"Adding property '{PropertyName}' to chaning event of value '{value}'");
-			             RegisteredPropertyNames.Add(PropertyName);
-			         }
-			         else
-			         {
-			             DebugLogger.WriteLine(this, LoggingLevel.Verbose, () => $"No add property '{PropertyName}' of value '{value}': is already added");
-			         }
-			     }
-			 }
+                        RegisteredProperties = new List<MemberInfo>();
+                        this.propertyNotifications.Add(value, RegisteredProperties);
+                    }
+                    RegisteredProperties.Add(memberInfo);
+                }
             }
         }
 
@@ -128,12 +114,11 @@ namespace WhileTrue.Classes.Framework
 
         private void NotifyPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            CompareObjectByReferenceWrapper SenderAsKey = new CompareObjectByReferenceWrapper(sender);
             lock (this)
             {
-                if (this.propertyNotifications.ContainsKey(SenderAsKey))
+                if (this.propertyNotifications.ContainsKey(sender))
                 {
-                    if (this.propertyNotifications[SenderAsKey].Contains(e.PropertyName))
+                    if (this.propertyNotifications[sender].Any(_=>_.Name == e.PropertyName))
                     {
                         this.InvokeChanged(sender, e);
                     }
@@ -217,27 +202,5 @@ namespace WhileTrue.Classes.Framework
                 return this.Visit(value);
             }
         }
-
-        private class CompareObjectByReferenceWrapper
-        {
-            private readonly object value;
-
-            public CompareObjectByReferenceWrapper(object value)
-            {
-                this.value = value;
-            }
-
-            public override bool Equals(object other)
-            {
-                CompareObjectByReferenceWrapper Other = other as CompareObjectByReferenceWrapper;
-                return Other != null && object.ReferenceEquals(this.value,Other.value);
-            }
-
-            public override int GetHashCode()
-            {
-                return this.value.GetHashCode();
-            }
-        }
-
     }
 }
