@@ -18,6 +18,7 @@ namespace WhileTrue.Classes.Installer
             private readonly ManualResetEvent installCompleteEvent;
             private readonly ManualResetEvent installStartedEvent;
             private bool installSuccess;
+            private Action<double> reportProgress;
 
             public TestPrerequisite(string name, bool requiresAdmin, bool alreadyInstalled, string downloadId) : base(name, requiresAdmin, ()=>alreadyInstalled, downloadId)
             {
@@ -29,12 +30,17 @@ namespace WhileTrue.Classes.Installer
 
             public override void DoInstall()
             {
+                if (this.downloadSuccess == false)
+                {
+                    throw new Exception("Download FAIL!");
+                }
+
                 this.installStartedEvent.Set();
                 this.installCompleteEvent.WaitOne();
                 this.DoInstallCalled = true;
                 if (this.installSuccess == false)
                 {
-                    throw new Exception("FAIL!");
+                    throw new Exception("Install FAIL!");
                 }
             }
 
@@ -55,6 +61,10 @@ namespace WhileTrue.Classes.Installer
                 this.installStartedEvent.WaitOne(Debugger.IsAttached ? TimeSpan.FromDays(1) : TimeSpan.FromSeconds(10));
             }
 
+            public void UpdateProgress(double progress)
+            {
+                this.reportProgress(progress);
+            }
 
             public void MarkDownloaded(bool success)
             {
@@ -62,8 +72,9 @@ namespace WhileTrue.Classes.Installer
                 this.downloadCompleteEvent.Set();
             }
 
-            public void WaitDownloaded()
+            public void WaitDownloaded(Action<double> reportProgress)
             {
+                this.reportProgress = reportProgress;
                 this.downloadStartedEvent.Set();
                 this.downloadCompleteEvent.WaitOne();
             }
@@ -147,12 +158,12 @@ namespace WhileTrue.Classes.Installer
             }
         }
 
-        private void DownloadFunc(string downloadId, Action<string> downloadedCallback, TestPrerequisite prerequisite)
+        private void DownloadFunc(string downloadId, Action<string, double> progressCallback, Action<string> downloadedCallback, TestPrerequisite prerequisite)
         {
             Assert.That(string.IsNullOrEmpty(downloadId), Is.False);
             Task.Run(() =>
             {
-                prerequisite.WaitDownloaded();
+                prerequisite.WaitDownloaded(progress => progressCallback(downloadId,progress));
                 downloadedCallback(downloadId);
             });
         }
@@ -161,7 +172,7 @@ namespace WhileTrue.Classes.Installer
         public void When_Install_needed_without_download_installation_shall_begin_immediately_after_start()
         {
             TestPrerequisite[] TestPrerequisites = { new TestPrerequisite("Name1",false, false, null) };
-            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
+            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, progressCallback, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
 
             Assert.That(Model.Status, Is.TypeOf<InstallWindowModel.PreperationStatus>());
             Assert.That(((InstallWindowModel.PreperationStatus)Model.Status).IsAdminRequired, Is.False);
@@ -188,7 +199,7 @@ namespace WhileTrue.Classes.Installer
         {
             TestPrerequisite[] TestPrerequisites = { new TestPrerequisite("Name1", false, false, "Down1"), new TestPrerequisite("Name2", false, false, "Down2") };
 
-            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
+            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, progressCallback, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
             Assert.That(Model.Status, Is.TypeOf<InstallWindowModel.PreperationStatus>());
             ((InstallWindowModel.PreperationStatus)Model.Status).SetUpSystemCommand.Execute(null);
             InstallWindowModelTest.WaitForStateChange<InstallWindowModel.InstallationStatus>(Model);
@@ -225,7 +236,7 @@ namespace WhileTrue.Classes.Installer
         {
             TestPrerequisite[] TestPrerequisites = { new TestPrerequisite("Name1", false, false, "Down1"), new TestPrerequisite("Name2", false, false, "Down2") };
 
-            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
+            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, progressCallback, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
             Assert.That(Model.Status, Is.TypeOf<InstallWindowModel.PreperationStatus>());
             ((InstallWindowModel.PreperationStatus)Model.Status).SetUpSystemCommand.Execute(null);
             InstallWindowModelTest.WaitForStateChange<InstallWindowModel.InstallationStatus>(Model);
@@ -265,11 +276,45 @@ namespace WhileTrue.Classes.Installer
         }
 
         [Test]
+        public void When_a_download_is_failing_error_condition_shall_be_shown_instead_if_status()
+        {
+            TestPrerequisite[] TestPrerequisites = { new TestPrerequisite("Name1", false, false, "Down1"), new TestPrerequisite("Name2", false, false, "Down2") };
+
+            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, progressCallback, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
+            Assert.That(Model.Status, Is.TypeOf<InstallWindowModel.PreperationStatus>());
+            ((InstallWindowModel.PreperationStatus)Model.Status).SetUpSystemCommand.Execute(null);
+            InstallWindowModelTest.WaitForStateChange<InstallWindowModel.InstallationStatus>(Model);
+            ManualResetEvent StatusChangeEvent = new ManualResetEvent(false);
+            Model.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(InstallWindowModel.Status))
+                {
+                    StatusChangeEvent.Set();
+                }
+            };
+
+
+            Assert.That(((InstallWindowModel.InstallationStatus)Model.Status).Installation, Is.TypeOf<InstallWindowModel.InstallationStatus.InstallationWaitingForDownloadStatus>());
+            Assert.That(((InstallWindowModel.InstallationStatus)Model.Status).Download, Is.TypeOf<InstallWindowModel.InstallationStatus.DownloadingStatus>());
+
+            TestPrerequisites[1].MarkDownloaded(false);
+
+            InstallWindowModelTest.WaitForStateChange<InstallWindowModel.InstallationErrorStatus>(Model);
+
+            InstallWindowModel.StatusBase Status = Model.Status;
+            //Shall not throw exception, but leave the status a-is
+            TestPrerequisites[0].UpdateProgress(.5);
+            TestPrerequisites[0].MarkDownloaded(true);
+
+            Assert.That(Model.Status, Is.SameAs(Status));
+        }
+
+        [Test]
         public void When_administrative_rights_are_needded_those_prerequisites_shall_be_delegated_to_child_process_with_admin_rights()
         {
             TestPrerequisite[] TestPrerequisites = { new TestPrerequisite("Name1", true, false, null), new TestPrerequisite("Name2", false, false, null) };
             AdminProcess AdminProcess = new AdminProcess();
-            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)),AdminProcess);
+            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, progressCallback, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)),AdminProcess);
             Assert.That(Model.Status, Is.TypeOf<InstallWindowModel.PreperationStatus>());
             Assert.That(((InstallWindowModel.PreperationStatus)Model.Status).IsAdminRequired, Is.True);
             ((InstallWindowModel.PreperationStatus)Model.Status).SetUpSystemCommand.Execute(null);
@@ -287,7 +332,7 @@ namespace WhileTrue.Classes.Installer
         public void When_install_of_a_prerequisite_fails_the_state_shall_move_into_error_status()
         {
             TestPrerequisite[] TestPrerequisites = { new TestPrerequisite("Name1", false, false, null) };
-            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
+            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, progressCallback, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)));
 
             Assert.That(Model.Status, Is.TypeOf<InstallWindowModel.PreperationStatus>());
             ((InstallWindowModel.PreperationStatus)Model.Status).SetUpSystemCommand.Execute(null);
@@ -305,7 +350,7 @@ namespace WhileTrue.Classes.Installer
         {
             TestPrerequisite[] TestPrerequisites = { new TestPrerequisite("Name1", true, false, null) };
             AdminProcess AdminProcess = new AdminProcess();
-            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)), AdminProcess);
+            InstallWindowModel Model = new InstallWindowModel(TestPrerequisites, (downloadId, progressCallback, downloadedCallback) => this.DownloadFunc(downloadId, progressCallback, downloadedCallback, TestPrerequisites.First(_ => _.DownloadId == downloadId)), AdminProcess);
 
             Assert.That(Model.Status, Is.TypeOf<InstallWindowModel.PreperationStatus>());
             ((InstallWindowModel.PreperationStatus)Model.Status).SetUpSystemCommand.Execute(null);
