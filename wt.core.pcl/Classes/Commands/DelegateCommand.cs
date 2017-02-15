@@ -2,6 +2,8 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using WhileTrue.Classes.Framework;
 using WhileTrue.Classes.Logging;
@@ -28,7 +30,9 @@ namespace WhileTrue.Classes.Commands
         private readonly Action<Exception> exceptionHandler;
         readonly NotifyChangeExpression<Func<TParameterType, bool>> canExecuteDelegateExpression;
         private readonly Func<TParameterType, bool> canExecuteDelegate;
+        // ReSharper disable once NotAccessedField.Local - see comment at usage below
         private EventHandler requerySuggestedEventHandler;
+        private readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim();
 
         /// <summary>
         /// Implements a command which is always executable
@@ -110,22 +114,42 @@ namespace WhileTrue.Classes.Commands
         /// <summary>
         /// <see cref="ICommand.Execute"/>
         /// </summary>
-        public void Execute(object parameter)
+        public async void Execute(object parameter)
         {
-            try
+            if (this.executeLock.TryEnterWriteLock(0))
             {
-                this.executeDelegate((TParameterType) (parameter ?? default(TParameterType)));
+                try
+                {
+                    Task Result = this.executeDelegate.DynamicInvoke((TParameterType) (parameter ?? default(TParameterType))) as Task;
+                    if (Result != null)
+                    {
+                        //Delegate is asynchronous, await its completion. This is done to release lock only if the delegate was executed completly to avoid re-entries
+                        await Result;
+                    }
+                    else
+                    {
+                        //Delegate is synchronous, just continue
+                    }
+                }
+                catch (Exception Exception)
+                {
+                    if (this.exceptionHandler != null)
+                    {
+                        this.exceptionHandler(Exception);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                finally
+                {
+                    this.executeLock.ExitWriteLock();
+                }
             }
-            catch (Exception Exception)
+            else
             {
-                if (this.exceptionHandler != null)
-                {
-                    this.exceptionHandler(Exception);
-                }
-                else
-                {
-                    throw;
-                }
+                //Ignore execution, last execution command is not completed yet
             }
         }
 
