@@ -105,7 +105,15 @@ namespace WhileTrue.Classes.Installer
                                      {
                                          this.prerequisites.First(_ => _.DownloadId == id).DownloadProgress = progress;
                                          double OverallProgress = this.prerequisites.Where(_ => _.DownloadId != null).Sum(_ => _.DownloadProgress);
-                                             // Update download status
+                                         lock (this.statusLock)
+                                         {
+                                             if (this.Status is InstallationErrorStatus)
+                                             {
+                                                 //Ignore if there is already an error reported. Can happen if multiple downloads are pending and one has a failure
+                                                 return;
+                                             }
+                                         }
+                                         // Update download status
                                          this.Status = new InstallationStatus(((InstallationStatus)this.Status).Installation, new InstallationStatus.DownloadingStatus(PackagesToDownload, OverallProgress, null));
                                      }
                                  },
@@ -116,7 +124,7 @@ namespace WhileTrue.Classes.Installer
                                      {
                                          if (this.Status is InstallationErrorStatus)
                                          {
-                                             //Ignore if there is already an error reported. Can happen in race conditions
+                                             //Ignore if there is already an error reported. Can happen if multiple downloads are pending and one has a failure
                                              return;
                                          }
                                      }
