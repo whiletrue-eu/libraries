@@ -26,14 +26,6 @@ namespace WhileTrue.Classes.Components
             }
         }
 
-        public void NotifyInstanceCreated(ComponentInstance componentInstance, object instance)
-        {
-            foreach (ComponentInstance ComponentInstance in this.innerList)
-            {
-                ComponentInstance.NotifyInstanceCreated(componentInstance, instance);
-            }
-        }
-
         public ComponentInstance[] ToArray()
         {
             return this.innerList.ToArray();

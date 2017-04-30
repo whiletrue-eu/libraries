@@ -16,9 +16,9 @@ namespace WhileTrue.Facades.SplashScreen
             this.HideCalled = true;
         }
 
-        public void SetStatus(int totalNumber, int currentNumber, string name)
+        public void SetStatus(string name)
         {
-            this.StatusTexts.Add($"Status: {currentNumber}/{totalNumber},{name}");
+            this.StatusTexts.Add($"Status: {name}");
         }
 
 

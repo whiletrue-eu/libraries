@@ -44,7 +44,7 @@ namespace WhileTrue.Classes.Utilities
         }
         public static bool IsAssignableFrom(this Type type, Type otherType)
         {
-            return type.GetTypeInfo().IsAssignableFrom(otherType.GetTypeInfo());
+            return type.GetTypeInfo().IsAssignableFrom(otherType?.GetTypeInfo());
         }
         public static bool IsGenericType(this Type type)
         {

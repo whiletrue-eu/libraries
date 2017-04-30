@@ -1,10 +1,11 @@
 using System;
 using JetBrains.Annotations;
+using WhileTrue.Classes.CodeInspection;
 
 namespace WhileTrue.Classes.Components
 {
     /// <summary/>
-   [PublicAPI]
+   [PublicAPI,ExcludeFromCodeCoverage]
     public class ComponentInstanceEventArgs : EventArgs
     {
         /// <summary>

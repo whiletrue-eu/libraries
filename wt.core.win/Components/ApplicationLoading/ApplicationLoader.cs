@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using WhileTrue.Classes.Components;
 using WhileTrue.Facades.ApplicationLoader;
@@ -38,7 +39,7 @@ namespace WhileTrue.Components.ApplicationLoading
                 try
                 {
                     ApplicationLoader.ResolveModules(ComponentContainer);
-                    ApplicationMain = ComponentContainer.ResolveInstance<IApplicationMain>((max, current, status) => SplashScreen.SetStatus(max, current, status));
+                    ApplicationMain = ComponentContainer.ResolveInstance<IApplicationMain>(status => SplashScreen.SetStatus(status));
                 }
                 finally
                 {
@@ -78,12 +79,12 @@ namespace WhileTrue.Components.ApplicationLoading
                 Plugin.Initialize(componentContainer);
             }
         }
-
+        [ExcludeFromCodeCoverage]
         private class SplashDummy : ISplashScreen
         {
             public void Show(){}
             public void Hide(){}
-            public void SetStatus(int totalNumber, int currentNumber, string name)
+            public void SetStatus(string name)
             {
             }
         }

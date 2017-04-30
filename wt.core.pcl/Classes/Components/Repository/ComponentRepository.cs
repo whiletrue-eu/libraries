@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using WhileTrue.Classes.CodeInspection;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -135,7 +136,7 @@ namespace WhileTrue.Classes.Components
         }
 
 
-        internal ComponentDescriptor[] GetComponentDescriptors(Type interfaceType)
+        internal ComponentDescriptor[] GetComponentDescriptors(Type interfaceType) 
         {
             ComponentDescriptor[] ComponentDescriptors = (
                                                              from ComponentDescriptor ComponentDescriptor in this.componentDescriptors
@@ -168,6 +169,7 @@ namespace WhileTrue.Classes.Components
         /// <summary>
         /// Returns the components and interface dependencies as an Eclipe UML2 model
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public void CopyAsUml2ModelToStream(Stream output)
         {
             string XmiNs = "http://www.omg.org/spec/XMI/20131001";

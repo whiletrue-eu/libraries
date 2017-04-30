@@ -102,7 +102,6 @@
     <Compile Include="Classes\Components\Instances\SingletonComponentInstance.cs" />
     <Compile Include="Classes\Components\Repository\ComponentAttribute.cs" />
     <Compile Include="Classes\Components\Repository\ComponentBindingPropertyAttribute.cs" />
-    <Compile Include="Classes\Components\Repository\ComponentConfigurationException.cs" />
     <Compile Include="Classes\Components\Repository\ComponentDescriptor.cs" />
     <Compile Include="Classes\Components\Repository\ComponentInstanceScope.cs" />
     <Compile Include="Classes\Components\Repository\ComponentInterfaceAttribute.cs" />
