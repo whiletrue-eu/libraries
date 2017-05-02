@@ -100,20 +100,16 @@ namespace WhileTrue.Classes.Components
             Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
             Repository.AddComponent<Test2A>(ComponentInstanceScope.Container);
 
-            List<Tuple<Tuple<int,int>,string>> Progress = new List<Tuple<Tuple<int, int>, string>>();
+            List<string> Progress = new List<string>();
 
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
-                Container.ResolveInstance<ITestFacade2>((max,cur,name)=>Progress.Add(new Tuple<Tuple<int, int>, string>(new Tuple<int, int>(max,cur),name)));
+                Container.ResolveInstance<ITestFacade2>(name=>Progress.Add(name));
             }
 
             Assert.That(Progress.Count, Is.EqualTo(2) );
-            Assert.That(Progress[0].Item1.Item1, Is.EqualTo(2) );
-            Assert.That(Progress[0].Item1.Item2, Is.EqualTo(1) );
-            Assert.That(Progress[0].Item2, Is.EqualTo("Test2A") );
-            Assert.That(Progress[1].Item1.Item1, Is.EqualTo(2));
-            Assert.That(Progress[1].Item1.Item2, Is.EqualTo(2));
-            Assert.That(Progress[1].Item2, Is.EqualTo("Test1"));
+            Assert.That(Progress[0], Is.EqualTo("Test2A") );
+            Assert.That(Progress[1], Is.EqualTo("Test1"));
         }
 
         [Test]
@@ -488,58 +484,10 @@ namespace WhileTrue.Classes.Components
             }
         }
 
+     
+    
         [Test]
-        public void component_properties_shall_support_lazy_initialisation_when_depended_component_is_created_later_simple()
-        {
-            ComponentRepository Repository = new ComponentRepository();
-            Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
-            Repository.AddComponent<Test2Lazy>(ComponentInstanceScope.Container);
-
-            using (ComponentContainer Container = new ComponentContainer(Repository))
-            {
-                ITestFacade2 TestFacade2 = Container.ResolveInstance<ITestFacade2>();
-                Assert.IsNull(((Test2Lazy) TestFacade2).TestFacade1);
-
-                Container.ResolveInstance<ITestFacade1>();
-                Assert.IsNotNull(((Test2Lazy) TestFacade2).TestFacade1);
-            }
-        }
-
-        [Test]
-        public void component_properties_shall_support_lazy_initialisation_when_depended_component_is_created_later_shared()
-        {
-            ComponentRepository Repository = new ComponentRepository();
-            Repository.AddComponent<Test1>();
-            Repository.AddComponent<Test2Lazy>();
-
-            using (ComponentContainer Container = new ComponentContainer(Repository))
-            {
-                ITestFacade2 TestFacade2 = Container.ResolveInstance<ITestFacade2>();
-                Assert.IsNull(((Test2Lazy) TestFacade2).TestFacade1);
-
-                Container.ResolveInstance<ITestFacade1>();
-                Assert.IsNotNull(((Test2Lazy) TestFacade2).TestFacade1);
-            }
-        }
-
-        [Test]
-        public void component_properties_shall_support_lazy_initialisation_when_depended_component_is_created_later_singleton()
-        {
-            ComponentRepository Repository = new ComponentRepository();
-            Repository.AddComponent<Test1>(ComponentInstanceScope.Global);
-            Repository.AddComponent<Test2Lazy>(ComponentInstanceScope.Global);
-
-            using (ComponentContainer Container = new ComponentContainer(Repository))
-            {
-                ITestFacade2 TestFacade2 = Container.ResolveInstance<ITestFacade2>();
-                Assert.IsNull(((Test2Lazy) TestFacade2).TestFacade1);
-
-                Container.ResolveInstance<ITestFacade1>();
-                Assert.IsNotNull(((Test2Lazy) TestFacade2).TestFacade1);
-            }
-        }
-        [Test]
-        public void component_properties_shall_support_lazy_initialisation_when_depended_component_is_already_created()
+        public void component_properties_shall_support_func_to_interface()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
@@ -555,7 +503,23 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
-        public void component_properties_shall_support_lazy_initialisation_in_cyclic_dependency_scenario_component()
+        public void component_properties_shall_support_func_to_interface_array()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
+            Repository.AddComponent<Test2Lazy>(ComponentInstanceScope.Container);
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                Container.ResolveInstance<ITestFacade1>();
+                ITestFacade2 TestFacade2 = Container.ResolveInstance<ITestFacade2>();
+
+                Assert.IsNotNull(((Test2Lazy) TestFacade2).TestFacade1Array);
+            }
+        }
+
+        [Test]
+        public void component_properties_shall_support_func_to_interface_in_cyclic_dependency_scenario_component()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<RecursionTest1>(ComponentInstanceScope.Container);
@@ -571,7 +535,7 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
-        public void component_properties_shall_support_lazy_initialisation_in_cyclic_dependency_scenario_shared()
+        public void component_properties_shall_support_func_to_interface_in_cyclic_dependency_scenario_shared()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<RecursionTest1>(ComponentInstanceScope.Repository);
@@ -587,7 +551,7 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
-        public void component_properties_shall_support_lazy_initialisation_in_cyclic_dependency_scenario_singleton()
+        public void component_properties_shall_support_func_to_interface_in_cyclic_dependency_scenario_singleton()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<RecursionTest1>(ComponentInstanceScope.Global);
@@ -767,23 +731,17 @@ namespace WhileTrue.Classes.Components
 
 
 
-            List<Tuple<Tuple<int, int>, string>> Progress = new List<Tuple<Tuple<int, int>, string>>();
+            List<string> Progress = new List<string>();
 
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
-                Container.ResolveInstance<ITestFacade2>((max, cur, name) => Progress.Add(new Tuple<Tuple<int, int>, string>(new Tuple<int, int>(max, cur), name)));
+                Container.ResolveInstance<ITestFacade2>(name => Progress.Add(name));
             }
 
             Assert.That(Progress.Count, Is.EqualTo(3));
-            Assert.That(Progress[0].Item1.Item1, Is.EqualTo(3));
-            Assert.That(Progress[0].Item1.Item2, Is.EqualTo(1));
-            Assert.That(Progress[0].Item2, Is.EqualTo("Test2B"));
-            Assert.That(Progress[1].Item1.Item1, Is.EqualTo(3));
-            Assert.That(Progress[1].Item1.Item2, Is.EqualTo(2));
-            Assert.That(Progress[1].Item2, Is.EqualTo("Test1"));  
-            Assert.That(Progress[2].Item1.Item1, Is.EqualTo(3));
-            Assert.That(Progress[2].Item1.Item2, Is.EqualTo(3));
-            Assert.That(Progress[2].Item2, Is.EqualTo("ConfigTest1"));
+            Assert.That(Progress[0], Is.EqualTo("Test2B"));
+            Assert.That(Progress[1], Is.EqualTo("Test1"));  
+            Assert.That(Progress[2], Is.EqualTo("ConfigTest1"));
         }
 
         [Test]

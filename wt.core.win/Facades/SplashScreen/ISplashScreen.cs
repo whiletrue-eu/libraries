@@ -20,6 +20,6 @@ namespace WhileTrue.Facades.SplashScreen
         /// <summary>
         /// Set the current status as progress message
         /// </summary>
-        void SetStatus(int totalNumber, int currentNumber, string name);
+        void SetStatus(string name);
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -38,7 +37,7 @@ namespace WhileTrue.Classes.Components
         /// <summary>
         /// returns all instances created within this container
         /// </summary>
-        public IEnumerable ComponentInstances => this.instances.ToArray();
+        private IEnumerable ComponentInstances => this.instances.ToArray();
 
         private IEnumerable ExternalInstances => this.externalInstances;
 
@@ -50,69 +49,23 @@ namespace WhileTrue.Classes.Components
         /// If a repository chain is used, first a lokkup is done in the directly referenced repository, then in its parent etc util the interface
         /// implementation is found. An exception is thrown, if none or multiple implementations are found in the same repository.
         /// </summary>
-        public TInterfaceType ResolveInstance<TInterfaceType>(Action<int,int,string> progressCallback=null) where TInterfaceType : class
+        public TInterface ResolveInstance<TInterface>(Action<string> progressCallback=null) where TInterface : class
         {
-            return this.InternalResolveInstance<TInterfaceType>(true, progressCallback);
+            return this.InternalResolveInstance<TInterface>(true, progressCallback);
         }
 
-        private TInterfaceType InternalResolveInstance<TInterfaceType>(bool throwIfNotFound, Action<int, int, string> progressCallback) where TInterfaceType : class
+        private TInterface InternalResolveInstance<TInterface>(bool throwIfNotFound, Action<string> progressCallback) where TInterface : class
         {
             this.CheckDisposed();
 
-            if (ComponentRepository.IsComponentInterface(typeof (TInterfaceType)))
+            if (ComponentRepository.IsComponentInterface(typeof (TInterface)))
             {
-                return ComponentContainer.ExecuteCreateExpression<TInterfaceType>(callback=>this.InternalResolveInstance(typeof (TInterfaceType), throwIfNotFound, callback), progressCallback);
+                return (TInterface)this.InternalResolveInstance(typeof(TInterface), throwIfNotFound, progressCallback);
             }
             else
             {
-                throw new ArgumentException($"Interface given is not a component interface: {typeof (TInterfaceType).Name}");
+                throw new ArgumentException($"Interface given is not a component interface: {typeof (TInterface).Name}");
             }
-        }
-
-        private static TInterfaceType ExecuteCreateExpression<TInterfaceType>(Func<Expression<Action<string>>, Expression> getExpression, Action<int, int, string> progressCallback) where TInterfaceType : class
-        {
-// ReSharper disable AccessToModifiedClosure
-            int MaxInstances = 0;
-            int CurrentInstance = 1;
-            Action<string> InternalCallback = componentName => progressCallback?.Invoke(MaxInstances, CurrentInstance++, componentName);
-            // ReSharper restore AccessToModifiedClosure
-
-            Expression<Action<string>> Callback = _ => InternalCallback(_);
-
-            Expression Expression = getExpression(Callback);
-            if (Expression != null)
-            {
-                LambdaExpression CreateExpression = Expression.Lambda(Expression);
-
-                //Replace empty callback by implementation
-                CountInstanceCreationExpressionVisitor Counter = new CountInstanceCreationExpressionVisitor();
-                Counter.Visit(CreateExpression);
-                MaxInstances = Counter.InstanceCount;
-
-                Func<object> Create = (Func<object>) CreateExpression.Compile();
-                return (TInterfaceType) Create();
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Counts occurences on object creations that are components (some wrapper are also created which have to be ignored)
-        /// </summary>
-        private class CountInstanceCreationExpressionVisitor : ExpressionVisitor
-        {
-            protected override Expression VisitNew(NewExpression node)
-            {
-                if (node.Constructor.DeclaringType.GetCustomAttributes<ComponentAttribute>().Any())
-                {
-                    this.InstanceCount++;
-                }
-                return base.VisitNew(node);
-            }
-
-            public int InstanceCount { get; private set; }
         }
 
         /// <summary>
@@ -121,7 +74,7 @@ namespace WhileTrue.Classes.Components
         /// If a repository chain is used, first a lokkup is done in the directly referenced repository, then in its parent etc util the interface
         /// implementation is found. An exception is thrown, if multiple implementations are found in the same repository. If no implementaiton is found, null is returned
         /// </summary>
-        public TInterfaceType TryResolveInstance<TInterfaceType>(Action<int, int, string> progressCallback=null) where TInterfaceType : class
+        public TInterfaceType TryResolveInstance<TInterfaceType>(Action<string> progressCallback=null) where TInterfaceType : class
         {
             return this.InternalResolveInstance<TInterfaceType>(false, progressCallback);
         }
@@ -132,18 +85,20 @@ namespace WhileTrue.Classes.Components
         /// If a repository chain is used, first a lokkup is done in the directly referenced repository, then in its parent etc until one or more interface
         /// implementations are found.
         /// </summary>
-        public TInterfaceType[] ResolveInstances<TInterfaceType>(Action<int,int,string> progressCallback=null) where TInterfaceType : class
+        public TInterface[] ResolveInstances<TInterface>(Action<string> progressCallback=null) where TInterface : class
         {
             this.CheckDisposed();
 
-            if (ComponentRepository.IsComponentInterface(typeof(TInterfaceType)))
+            if (ComponentRepository.IsComponentInterface(typeof(TInterface)))
             {
-                return ComponentContainer.ExecuteCreateExpression<TInterfaceType[]>(callback=>Expression.NewArrayInit(typeof (TInterfaceType), this.InternalResolveInstances(typeof (TInterfaceType), callback)),progressCallback);
+                return this.InternalResolveInstances(typeof(TInterface), progressCallback)
+                    .Cast<TInterface>()
+                    .ToArray();
             }
             else
             {
                 throw new ArgumentException(
-                    $"Interface given is not a component interface: {typeof (TInterfaceType).Name}");
+                    $"Interface given is not a component interface: {typeof (TInterface).Name}");
             }
         }
 
@@ -151,84 +106,86 @@ namespace WhileTrue.Classes.Components
 
         #region Internal Resolve & Create methods
 
-        internal bool CanResolveComponent(Type interfaceType)
+        internal bool CanResolveComponent(Type interfaceType) 
         {
             if (this.externalInstances != null)
             {
-                if (this.externalInstances.Any(instance => instance.GetType().GetInterface(interfaceType.FullName) != null))
+                if (this.externalInstances.Any(interfaceType.IsInstanceOfType))
                 {
                     return true;
                 }
             }
 
-            return this.Repository.GetComponentDescriptors(interfaceType).Length > 0;
+            return this.Repository.GetComponentDescriptors(interfaceType).Any();
         }
 
-        internal IEnumerable<Expression> InternalResolveInstances(Type interfaceType, Expression progressCallback)
+        internal IEnumerable<object> InternalResolveInstances(Type interfaceType, Action<string> progressCallback)
         {
-            return
-                (
-                    from object Instance in this.ExternalInstances
-                    where Instance.GetType().GetInterface(interfaceType.FullName) != null
-                    select Expression.Convert(Expression.Constant(Instance), interfaceType)
-                ).Union(
-                    from ComponentDescriptor in this.Repository.GetComponentDescriptors(interfaceType)
-                    select this.CreateInstance(ComponentDescriptor, interfaceType, progressCallback)
-                    );
-        }
-
-        internal Expression InternalResolveInstance(Type interfaceType, bool throwIfNotFound, Expression progessCallback)
-        {
-            IEnumerable<Expression> Instances = this.InternalResolveInstances(interfaceType, progessCallback).ToArray();
-            if (Instances.Count() == 1)
+            foreach (object Instance in this.ExternalInstances)
             {
-                return Instances.First();
-            }
-            else
-            {
-                if (throwIfNotFound)
+                if (interfaceType.IsInstanceOfType(Instance))
                 {
-                    if (Instances.Any() == false)
-                    {
-                        string Message =
-                            $"There is no component that implement the interface {interfaceType.Name}.There must be exactly one.";
-                        throw new ResolveComponentException(Message);
-                    }
-                    else // count > 1
-                    {
-                        IEnumerable<Type> ImplementingComponents = (
-                    from object Instance in this.ExternalInstances
-                    where Instance.GetType().GetInterface(interfaceType.FullName) != null
-                    select Instance.GetType()
-                ).Union(
-                    from ComponentDescriptor in this.Repository.GetComponentDescriptors(interfaceType)
-                    select ComponentDescriptor.Type
-                    );
-
-                        string Message = $"There are multiple components that implement the interface {interfaceType.Name}.There must be exactly one.\n\nThe following components implement the interface:\n{string.Join("\n", ImplementingComponents.ConvertTo(type=>type.FullName))}";
-                        throw new ResolveComponentException(Message);
-                    }
+                    yield return Instance;
                 }
-
-                return null;
+            }
+            foreach (ComponentDescriptor Descriptor in this.Repository.GetComponentDescriptors(interfaceType))
+            {
+                yield return this.CreateInstance(interfaceType, Descriptor, progressCallback);
             }
         }
 
-        private Expression CreateInstance(ComponentDescriptor componentDescriptor, Type interfaceType, Expression progressCallback)
+        internal Array InternalResolveInstancesAsArray(Type interfaceType, Action<string> progressCallback)
+        {
+            object[] Components = this.InternalResolveInstances(interfaceType, progressCallback).ToArray();
+            Array ComponentArray = Array.CreateInstance(interfaceType, Components.Length);
+            Array.Copy(Components, ComponentArray, Components.Length);
+            return ComponentArray;
+        }
+
+        internal object InternalResolveInstance(Type interfaceType, bool throwIfNotFound,  Action<string> progessCallback)
+        {
+                object[] Instances = this.InternalResolveInstances(interfaceType, progessCallback).ToArray();
+                if (Instances.Length == 1)
+                {
+                    return Instances[0];
+                }
+                else
+                {
+                    if (throwIfNotFound)
+                    {
+                        if (Instances.Any() == false)
+                        {
+                            string Message =
+                                $"There is no component that implements the interface {interfaceType.FullName}.There must be exactly one.";
+                            throw new ResolveComponentException(Message);
+                        }
+                        else // count > 1
+                        {
+                            IEnumerable<Type> ImplementingComponents = (
+                                from object Instance in this.ExternalInstances
+                                where Instance.GetType().GetInterface(interfaceType.FullName) != null
+                                select Instance.GetType()
+                            ).Union(
+                                from ComponentDescriptor in this.Repository.GetComponentDescriptors(interfaceType)
+                                select ComponentDescriptor.Type
+                            );
+
+                            string Message = $"There are multiple components that implement the interface {interfaceType.FullName}.There must be exactly one.\n\nThe following components implement the interface:\n{string.Join("\n", ImplementingComponents.ConvertTo(type => type.FullName))}";
+                            throw new ResolveComponentException(Message);
+                        }
+                    }
+
+                    return null;
+                }
+        }
+
+        private object CreateInstance(Type interfaceType, ComponentDescriptor componentDescriptor, Action<string> progressCallback) 
         {
             try
             {
                 this.BeginPreventRecursion(componentDescriptor);
                 ComponentInstance ComponentInstance = this.instances[componentDescriptor];
-
-                ParameterExpression InstanceVariable = Expression.Variable(typeof(object));
-                return Expression.Block(
-                    interfaceType,
-                    new[]{InstanceVariable},
-                    Expression.Assign(InstanceVariable, ComponentInstance.CreateInstance(interfaceType, this, progressCallback)),
-                    Expression.Call(Expression.Constant(this.instances),nameof(ComponentInstanceCollection.NotifyInstanceCreated),new Type[0], Expression.Constant(ComponentInstance), InstanceVariable),
-                    Expression.Convert(InstanceVariable,interfaceType)
-                    );
+                return ComponentInstance.CreateInstance(interfaceType, this, progressCallback);
             }
             finally
             {

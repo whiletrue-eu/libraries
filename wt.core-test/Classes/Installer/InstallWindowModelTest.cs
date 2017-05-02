@@ -14,7 +14,7 @@ namespace WhileTrue.Classes.Installer
         {
             private readonly ManualResetEvent downloadCompleteEvent;
             private readonly ManualResetEvent downloadStartedEvent;
-            private bool downloadSuccess;
+            private bool downloadSuccess=true;
             private readonly ManualResetEvent installCompleteEvent;
             private readonly ManualResetEvent installStartedEvent;
             private bool installSuccess;
@@ -342,7 +342,7 @@ namespace WhileTrue.Classes.Installer
             TestPrerequisites[0].MarkInstalled(false);
 
             InstallWindowModelTest.WaitForStateChange<InstallWindowModel.InstallationErrorStatus>(Model);
-            Assert.That(((InstallWindowModel.InstallationErrorStatus)Model.Status).Message, Is.EqualTo("FAIL!"));
+            Assert.That(((InstallWindowModel.InstallationErrorStatus)Model.Status).Message, Is.EqualTo("Install FAIL!"));
         }
 
         [Test]

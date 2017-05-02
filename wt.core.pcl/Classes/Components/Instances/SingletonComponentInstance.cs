@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 using JetBrains.Annotations;
 using WhileTrue.Classes.Utilities;
 
@@ -15,8 +13,6 @@ namespace WhileTrue.Classes.Components
             : base(componentDescriptor)
         {
         }
-
-        protected override object Instance => this.InstanceReference != null ? this.InstanceReference.Target:null;
 
         private SingletonInstanceWrapper InstanceReference
         {
@@ -44,26 +40,13 @@ namespace WhileTrue.Classes.Components
             }
         }
 
-        internal override Expression CreateInstance(Type interfaceType, ComponentContainer componentContainer, Expression progressCallback)
+        internal override object CreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback)
         {
-            /*
             if (this.InstanceReference == null)
             {
-                this.InstanceReference = new SingletonInstanceWrapper(base.CreateInstance(interfaceType, componentContainer, progressCallback));
-                this.LazyInitializeWithInstancesAlreadyExisting(componentContainer);
+                this.InstanceReference = new SingletonInstanceWrapper(this.DoCreateInstance(interfaceType, componentContainer, progressCallback));
             }
             return this.InstanceReference.AddReference(componentContainer);
-             */
-            Expression InstanceProperty = Expression.Property(Expression.Constant(this), nameof(SingletonComponentInstance.InstanceReference));
-            return Expression.Block(
-                typeof(object),
-                Expression.IfThen(
-                    Expression.ReferenceEqual(InstanceProperty, Expression.Constant(null)),
-                    Expression.Block(
-                        Expression.Assign(InstanceProperty, Expression.New(typeof(SingletonInstanceWrapper).GetConstructor(new[] { typeof(object) }), this.DoCreateInstance(interfaceType, componentContainer, progressCallback))),
-                        Expression.Call(Expression.Constant(this), nameof(ComponentInstance.LazyInitializeWithInstancesAlreadyExisting), null, Expression.Constant(componentContainer)))),
-                Expression.Call(InstanceProperty, nameof(SingletonInstanceWrapper.AddReference), null, Expression.Constant(componentContainer))
-                );
         }
 
         internal override void Dispose(ComponentContainer componentContainer)
@@ -71,21 +54,9 @@ namespace WhileTrue.Classes.Components
             if (this.InstanceReference != null &&
                 this.InstanceReference.ReleaseReference(componentContainer))
             {
-                if (this.InstanceReference.Target is IDisposable)
-                {
-                    ((IDisposable) this.InstanceReference.Target).Dispose();
-                }
+                (this.InstanceReference.Target as IDisposable)?.Dispose();
                 this.InstanceReference = null;
                 base.Dispose(componentContainer);
-            }
-        }
-
-
-        internal override void LazyInitialize(PropertyInfo property, object instance)
-        {
-            if (this.InstanceReference != null)
-            {
-                property.SetValue(this.InstanceReference.Target, instance, null);
             }
         }
 
