@@ -52,7 +52,7 @@ namespace WhileTrue.Classes.Components
         {
             return from Property in this.Type.GetRuntimeProperties()
                    where ComponentBindingPropertyAttribute.IsSetFor(Property) 
-                   .DbC_Assure(_=> _==false || Property.CanWrite==false || Property.SetMethod?.IsPublic == false, "ComponentBindingProperty on set attributes no longer supported. Use Constructor Parameter with Func<TInterface> instead for deferred component resolution") &&
+                   .DbC_Assure(_=> _==false || Property.CanWrite==false || Property.SetMethod?.IsPublic == false, $"{Property.DeclaringType.Name}.{Property.Name}: ComponentBindingProperty on set attributes no longer supported. Use Constructor Parameter with Func<TInterface> instead for deferred component resolution") &&
                          Property.CanRead && Property.GetMethod?.IsPublic == true && //must have a public get method
                          Property.PropertyType.IsInterface() &&
                          ComponentRepository.IsComponentInterface(Property.PropertyType)

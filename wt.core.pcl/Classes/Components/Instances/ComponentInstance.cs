@@ -65,23 +65,23 @@ namespace WhileTrue.Classes.Components
             if (OptimalConstructor != null)
             {
                 DateTime Start = DateTime.Now;
-                Debug.WriteLine($"{new string(' ',ComponentInstance.debugIndent*3)}Start instanciation of {this.Name}");
+                Debug.WriteLine($"{new string(' ',ComponentInstance.debugIndent*3)}Start instantiation of {this.Name}");
                 ComponentInstance.debugIndent++;
                 try
                 {
-                    IEnumerable<object> ConstructorParameters = this.GetParametersFor(OptimalConstructor, componentContainer, progressCallback);
+                    object[] ConstructorParameters = this.GetParametersFor(OptimalConstructor, componentContainer, progressCallback).ToArray();
                     DateTime ParameterResolved = DateTime.Now;
                     progressCallback?.Invoke(this.Descriptor.Name);
-                    object Component = OptimalConstructor.Invoke(ConstructorParameters.ToArray());
+                    object Component = OptimalConstructor.Invoke(ConstructorParameters);
                     DateTime ComponentCreated = DateTime.Now;
                     ComponentInstance.debugIndent--;
-                    Debug.WriteLine($"{new string(' ', ComponentInstance.debugIndent * 3)}Instanciation of {this.Name} took {ComponentInstance.Format(ComponentCreated - Start)} (params: {ComponentInstance.Format(ParameterResolved - Start)}, ctor: {ComponentInstance.Format(ComponentCreated - ParameterResolved)})");
+                    Debug.WriteLine($"{new string(' ', ComponentInstance.debugIndent * 3)}Instantiation of {this.Name} took {ComponentInstance.Format(ComponentCreated - Start)} (params: {ComponentInstance.Format(ParameterResolved - Start)}, ctor: {ComponentInstance.Format(ComponentCreated - ParameterResolved)})");
                     return Component;
                 }
                 catch (Exception Error)
                 {
                     ComponentInstance.debugIndent--;
-                    Debug.WriteLine($"{new string(' ', ComponentInstance.debugIndent * 3)}Instanciation of {this.Name} failed with message: {Error.Message.Replace("\n",$"\n{new string(' ', ComponentInstance.debugIndent * 3)}")}");
+                    Debug.WriteLine($"{new string(' ', ComponentInstance.debugIndent * 3)}Instantiation of {this.Name} failed with message: {Error.Message.Replace("\n",$"\n{new string(' ', ComponentInstance.debugIndent * 3)}")}");
                     throw;
                 }
             }
