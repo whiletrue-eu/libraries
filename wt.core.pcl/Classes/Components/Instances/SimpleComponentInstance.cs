@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace WhileTrue.Classes.Components
 {
@@ -20,6 +21,7 @@ namespace WhileTrue.Classes.Components
         {
             (this.instance as IDisposable)?.Dispose();
             this.instance = null;
+            Debug.WriteLine($"Disposing simple component instance {this.Name}");
             base.Dispose(componentContainer);
         }
     }

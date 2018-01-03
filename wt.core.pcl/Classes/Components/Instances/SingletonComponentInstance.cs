@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using WhileTrue.Classes.Utilities;
 
@@ -56,6 +57,7 @@ namespace WhileTrue.Classes.Components
             {
                 (this.InstanceReference.Target as IDisposable)?.Dispose();
                 this.InstanceReference = null;
+                Debug.WriteLine($"Disposing singleton component instance {this.Name}");
                 base.Dispose(componentContainer);
             }
         }
