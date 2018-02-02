@@ -29,9 +29,13 @@ namespace WhileTrue.Classes.Framework
             this.innerList.CollectionChanged += this.InnerListCollectionChanged;
 
             ((INotifyCollectionChanged)source).CollectionChanged += this.SourceCollectionChanged;
-            foreach( TSourceType Item in source)
+
+            int Index = 0;
+
+            foreach ( TSourceType Item in source)
             {
-                this.Add(Item);
+                this.Insert(Item, Index);
+                Index++;
             }            
         }
 
@@ -40,13 +44,13 @@ namespace WhileTrue.Classes.Framework
             this.CollectionChanged(this, e);
         }
 
-        private void Add(TSourceType item)
+        private void Insert(TSourceType item, int index)
         {
             TItemType FilteredItem = this.FilterItem(item);
             if (object.Equals(FilteredItem, default(TItemType)) == false)
             {
                 this.itemMappings.Add(item, FilteredItem);
-                this.innerList.Add(FilteredItem);
+                this.innerList.Insert(index,FilteredItem);
             }
         }
 
@@ -64,7 +68,7 @@ namespace WhileTrue.Classes.Framework
                     {
                         throw new NotSupportedException("Cannot handle collection events with more than one item!");
                     }
-                    this.Add((TSourceType) e.NewItems[0]);
+                    this.Insert((TSourceType) e.NewItems[0], e.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems.Count > 1)
