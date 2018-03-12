@@ -306,7 +306,8 @@ namespace WhileTrue.Classes.Commands
     public class AsyncDelegateCommand<T> : DelegateCommandBase<T>
     {
         private readonly Func<T, Task> executeDelegate;
-        private readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private bool isExecuting;
 
         /// <summary>
         /// Implements a command which is always executable
@@ -344,24 +345,29 @@ namespace WhileTrue.Classes.Commands
         {
             if (this.executeLock.TryEnterWriteLock(0))
             {
-                try
+                if (this.isExecuting == false)
                 {
-                    await this.executeDelegate((T) (parameter ?? default(T)));
-                }
-                catch (Exception Exception)
-                {
-                    if (this.ExceptionHandler != null)
+                    this.isExecuting = true;
+                    try
                     {
-                        this.ExceptionHandler(Exception);
+                        await this.executeDelegate((T) (parameter ?? default(T)));
                     }
-                    else
+                    catch (Exception Exception)
                     {
-                        throw;
+                        if (this.ExceptionHandler != null)
+                        {
+                            this.ExceptionHandler(Exception);
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
-                }
-                finally
-                {
-                    this.executeLock.ExitWriteLock();
+                    finally
+                    {
+                        this.isExecuting = false;
+                        this.executeLock.ExitWriteLock();
+                    }
                 }
             }
             else
