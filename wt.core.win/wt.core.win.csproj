@@ -194,7 +194,6 @@
     <Compile Include="Controls\NotificationLabel\NotificationTypeTypeConverter.cs" />
     <Compile Include="Controls\NotificationLabel\ValidationResultBanner.cs" />
     <Compile Include="Controls\Progress\Progress.cs" />
-    <Compile Include="Facades\ApplicationLoader\IMainModule.cs" />
     <Compile Include="Controls\AnimatedImage\AnimatedImage.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentUnavailableControl.cs" />
     <Compile Include="Controls\DialogPanel\DialogPanelModeStyle.cs" />
@@ -240,14 +239,9 @@
     <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyExtension.cs" />
     <Compile Include="Classes\UIFeatures\UIFeatureManagement.cs" />
     <Compile Include="Classes\UIFeatures\FeatureVisibleExtension.cs" />
-    <Compile Include="Components\ApplicationLoading\ApplicationLoader.cs" />
     <Compile Include="Components\UIFeatures\UIFeatureManager.cs" />
     <Compile Include="Controls\Progress\ProgressControl.cs" />
-    <Compile Include="Facades\ApplicationLoader\IApplicationLoader.cs" />
-    <Compile Include="Facades\ApplicationLoader\IApplicationMain.cs" />
-    <Compile Include="Facades\ApplicationLoader\IModule.cs" />
     <Compile Include="Facades\ProgressOutput\IProgress.cs" />
-    <Compile Include="Facades\SplashScreen\ISplashScreen.cs" />
     <Compile Include="Facades\SystemDialogs\ISystemDialogsProvider.cs" />
     <Compile Include="Facades\SystemDialogs\OpenFileDialogResult.cs" />
     <Compile Include="Facades\SystemDialogs\SaveFileDialogResult.cs" />
