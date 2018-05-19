@@ -134,6 +134,12 @@
     <Compile Include="Classes\Utilities\Conversion.cs" />
     <Compile Include="Classes\Utilities\DbC.cs" />
     <Compile Include="Classes\Utilities\ReflectionHelper.cs" />
+    <Compile Include="Components\ApplicationLoading\ApplicationLoader.cs" />
+    <Compile Include="Facades\ApplicationLoader\IApplicationLoader.cs" />
+    <Compile Include="Facades\ApplicationLoader\IApplicationMain.cs" />
+    <Compile Include="Facades\ApplicationLoader\IMainModule.cs" />
+    <Compile Include="Facades\ApplicationLoader\IModule.cs" />
+    <Compile Include="Facades\SplashScreen\ISplashScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

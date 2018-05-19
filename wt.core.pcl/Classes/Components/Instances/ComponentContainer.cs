@@ -230,7 +230,14 @@ namespace WhileTrue.Classes.Components
 
             foreach (ComponentInstance ComponentInstance in this.ComponentInstances)
             {
-                ComponentInstance.Dispose(this);
+                try
+                {
+                    ComponentInstance.Dispose(this);
+                }
+                catch
+                {
+                    //Ignore
+                }
             }
 
             this.disposed = true;

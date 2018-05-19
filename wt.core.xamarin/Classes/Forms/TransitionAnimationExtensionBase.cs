@@ -52,11 +52,13 @@ namespace WhileTrue.Classes.Forms
         }
 
         public bool AnimateInitially { get; set; }
+        public IValueConverter Converter { get; set; }
         private bool isInitialValue = true;
 
         private object value;
         private BindableObject bindableObject;
         private VisualElement visualElement;
+        private IValueConverter imageConverter;
 
         private static void SourceChanged(BindableObject bindable, object oldvalue, object newvalue)
         {
@@ -72,6 +74,8 @@ namespace WhileTrue.Classes.Forms
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Value)));
             }
         }
+
+
 
         private void SetNewValue(object newvalue)
         {
@@ -110,8 +114,8 @@ namespace WhileTrue.Classes.Forms
             {
                 this.bindableObject.BindingContextChanged += this.TransitionAnimationExtension_BindingContextChanged;
             }
-            return new Binding("Value", BindingMode.OneWay, source: this);
-
+            
+            return new Binding("Value", BindingMode.OneWay, source: this, converter: this.Converter);
         }
 
         private void TransitionAnimationExtension_BindingContextChanged(object sender, EventArgs e)

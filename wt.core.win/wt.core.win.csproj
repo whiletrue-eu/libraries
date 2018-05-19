@@ -26,7 +26,7 @@
     </SccProvider>
     <TargetFrameworkProfile />
     <OldToolsVersion>4.0</OldToolsVersion>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\Projects\Projects\Source\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>
@@ -60,9 +60,8 @@
       <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.0.5797.27534, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\..\App\packages\NUnit.3.0.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
@@ -194,7 +193,6 @@
     <Compile Include="Controls\NotificationLabel\NotificationTypeTypeConverter.cs" />
     <Compile Include="Controls\NotificationLabel\ValidationResultBanner.cs" />
     <Compile Include="Controls\Progress\Progress.cs" />
-    <Compile Include="Facades\ApplicationLoader\IMainModule.cs" />
     <Compile Include="Controls\AnimatedImage\AnimatedImage.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentUnavailableControl.cs" />
     <Compile Include="Controls\DialogPanel\DialogPanelModeStyle.cs" />
@@ -240,14 +238,9 @@
     <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyExtension.cs" />
     <Compile Include="Classes\UIFeatures\UIFeatureManagement.cs" />
     <Compile Include="Classes\UIFeatures\FeatureVisibleExtension.cs" />
-    <Compile Include="Components\ApplicationLoading\ApplicationLoader.cs" />
     <Compile Include="Components\UIFeatures\UIFeatureManager.cs" />
     <Compile Include="Controls\Progress\ProgressControl.cs" />
-    <Compile Include="Facades\ApplicationLoader\IApplicationLoader.cs" />
-    <Compile Include="Facades\ApplicationLoader\IApplicationMain.cs" />
-    <Compile Include="Facades\ApplicationLoader\IModule.cs" />
     <Compile Include="Facades\ProgressOutput\IProgress.cs" />
-    <Compile Include="Facades\SplashScreen\ISplashScreen.cs" />
     <Compile Include="Facades\SystemDialogs\ISystemDialogsProvider.cs" />
     <Compile Include="Facades\SystemDialogs\OpenFileDialogResult.cs" />
     <Compile Include="Facades\SystemDialogs\SaveFileDialogResult.cs" />

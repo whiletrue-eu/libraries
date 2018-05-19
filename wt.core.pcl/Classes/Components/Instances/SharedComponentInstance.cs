@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace WhileTrue.Classes.Components
 {
@@ -54,6 +55,7 @@ namespace WhileTrue.Classes.Components
             {
                 (this.InstanceReference.Target as IDisposable)?.Dispose();
                 this.InstanceReference = null;
+                Debug.WriteLine($"Disposing shared component instance {this.Name}");
                 base.Dispose(componentContainer);
             }
         }

@@ -115,6 +115,26 @@ namespace WhileTrue.Classes.Utilities
         }
 
         /// <summary>
+        /// Concatenates the two arrays into one
+        /// </summary>
+        public static T[] Concat<T>(T[] data1, T[] data2)
+        {
+            if (data1 == null)
+            {
+                return data2;
+            }
+            if (data2 == null)
+            {
+                return data1;
+            }
+            T[] Data = new T[data1.Length + data2.Length];
+            Array.Copy(data1,0,Data,0,data1.Length);
+            Array.Copy(data2,0,Data, data1.Length, data2.Length);
+
+            return Data;
+        }
+
+        /// <summary>
         /// Executes the given <c>action</c> on each item of the enumeration
         /// </summary>
         public static void ForEach<TArrayType>(this IEnumerable<TArrayType> sequence, Action<TArrayType> action)
