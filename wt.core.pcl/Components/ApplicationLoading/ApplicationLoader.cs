@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using WhileTrue.Classes.CodeInspection;
 using WhileTrue.Classes.Components;
 using WhileTrue.Facades.ApplicationLoader;
 using WhileTrue.Facades.SplashScreen;
@@ -37,8 +39,8 @@ namespace WhileTrue.Components.ApplicationLoading
 
                 try
                 {
-                    ApplicationLoader.ResolveModules(ComponentContainer);
-                    ApplicationMain = ComponentContainer.ResolveInstance<IApplicationMain>((max, current, status) => SplashScreen.SetStatus(max, current, status));
+                    this.ResolveModules(ComponentContainer);
+                    ApplicationMain = ComponentContainer.ResolveInstance<IApplicationMain>(status => SplashScreen.SetStatus(status));
                 }
                 finally
                 {
@@ -53,7 +55,7 @@ namespace WhileTrue.Components.ApplicationLoading
         /// <summary>
         /// resolves all modules,i.e. callas all modules to include subcomponents into the compontent container
         /// </summary>
-        private static void ResolveModules(ComponentContainer componentContainer)
+        public void ResolveModules(ComponentContainer componentContainer)
         {
             // Add components through modules. To support recursive modules, 
             // do this until no new modules are inserted
@@ -78,12 +80,12 @@ namespace WhileTrue.Components.ApplicationLoading
                 Plugin.Initialize(componentContainer);
             }
         }
-
+        [ExcludeFromCodeCoverage]
         private class SplashDummy : ISplashScreen
         {
             public void Show(){}
             public void Hide(){}
-            public void SetStatus(int totalNumber, int currentNumber, string name)
+            public void SetStatus(string name)
             {
             }
         }

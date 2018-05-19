@@ -1,7 +1,13 @@
 // ReSharper disable MemberCanBePrivate.Global
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
+using WhileTrue.Classes.CodeInspection;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -130,7 +136,7 @@ namespace WhileTrue.Classes.Components
         }
 
 
-        internal ComponentDescriptor[] GetComponentDescriptors(Type interfaceType)
+        internal ComponentDescriptor[] GetComponentDescriptors(Type interfaceType) 
         {
             ComponentDescriptor[] ComponentDescriptors = (
                                                              from ComponentDescriptor ComponentDescriptor in this.componentDescriptors
@@ -158,6 +164,71 @@ namespace WhileTrue.Classes.Components
         internal static bool IsComponentInterface(Type interfaceType)
         {
             return interfaceType.GetCustomAttributes<ComponentInterfaceAttribute>().Any();
+        }
+
+        /// <summary>
+        /// Returns the components and interface dependencies as an Eclipe UML2 model
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        public void CopyAsUml2ModelToStream(Stream output)
+        {
+            string XmiNs = "http://www.omg.org/spec/XMI/20131001";
+            string UmlNs = "http://www.eclipse.org/uml2/5.0.0/UML";
+            using (XmlWriter Writer = XmlWriter.Create(output, new XmlWriterSettings {Indent = true, Encoding = Encoding.UTF8}))
+            {
+                IEnumerable<Type> AllInterfaces = this.componentDescriptors.SelectMany(_ => _.GetProvidedInterfaces());
+
+                Writer.WriteStartDocument();
+                Writer.WriteStartElement("uml","Model", UmlNs);
+                Writer.WriteAttributeString("xmi","version", XmiNs , "20131001");
+                Writer.WriteAttributeString("xmi","id", XmiNs, "root");
+                Writer.WriteAttributeString("name", "Root");
+                foreach( IGrouping<string, ComponentDescriptor> GroupedComponents in this.componentDescriptors.GroupBy(_=>_.Type.Namespace) )
+                {
+                    Writer.WriteStartElement("packagedElement");
+                    Writer.WriteAttributeString("xmi", "type", XmiNs, "uml:Package");
+                    Writer.WriteAttributeString("xmi", "id", XmiNs, Encoding.UTF8.GetBytes(GroupedComponents.Key).ToHexString());
+                    Writer.WriteAttributeString("name", GroupedComponents.Key.Substring(GroupedComponents.Key.LastIndexOf('.')+1));
+                    foreach (ComponentDescriptor Component in GroupedComponents)
+                    {
+                        Writer.WriteStartElement("packagedElement");
+                        Writer.WriteAttributeString("xmi", "type", XmiNs, "uml:Component");
+                        Writer.WriteAttributeString("xmi", "id", XmiNs, Encoding.UTF8.GetBytes(Component.Type.FullName).ToHexString());
+                        Writer.WriteAttributeString("name", Component.Name);
+                        foreach (Type ProvidedInterface in Component.GetProvidedInterfaces())
+                        {
+                            Writer.WriteStartElement("interfaceRealization");
+                            Writer.WriteAttributeString("xmi", "type", XmiNs, "uml:InterfaceRealization");
+                            Writer.WriteAttributeString("xmi", "id", XmiNs, Encoding.UTF8.GetBytes($"{Component.Type.FullName}-provides-{ProvidedInterface.FullName}").ToHexString());
+                            Writer.WriteAttributeString("client", Encoding.UTF8.GetBytes(Component.Type.FullName).ToHexString());
+                            Writer.WriteAttributeString("supplier", Encoding.UTF8.GetBytes(ProvidedInterface.FullName).ToHexString());
+                            Writer.WriteAttributeString("contract", Encoding.UTF8.GetBytes(ProvidedInterface.FullName).ToHexString());
+                            Writer.WriteEndElement();
+                        }
+                        foreach (Type RequiredInterface in Component.GetRequiredInterfaces().Where(_=>AllInterfaces.Contains(_)))
+                        {
+                            Writer.WriteStartElement("packagedElement");
+                            Writer.WriteAttributeString("xmi", "type", XmiNs, "uml:Dependency");
+                            Writer.WriteAttributeString("xmi", "id", XmiNs, Encoding.UTF8.GetBytes($"{Component.Type.FullName}-requires-{RequiredInterface.FullName}").ToHexString());
+                            Writer.WriteAttributeString("client", Encoding.UTF8.GetBytes(Component.Type.FullName).ToHexString());
+                            Writer.WriteAttributeString("supplier", Encoding.UTF8.GetBytes(RequiredInterface.FullName).ToHexString());
+                            Writer.WriteEndElement();
+                        }
+                        Writer.WriteEndElement();
+                    }
+                    Writer.WriteEndElement();
+                }
+                foreach (Type Interface in AllInterfaces)
+                {
+                    Writer.WriteStartElement("packagedElement");
+                    Writer.WriteAttributeString("xmi", "type", XmiNs, "uml:Interface");
+                    Writer.WriteAttributeString("xmi", "id", XmiNs, Encoding.UTF8.GetBytes(Interface.FullName).ToHexString());
+                    Writer.WriteAttributeString("name", Interface.Name);
+                    Writer.WriteEndElement();
+                }
+                Writer.WriteEndElement();
+                Writer.WriteEndDocument();
+            }
         }
     }
 }

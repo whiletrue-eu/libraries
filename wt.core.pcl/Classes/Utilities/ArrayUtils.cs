@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace WhileTrue.Classes.Utilities
 {
@@ -114,6 +115,26 @@ namespace WhileTrue.Classes.Utilities
         }
 
         /// <summary>
+        /// Concatenates the two arrays into one
+        /// </summary>
+        public static T[] Concat<T>(T[] data1, T[] data2)
+        {
+            if (data1 == null)
+            {
+                return data2;
+            }
+            if (data2 == null)
+            {
+                return data1;
+            }
+            T[] Data = new T[data1.Length + data2.Length];
+            Array.Copy(data1,0,Data,0,data1.Length);
+            Array.Copy(data2,0,Data, data1.Length, data2.Length);
+
+            return Data;
+        }
+
+        /// <summary>
         /// Executes the given <c>action</c> on each item of the enumeration
         /// </summary>
         public static void ForEach<TArrayType>(this IEnumerable<TArrayType> sequence, Action<TArrayType> action)
@@ -121,6 +142,17 @@ namespace WhileTrue.Classes.Utilities
             foreach (TArrayType Item in sequence)
             {
                 action(Item);
+            }
+        }
+
+        /// <summary>
+        /// Executes the given <c>actionAsync</c> on each item of the enumeration
+        /// </summary>
+        public static async Task ForEachAsync<TArrayType>(this IEnumerable<TArrayType> sequence, Func<TArrayType,Task> actionAsync)
+        {
+            foreach (TArrayType Item in sequence)
+            {
+                await actionAsync(Item);
             }
         }
 

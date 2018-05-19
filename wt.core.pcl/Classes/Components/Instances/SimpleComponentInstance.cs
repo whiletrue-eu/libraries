@@ -1,6 +1,5 @@
 using System;
-using System.Linq.Expressions;
-using System.Reflection;
+using System.Diagnostics;
 
 namespace WhileTrue.Classes.Components
 {
@@ -13,46 +12,17 @@ namespace WhileTrue.Classes.Components
         {
         }
 
-        protected override object Instance => this.instance;
-
-        internal override Expression CreateInstance(Type interfaceType, ComponentContainer componentContainer, Expression progressCallback)
+        internal override object CreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback)
         {
-            /*
-            if (this.instance == null)
-            {
-                this.instance = base.CreateInstance(interfaceType, componentContainer, progressCallback);
-                this.LazyInitializeWithInstancesAlreadyExisting(componentContainer);
-            }
-            return this.instance;
-             */
-            Expression InstanceField = Expression.Field(Expression.Constant(this), nameof(SimpleComponentInstance.instance));
-            return Expression.Block(
-                typeof(object),
-                Expression.IfThen(
-                    Expression.ReferenceEqual(InstanceField, Expression.Constant(null)),
-                    Expression.Block(
-                        Expression.Assign(InstanceField, this.DoCreateInstance(interfaceType, componentContainer, progressCallback)),
-                        Expression.Call(Expression.Constant(this), nameof(ComponentInstance.LazyInitializeWithInstancesAlreadyExisting), null, Expression.Constant(componentContainer)))),
-                InstanceField
-                );
+            return this.instance ?? (this.instance = this.DoCreateInstance(interfaceType, componentContainer, progressCallback));
         }
 
         internal override void Dispose(ComponentContainer componentContainer)
         {
-            if (this.instance is IDisposable)
-            {
-                ((IDisposable) this.instance).Dispose();
-            }
+            (this.instance as IDisposable)?.Dispose();
             this.instance = null;
+            Debug.WriteLine($"Disposing simple component instance {this.Name}");
             base.Dispose(componentContainer);
-        }
-
-        internal override void LazyInitialize(PropertyInfo property, object instance)
-        {
-            if (this.instance != null)
-            {
-                property.SetValue(this.instance, instance, null);
-            }
         }
     }
 }

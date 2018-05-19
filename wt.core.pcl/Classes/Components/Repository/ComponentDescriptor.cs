@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using JetBrains.Annotations;
+using WhileTrue.Classes.CodeInspection;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -48,50 +48,54 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public ComponentRepository PrivateRepository { get; }
 
-        internal IEnumerable<PropertyInfo> GetLazyInitializeProperties()
-        {
-                return
-                    from Property in this.Type.GetRuntimeProperties()
-                    where Property.CanWrite && Property.SetMethod?.IsPublic == true && //must have a puzblic set method
-                          Property.PropertyType.IsInterface() &&
-                          ComponentRepository.IsComponentInterface(Property.PropertyType) &&
-                          ComponentBindingPropertyAttribute.IsSetFor(Property)
-                    select Property;
-
-        }
-
-        private IEnumerable<Type> GetProvidedInterfaces()
-        {
-            return (
-                       from InterfaceType in this.Type.GetInterfaces()
-                       where ComponentRepository.IsComponentInterface(InterfaceType)
-                       select InterfaceType
-                   ).Union(
-                       from Property in this.GetProvidedDelegatedProperties()
-                       select Property.PropertyType
-                );
-        }
-
         private IEnumerable<PropertyInfo> GetProvidedDelegatedProperties()
         {
             return from Property in this.Type.GetRuntimeProperties()
-                   where Property.CanRead && Property.GetMethod?.IsPublic == true && //must have a public get method
+                   where ComponentBindingPropertyAttribute.IsSetFor(Property) 
+                   .DbC_Assure(_=> _==false || Property.CanWrite==false || Property.SetMethod?.IsPublic == false, $"{Property.DeclaringType.Name}.{Property.Name}: ComponentBindingProperty on set attributes no longer supported. Use Constructor Parameter with Func<TInterface> instead for deferred component resolution") &&
+                         Property.CanRead && Property.GetMethod?.IsPublic == true && //must have a public get method
                          Property.PropertyType.IsInterface() &&
-                         ComponentRepository.IsComponentInterface(Property.PropertyType) &&
-                         ComponentBindingPropertyAttribute.IsSetFor(Property)
+                         ComponentRepository.IsComponentInterface(Property.PropertyType)
+                         
                    select Property;
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal IEnumerable<Type> GetProvidedInterfaces()
+        {
+            return (
+                from InterfaceType in this.Type.GetInterfaces()
+                where ComponentRepository.IsComponentInterface(InterfaceType)
+                select InterfaceType
+            ).Union(
+                from Property in this.GetProvidedDelegatedProperties()
+                select Property.PropertyType
+            );
+        }
+
+        [ExcludeFromCodeCoverage]
+        internal IEnumerable<Type> GetRequiredInterfaces()
+        {
+            return (
+                from Constructor in this.Type.GetConstructors()
+                from ConstructorParameter in Constructor.GetParameters()
+                let ParameterType = ConstructorParameter.ParameterType
+                let InterfaceType = ParameterType.IsArray
+                    ? ParameterType.GetElementType() //interface array
+                    : ParameterType.IsConstructedGenericType && ParameterType.GetGenericTypeDefinition() == typeof(Func<>)
+                        ? ParameterType.GenericTypeArguments[0].IsArray
+                            ? ParameterType.GenericTypeArguments[0].GetElementType() //func interface array
+                            : ParameterType.GenericTypeArguments[0] //func interface
+                        : ParameterType // interface
+                where ComponentRepository.IsComponentInterface(InterfaceType)
+                select InterfaceType
+            ).Distinct();
         }
 
         internal bool ProvidesInterface(Type interfaceType)
         {
-            if (this.GetProvidedInterfaces().Contains(interfaceType))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return interfaceType.IsAssignableFrom(this.Type) ||
+                   (from Property in this.GetProvidedDelegatedProperties() where interfaceType.IsAssignableFrom(Property.PropertyType) select Property).Any();
         }
 
         /// <summary>
@@ -120,22 +124,6 @@ namespace WhileTrue.Classes.Components
                     from Property in this.GetProvidedDelegatedProperties()
                     where interfaceType.IsAssignableFrom(Property.PropertyType)
                     select Property.GetValue(instance,null)
-                    ).FirstOrDefault();
-            }
-        }
-
-        internal Expression TryCastExpressionTo(Expression instance, Type interfaceType)
-        {
-            if (interfaceType.IsAssignableFrom(this.Type))
-            {
-                return Expression.Convert(instance, interfaceType);
-            }
-            else
-            {
-                return (
-                    from Property in this.GetProvidedDelegatedProperties() 
-                    where interfaceType.IsAssignableFrom(Property.PropertyType) 
-                    select Expression.Property(instance, Property)
                     ).FirstOrDefault();
             }
         }

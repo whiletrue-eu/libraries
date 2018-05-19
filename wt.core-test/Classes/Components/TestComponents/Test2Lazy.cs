@@ -1,10 +1,21 @@
 
+using System;
+
 namespace WhileTrue.Classes.Components.TestComponents
 {
     [Component]
     internal class Test2Lazy : ITestFacade2
     {
-        [ComponentBindingProperty]
-        public ITestFacade1 TestFacade1 { set; internal get; }
+        private readonly Func<ITestFacade1> testFacade1;
+        private readonly Func<ITestFacade1[]> testFacade1Array;
+
+        public Test2Lazy(Func<ITestFacade1> testFacade1, Func<ITestFacade1[]> testFacade1Array)
+        {
+            this.testFacade1 = testFacade1;
+            this.testFacade1Array = testFacade1Array;
+        }
+
+        public ITestFacade1 TestFacade1 => this.testFacade1();
+        public ITestFacade1[] TestFacade1Array => this.testFacade1Array();
     }
 }

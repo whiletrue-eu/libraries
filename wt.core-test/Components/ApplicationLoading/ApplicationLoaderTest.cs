@@ -37,8 +37,8 @@ namespace WhileTrue.Components.ApplicationLoading
 
                 Assert.AreEqual(2, SplashScreen.StatusTexts.Count);
 
-                Assert.AreEqual("Status: 1/2,Test2", SplashScreen.StatusTexts[0]);
-                Assert.AreEqual("Status: 2/2,Test1", SplashScreen.StatusTexts[1]);
+                Assert.AreEqual("Status: Test2", SplashScreen.StatusTexts[0]);
+                Assert.AreEqual("Status: Test1", SplashScreen.StatusTexts[1]);
             }
         }
     }

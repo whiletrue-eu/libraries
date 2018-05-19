@@ -64,8 +64,24 @@ namespace WhileTrue.Classes.Framework
         /// <summary>
         /// Implementation of the <see cref="INotifyPropertyChanged.PropertyChanged"/> event.
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => DebugLogger.WriteLine(sender, LoggingLevel.Normal, () => $"PropertyChanged({e.PropertyName})");
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add
+            {
+                lock (this.propertyChanged)
+                {
+                    this.propertyChanged += value;
+                }
+            }
+            remove {
+                lock (this.propertyChanged)
+                {
+                    this.propertyChanged -= value;
+                }
+            }
+        }
 
+        private event PropertyChangedEventHandler propertyChanged = (sender, e) => DebugLogger.WriteLine(sender, LoggingLevel.Normal, () => $"PropertyChanged({e.PropertyName})");
         /// <summary>
         /// Fires the <see cref="PropertyChanged"/> event.
         /// </summary>
@@ -82,7 +98,12 @@ namespace WhileTrue.Classes.Framework
         /// </example>
         protected void InvokePropertyChanged(string propertyName)
         {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChangedEventHandler Handler;
+            lock (this.propertyChanged)
+            {
+                Handler = this.propertyChanged;
+            }
+            Handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -108,7 +129,7 @@ namespace WhileTrue.Classes.Framework
         protected void SetAndInvoke<TFieldType>(string propertyName, ref TFieldType field, TFieldType newValue, Action<string> changeDelegate=null)
         {
             // ReSharper disable once ExplicitCallerInfoArgument
-            ObservableObjectHelper.SetAndInvoke(this, this.PropertyChanged, ref field, newValue, changeDelegate, propertyName);
+            ObservableObjectHelper.SetAndInvoke(this, this.propertyChanged, ref field, newValue, changeDelegate, propertyName);
         }     
         
         
@@ -135,7 +156,7 @@ namespace WhileTrue.Classes.Framework
         protected void SetAndInvoke<TFieldType>(ref TFieldType field, TFieldType newValue, Action<string> changeDelegate=null, [CallerMemberName] string propertyName = null)
         {
             // ReSharper disable once ExplicitCallerInfoArgument
-            ObservableObjectHelper.SetAndInvoke(this, this.PropertyChanged, ref field, newValue, changeDelegate, propertyName);
+            ObservableObjectHelper.SetAndInvoke(this, this.propertyChanged, ref field, newValue, changeDelegate, propertyName);
         }
 
         #endregion
@@ -161,7 +182,7 @@ namespace WhileTrue.Classes.Framework
 
         internal void NotifyPropertyChanged(string propertyName)
         {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            this.propertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private class PropertyAdapterFactory<T> : IPropertyAdapterFactory<T> where T : ObservableObject
