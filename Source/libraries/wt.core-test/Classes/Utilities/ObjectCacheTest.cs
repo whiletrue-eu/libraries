@@ -50,6 +50,7 @@ namespace WhileTrue.Classes.Utilities
             Object = null;
             GC.Collect();
             GC.WaitForFullGCComplete(10000);
+            GC.Collect(10, GCCollectionMode.Forced);
 
             Assert.IsFalse(ObjectRef.IsAlive);
 
