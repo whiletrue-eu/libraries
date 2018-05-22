@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using WhileTrue.Classes.CodeInspection;
@@ -19,20 +21,23 @@ namespace WhileTrue.Classes.Components
     public class ComponentRepository
     {
         private readonly ComponentRepository parentRepository;
+        private readonly Func<Type, bool> getMustRunOnUiThreadFunc;
         private readonly Collection<ComponentDescriptor> componentDescriptors = new Collection<ComponentDescriptor>();
 
         /// <summary/>
-        public ComponentRepository()
-            :this(null)
+        public ComponentRepository(Func<Type,bool> getMustRunOnUiThreadFunc=null, Func<Func<Task<object>>,Task<object>> runOnUiThreadFunc=null)
+            :this(null, getMustRunOnUiThreadFunc, runOnUiThreadFunc)
         {
         }
 
         /// <summary>
         /// The parent repository is used when no matching component is found in the current repository
         /// </summary>
-        public ComponentRepository(ComponentRepository parentRepository)
+        public ComponentRepository(ComponentRepository parentRepository, Func<Type, bool> getMustRunOnUiThreadFunc = null, Func<Func<Task<object>>, Task<object>> runOnUiThreadFunc=null)
         {
             this.parentRepository = parentRepository;
+            this.getMustRunOnUiThreadFunc = getMustRunOnUiThreadFunc;
+            this.RunOnUiThread = runOnUiThreadFunc??(async _=> await _());
         }
         
 
@@ -166,6 +171,9 @@ namespace WhileTrue.Classes.Components
             return interfaceType.GetCustomAttributes<ComponentInterfaceAttribute>().Any();
         }
 
+        internal Func<Func<Task<object>>, Task<object>> RunOnUiThread { get; }
+
+
         /// <summary>
         /// Returns the components and interface dependencies as an Eclipe UML2 model
         /// </summary>
@@ -229,6 +237,11 @@ namespace WhileTrue.Classes.Components
                 Writer.WriteEndElement();
                 Writer.WriteEndDocument();
             }
+        }
+
+        internal bool GetMustCreateOnUiThread(Type type)
+        {
+            return this.getMustRunOnUiThreadFunc?.Invoke(type) ?? false;
         }
     }
 }

@@ -3,7 +3,7 @@ using System;
 
 namespace WhileTrue.Classes.Components.TestComponents
 {
-    [Component]
+    [Component(ThreadAffinity = ThreadAffinity.NeedsUiThread)]
     internal class Test2Lazy : ITestFacade2
     {
         private readonly Func<ITestFacade1> testFacade1;

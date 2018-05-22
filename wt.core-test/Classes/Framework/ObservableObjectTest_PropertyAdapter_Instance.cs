@@ -19,8 +19,8 @@ namespace WhileTrue.Classes.Framework
     [TestFixture]
     public class ObservableObjectTest_PropertyAdapter_Instance
     {
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             Logging.DebugLogger.EnableLogging(typeof (NotifyChangeExpression<>), LoggingLevel.Verbose);
             Logging.DebugLogger.EnableLogging(typeof (ObservableObject), LoggingLevel.Normal);
@@ -822,12 +822,15 @@ namespace WhileTrue.Classes.Framework
         [Test]
         public void weak_property_adapter_shall_allow_adapter_to_be_released()
         {
-            TestObject TestObject = new TestObject();
-            WeakAdapter WeakAdapter = new WeakAdapter(TestObject);
+            WeakReference Create(TestObject testObject)
+            {
+                WeakAdapter WeakAdapter = new WeakAdapter(testObject);
+                WeakReference weakAdapterReference = new WeakReference(WeakAdapter);
+                return weakAdapterReference;
+            }
 
-            WeakReference WeakAdapterReference = new WeakReference(WeakAdapter);
-            // ReSharper disable once RedundantAssignment
-            WeakAdapter = null;
+            TestObject TestObject = new TestObject();
+            WeakReference WeakAdapterReference = Create(TestObject);
 
             GC.Collect();
 

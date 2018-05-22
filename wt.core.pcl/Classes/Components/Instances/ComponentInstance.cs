@@ -4,7 +4,8 @@ using System.Collections.Generic;
  using System.Linq;
  using System.Linq.Expressions;
  using System.Reflection;
-using JetBrains.Annotations;
+ using System.Threading.Tasks;
+ using JetBrains.Annotations;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -33,6 +34,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public ComponentDescriptor Descriptor { get; }
 
+
         #region IDisposable Members
 
         internal virtual void Dispose(ComponentContainer componentContainer)
@@ -43,7 +45,7 @@ namespace WhileTrue.Classes.Components
 
         #endregion
 
-        private object CreateWithOptimalConstructor(ComponentContainer componentContainer, Action<string> progressCallback)
+        private async Task<object> CreateWithOptimalConstructorAsync(ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
             ConstructorInfo OptimalConstructor = null;
             List<string> DiagnosisInformation = new List<string>();
@@ -69,7 +71,7 @@ namespace WhileTrue.Classes.Components
                 ComponentInstance.debugIndent++;
                 try
                 {
-                    object[] ConstructorParameters = this.GetParametersFor(OptimalConstructor, componentContainer, progressCallback).ToArray();
+                    object[] ConstructorParameters = await this.GetParametersForAsync(OptimalConstructor, componentContainer, progressCallback, resolveStack);
                     DateTime ParameterResolved = DateTime.Now;
                     progressCallback?.Invoke(this.Descriptor.Name);
                     object Component = OptimalConstructor.Invoke(ConstructorParameters);
@@ -98,70 +100,82 @@ namespace WhileTrue.Classes.Components
         /// Gets the parameter list to call the given constructor. If a parameter could not be
         /// resolved, null is returned
         /// </summary>
-        private IEnumerable<object> GetParametersFor(ConstructorInfo constructor, ComponentContainer componentContainer, Action<string> progressCallback)
+        private async Task<object[]> GetParametersForAsync(ConstructorInfo constructor, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
+            async Task<object> CreateInstanceAsync(Type parameterType, string parameterName)
+            {
+                object Instance = await componentContainer.InternalResolveInstanceAsync(parameterType, true, progressCallback,resolveStack);
+                Instance.DbC_AssureNotNull($"Could not resolve component '{this.Descriptor.Type.FullName}' even though resolver claimed that he can. Parameter '{parameterName}' (type providing '{parameterType.FullName}' implementation) could not be instanciated");
+                return Instance;
+            }
+
+            async Task<object> CreateInstanceArrayAsync(Type parameterType)
+            {
+                Array Instances = await componentContainer.InternalResolveInstancesAsArrayAsync(parameterType, progressCallback,resolveStack);
+                return Instances;
+            }
+
+            List<Task<object>> Parameters = new List<Task<object>>();
             foreach (ParameterInfo Parameter in constructor.GetParameters())
             {
                 Type ParameterType = Parameter.ParameterType;
                 if (ComponentInstance.IsValidInterfaceReference(ParameterType))
                 {
-                    object Component = componentContainer.InternalResolveInstance(ParameterType, true, progressCallback);
-                    Component.DbC_AssureNotNull($"Could not resolve component '{this.Descriptor.Type.FullName}' even though resolver claimed that he can. Parameter '{Parameter.Name}' (type providing '{ParameterType.FullName}' implementation) could not be instanciated");
-                    yield return Component;
+                    Task<object> Component = CreateInstanceAsync(ParameterType, Parameter.Name);
+                    Parameters.Add(Component);
+                }
+                else if (ComponentInstance.IsValidInterfaceTaskReference(ParameterType))
+                {
+                    object Component = ComponentContainerUtils.DoDynamicCastAsync( ParameterType, CreateInstanceAsync(ParameterType.GenericTypeArguments[0], Parameter.Name));
+                    Parameters.Add(Task.FromResult(Component));
                 }
                 else if (ComponentInstance.IsValidFuncToInterfaceReference(ParameterType))
                 {
                     LambdaExpression Lambda = Expression.Lambda(
                         ParameterType,
                         Expression.Convert(
-                            ((Expression<Func<object>>)(() => componentContainer.InternalResolveInstance(ParameterType.GenericTypeArguments[0], true, progressCallback))).Body,
+                            ((Expression<Func<object>>)(() => componentContainer.InternalResolveInstanceAsync(ParameterType.GenericTypeArguments[0], true, progressCallback, new ComponentDescriptor[0]).Result)).Body,
                              ParameterType.GenericTypeArguments[0]));
 
-                    yield return Lambda.Compile();
+                    Parameters.Add(Task.FromResult((Object)Lambda.Compile()));
                 }
                 else if (ComponentInstance.IsValidInterfaceArrayReference(ParameterType))
                 {
-                    yield return componentContainer.InternalResolveInstancesAsArray(ParameterType.GetElementType(), progressCallback);
+                    Parameters.Add(componentContainer.InternalResolveInstancesAsArrayAsync(ParameterType.GetElementType(), progressCallback, resolveStack).ContinueWith(_=>(object)_.Result));
+                }
+                else if (ComponentInstance.IsValidInterfaceArrayTaskReference(ParameterType))
+                {
+                    object Component = ComponentContainerUtils.DoDynamicCastAsync(ParameterType, CreateInstanceArrayAsync(ParameterType.GenericTypeArguments[0].GetElementType()));
+                    Parameters.Add(Task.FromResult(Component));
                 }
                 else if (ComponentInstance.IsValidFuncToInterfaceArrayReference(ParameterType))
                 {
                     LambdaExpression Lambda = Expression.Lambda(
                         ParameterType,
                         Expression.Convert(
-                            ((Expression<Func<Array>>) (() => componentContainer.InternalResolveInstancesAsArray(ParameterType.GenericTypeArguments[0].GetElementType(), progressCallback))).Body,
+                            ((Expression<Func<Array>>) (() => componentContainer.InternalResolveInstancesAsArrayAsync(ParameterType.GenericTypeArguments[0].GetElementType(), progressCallback, new ComponentDescriptor[0]).Result)).Body,
                             ParameterType.GenericTypeArguments[0]));
 
-                    yield return Lambda.Compile();
+                    Parameters.Add(Task.FromResult((Object)Lambda.Compile()));
                 }
                 else if (ParameterType == typeof(ComponentRepository))
                 {
-                    if (this.Descriptor.PrivateRepository != null)
-                    {
-                        yield return this.Descriptor.PrivateRepository;
-                    }
-                    else
-                    {
-                        yield return this.Descriptor.Repository;
-                    }
+                    Parameters.Add(Task.FromResult((object) this.Descriptor.PrivateRepository ?? this.Descriptor.Repository));
                 }
                 else if (ParameterType == typeof(ComponentContainer))
                 {
-                    yield return componentContainer;
+                    Parameters.Add(Task.FromResult((object)componentContainer));
                 }
                 else if (ParameterType.IsAssignableFrom(this.Descriptor.ConfigType))
                 {
-                    yield return this.Descriptor.Config;
+                    Parameters.Add(Task.FromResult((object)this.Descriptor.Config));
                 }
                 else
                 {
                     throw new InvalidOperationException("Internal error: tried to resolve constructor parameters even though the constructor wasn't adequate");
                 }
             }
-        }
-
-        private static bool IsValidInterfaceArrayReference(Type parameterType)
-        {
-            return parameterType.IsArray && parameterType.GetElementType().IsInterface();
+            return await Task.WhenAll(Parameters);
         }
 
         /// <summary>
@@ -181,6 +195,14 @@ namespace WhileTrue.Classes.Components
                         return false;
                     }
                 }
+                else if (ComponentInstance.IsValidInterfaceTaskReference(ParameterType))
+                {
+                    //Task to Simple interface reference
+                    if (CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0], true, $"{ParameterType.Name} {Parameter.Name}", "a", out diagnosisInformation) == false)
+                    {
+                        return false;
+                    }
+                }
                 else if (ComponentInstance.IsValidFuncToInterfaceReference(ParameterType))
                 {
                     //Func<> Interface reference
@@ -193,6 +215,14 @@ namespace WhileTrue.Classes.Components
                 {
                     //Array of interface
                     if( CheckInterfaceParameter(componentContainer, ParameterType.GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "an array of a", out diagnosisInformation) == false)
+                    {
+                        return false;
+                    }
+                }
+                else if (ComponentInstance.IsValidInterfaceArrayTaskReference(ParameterType))
+                {
+                    //Task to Array of interface
+                    if (CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0].GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "an array of a", out diagnosisInformation) == false)
                     {
                         return false;
                     }
@@ -219,7 +249,7 @@ namespace WhileTrue.Classes.Components
                 }
                 else
                 {
-                    diagnosisInformation = $"parameter '{ParameterType.Name} {Parameter.Name}' type not supported. Except component interfaces, arrays of component interfaces, Func<> returning component interfaces or arrays of them, only ComponentRepository, ComponentContainer and the 'Config' Type using in component registration (if given) can be used.";
+                    diagnosisInformation = $"parameter '{ParameterType.Name} {Parameter.Name}' type not supported. Except component interfaces, arrays of component interfaces, Func<> returning component interfaces or arrays of them or Tasks returning the above, only ComponentRepository, ComponentContainer and the 'Config' Type using in component registration (if given) can be used.";
                     return false;
                 }
             }
@@ -230,18 +260,45 @@ namespace WhileTrue.Classes.Components
 
         private static bool IsValidFuncToInterfaceArrayReference(Type parameterType)
         {
-            return parameterType.IsConstructedGenericType && parameterType.GetGenericTypeDefinition() == typeof(Func<>) && parameterType.GenericTypeArguments[0].IsArray && parameterType.GenericTypeArguments[0].GetElementType().IsInterface();
+            return parameterType.IsConstructedGenericType &&
+                   parameterType.GetGenericTypeDefinition() == typeof(Func<>) &&
+                   parameterType.GenericTypeArguments[0].IsArray &&
+                   parameterType.GenericTypeArguments[0].GetElementType().IsInterface();
         }
 
         private static bool IsValidFuncToInterfaceReference(Type parameterType)
         {
-            return parameterType.IsConstructedGenericType && parameterType.GetGenericTypeDefinition() == typeof(Func<>) && parameterType.GenericTypeArguments[0].IsInterface();
+            return parameterType.IsConstructedGenericType &&
+                   parameterType.GetGenericTypeDefinition() == typeof(Func<>) &&
+                   parameterType.GenericTypeArguments[0].IsInterface();
         }
 
         private static bool IsValidInterfaceReference(Type parameterType)
         {
             return parameterType.IsInterface();
         }
+
+        private static bool IsValidInterfaceTaskReference(Type parameterType)
+        {
+            return parameterType.IsConstructedGenericType &&
+                   parameterType.GetGenericTypeDefinition() == typeof(Task<>) &&
+                   parameterType.GenericTypeArguments[0].IsInterface();
+        }
+
+        private static bool IsValidInterfaceArrayReference(Type parameterType)
+        {
+            return parameterType.IsArray &&
+                   parameterType.GetElementType().IsInterface();
+        }
+
+        private static bool IsValidInterfaceArrayTaskReference(Type parameterType)
+        {
+            return parameterType.IsConstructedGenericType &&
+                   parameterType.GetGenericTypeDefinition() == typeof(Task<>) &&
+                   parameterType.GenericTypeArguments[0].IsArray &&
+                   parameterType.GenericTypeArguments[0].GetElementType().IsInterface();
+        }
+
 
         private bool CheckInterfaceParameter(ComponentContainer componentContainer, Type parameterType, bool mustResolve, string parameterTypeAndName, string specialTypeName, out string diagnosisInformation)
         {
@@ -266,16 +323,16 @@ namespace WhileTrue.Classes.Components
             return true;
         }
 
-        internal abstract object CreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback);
+        internal abstract Task<object> CreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack);
 
-        internal object DoCreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback)
+        internal async Task<object> DoCreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
             this.CheckDisposed();
 
             this.Descriptor.DbC_Assure(value => value.Type == interfaceType || value.ProvidesInterface(interfaceType),
                 $"Requested interface type '{interfaceType.FullName}' not supported by component '{this.Descriptor.Type.FullName}'");
 
-            return this.CastTo(this.CreateWithOptimalConstructor(componentContainer, progressCallback), interfaceType);
+            return this.CastTo(await this.CreateWithOptimalConstructorAsync(componentContainer, progressCallback,resolveStack), interfaceType);
         }
 
         private object CastTo(object instance, Type interfaceType)

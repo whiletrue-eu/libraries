@@ -81,7 +81,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Properties\SignKey.snk</AssemblyOriginatorKeyFile>
@@ -93,6 +93,7 @@
     <Compile Include="Classes\CodeInspection\ExcludeFromCodeCoverage.cs" />
     <Compile Include="Classes\Commands\DelegateCommand.cs" />
     <Compile Include="Classes\Components\Instances\ComponentContainer.cs" />
+    <Compile Include="Classes\Components\Instances\ComponentContainerUtils.cs" />
     <Compile Include="Classes\Components\Instances\ComponentInstance.cs" />
     <Compile Include="Classes\Components\Instances\ComponentInstanceCollection.cs" />
     <Compile Include="Classes\Components\Instances\ComponentInstanceEvent.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Classes\Components\Repository\SharedComponentDescriptor.cs" />
     <Compile Include="Classes\Components\Repository\SimpleComponentDescriptor.cs" />
     <Compile Include="Classes\Components\Repository\SingletonComponentDescriptor.cs" />
+    <Compile Include="Classes\Components\Repository\ThreadAffinity.cs" />
     <Compile Include="Classes\Framework\EnumerablePropertyAdapter.cs" />
     <Compile Include="Classes\Framework\EnumerationAdapter.cs" />
     <Compile Include="Classes\Framework\IObjectValidation.cs" />
@@ -150,6 +152,12 @@
     <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\portable-net45+netcore45+wpa81\Nito.AsyncEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Concurrent, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\portable-net45+netcore45+wpa81\Nito.AsyncEx.Concurrent.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

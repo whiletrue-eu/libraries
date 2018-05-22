@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Nito.AsyncEx;
 
 namespace WhileTrue.Classes.Components
 {
@@ -39,14 +42,19 @@ namespace WhileTrue.Classes.Components
             }
         }
 
-        internal override object CreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback)
+        internal override async Task<object> CreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
-            if (this.InstanceReference == null)
+            using (await new AsyncMonitor().EnterAsync())
             {
-                this.InstanceReference = new SharedInstanceWrapper(this.DoCreateInstance(interfaceType, componentContainer, progressCallback));
+                if (this.InstanceReference == null)
+                {
+                    this.InstanceReference = new SharedInstanceWrapper(await this.DoCreateInstanceAsync(interfaceType, componentContainer, progressCallback, resolveStack));
+                }
+
+                return this.InstanceReference.AddReference(componentContainer);
             }
-            return this.InstanceReference.AddReference(componentContainer);
         }
+
 
         internal override void Dispose(ComponentContainer componentContainer)
         {

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using WhileTrue.Classes.Components.TestComponents;
 #pragma warning disable 1591
 // ReSharper disable InconsistentNaming
@@ -107,9 +109,7 @@ namespace WhileTrue.Classes.Components
                 Container.ResolveInstance<ITestFacade2>(name=>Progress.Add(name));
             }
 
-            Assert.That(Progress.Count, Is.EqualTo(2) );
-            Assert.That(Progress[0], Is.EqualTo("Test2A") );
-            Assert.That(Progress[1], Is.EqualTo("Test1"));
+            Assert.That(Progress, Is.EquivalentTo(new[]{ "Test2A" , "Test1" }) );
         }
 
         [Test]
@@ -310,11 +310,22 @@ namespace WhileTrue.Classes.Components
 
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
-                TestReference = new WeakReference(Container.ResolveInstance<ITestFacade1>());
+                TestReference = ComponentsTest.ResolveWeak<ITestFacade1>(Container);
                 Assert.IsTrue(TestReference.IsAlive);
             }
+
             GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             Assert.IsFalse(TestReference.IsAlive);
+        }
+
+        /// <summary>
+        /// Needed to aviod the compiler to generate local variables that could affect garbage collection within tests
+        /// </summary>
+        private static WeakReference ResolveWeak<T>(ComponentContainer Container) where T : class
+        {
+            return new WeakReference(Container.ResolveInstance<T>());
         }
 
         [Test]
@@ -342,7 +353,7 @@ namespace WhileTrue.Classes.Components
 
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
-                TestReference = new WeakReference(Container.ResolveInstance<ITestFacade1>());
+                TestReference = ResolveWeak<ITestFacade1>(Container);
                 Assert.IsTrue(TestReference.IsAlive);
             }
             GC.Collect();
@@ -360,11 +371,12 @@ namespace WhileTrue.Classes.Components
             using (ComponentContainer Container1 = new ComponentContainer(Repository))
             using (ComponentContainer Container2 = new ComponentContainer(Repository))
             {
-                Container1.ResolveInstance<ITestFacade1>();
-                TestReference = new WeakReference(Container2.ResolveInstance<ITestFacade1>());
+                ResolveWeak<ITestFacade1>(Container1);
+                TestReference = ResolveWeak<ITestFacade1>(Container2);
                 Assert.IsTrue(TestReference.IsAlive);
             }
             GC.Collect();
+
             Assert.IsFalse(TestReference.IsAlive);
         }
 
@@ -393,7 +405,7 @@ namespace WhileTrue.Classes.Components
 
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
-                TestReference = new WeakReference(Container.ResolveInstance<ITestFacade1>());
+                TestReference = ResolveWeak<ITestFacade1>(Container);
                 Assert.IsTrue(TestReference.IsAlive);
             }
             GC.Collect();
@@ -413,11 +425,12 @@ namespace WhileTrue.Classes.Components
             using (ComponentContainer Container1 = new ComponentContainer(Repository1))
             using (ComponentContainer Container2 = new ComponentContainer(Repository2))
             {
-                Container1.ResolveInstance<ITestFacade1>();
-                TestReference = new WeakReference(Container2.ResolveInstance<ITestFacade1>());
+                ResolveWeak<ITestFacade1>(Container1);
+                TestReference = ResolveWeak<ITestFacade1>(Container2);
                 Assert.IsTrue(TestReference.IsAlive);
             }
             GC.Collect();
+                GC.WaitForPendingFinalizers();
             Assert.IsFalse(TestReference.IsAlive);
         }
 
@@ -487,7 +500,7 @@ namespace WhileTrue.Classes.Components
      
     
         [Test]
-        public void component_properties_shall_support_func_to_interface()
+        public void constructor_dependecies_shall_support_func_to_interface()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
@@ -503,7 +516,7 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
-        public void component_properties_shall_support_func_to_interface_array()
+        public void constructor_dependecies_shall_support_func_to_interface_array()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
@@ -519,7 +532,39 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
-        public void component_properties_shall_support_func_to_interface_in_cyclic_dependency_scenario_component()
+        public async Task constructor_dependecies_shall_support_task_to_interface()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
+            Repository.AddComponent<Test2Tasks>(ComponentInstanceScope.Container);
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                Container.ResolveInstance<ITestFacade1>();
+                ITestFacade2 TestFacade2 = Container.ResolveInstance<ITestFacade2>();
+
+                Assert.IsNotNull(await ((Test2Tasks)TestFacade2).TestFacade1);
+            }
+        }
+
+        [Test]
+        public async Task constructor_dependecies_shall_support_task_to_interface_array()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>(ComponentInstanceScope.Container);
+            Repository.AddComponent<Test2Tasks>(ComponentInstanceScope.Container);
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                Container.ResolveInstance<ITestFacade1>();
+                ITestFacade2 TestFacade2 = Container.ResolveInstance<ITestFacade2>();
+
+                Assert.IsNotNull(await ((Test2Tasks)TestFacade2).TestFacade1Array);
+            }
+        }
+
+        [Test]
+        public void constructor_dependecies_shall_support_func_to_interface_in_cyclic_dependency_scenario_component()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<RecursionTest1>(ComponentInstanceScope.Container);
@@ -535,7 +580,7 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
-        public void component_properties_shall_support_func_to_interface_in_cyclic_dependency_scenario_shared()
+        public void constructor_dependecies_shall_support_func_to_interface_in_cyclic_dependency_scenario_shared()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<RecursionTest1>(ComponentInstanceScope.Repository);
@@ -551,7 +596,7 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
-        public void component_properties_shall_support_func_to_interface_in_cyclic_dependency_scenario_singleton()
+        public void constructor_dependecies_shall_support_func_to_interface_in_cyclic_dependency_scenario_singleton()
         {
             ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<RecursionTest1>(ComponentInstanceScope.Global);
@@ -738,10 +783,7 @@ namespace WhileTrue.Classes.Components
                 Container.ResolveInstance<ITestFacade2>(name => Progress.Add(name));
             }
 
-            Assert.That(Progress.Count, Is.EqualTo(3));
-            Assert.That(Progress[0], Is.EqualTo("Test2B"));
-            Assert.That(Progress[1], Is.EqualTo("Test1"));  
-            Assert.That(Progress[2], Is.EqualTo("ConfigTest1"));
+            Assert.That(Progress, Is.EquivalentTo(new[]{ "Test2B" , "Test1" , "ConfigTest1" }));
         }
 
         [Test]
@@ -915,6 +957,97 @@ namespace WhileTrue.Classes.Components
                 Test1 Test1 = (Test1)Container.ResolveInstance<ITestFacade1>();
 
                 Assert.IsNotNull(Test1);
+            }
+        }
+
+
+        [Test]
+        public async Task Components_resolved_in_a_multithreaded_way_shall_resolve_to_the_same_instances()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<MultithreadTest>();
+            Repository.AddComponent<Test2C>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                MultithreadTest Test = (MultithreadTest)Container.ResolveInstance<ITestFacade1>();
+                ITestFacade2 Dependency = Container.ResolveInstance<ITestFacade2>();
+
+                Assert.That(Test.Dependency1, Is.SameAs(Dependency));
+                Assert.That(Test.Dependency2, Is.SameAs(Dependency));
+                Assert.That(Test.Dependency3, Is.EquivalentTo(new[]{Dependency}));
+                Assert.That(await Test.Dependency4, Is.SameAs(Dependency));
+                Assert.That(await Test.Dependency5, Is.EquivalentTo(new[] { Dependency }));
+            }
+        }
+
+        [Test]
+        public async Task Components_that_need_Ui_thread_because_of_automatic_detection_must_be_created_in_this_way()
+        {
+            List<object> InstancesCreatedInUiThread = new List<object>();
+
+            Task<object> RunInMainThread(Func<Task<object>> func)
+            {
+                TaskCompletionSource<object> CompletionSource = new TaskCompletionSource<object>();
+                func().ContinueWith(_ =>
+                {
+                    InstancesCreatedInUiThread.Add(_.Result);
+                    CompletionSource.SetResult(_.Result);
+                });
+                return CompletionSource.Task;
+            }
+
+            ComponentRepository Repository = new ComponentRepository(type=>typeof(ITestFacade1).IsAssignableFrom(type), RunInMainThread);
+            Repository.AddComponent<MultithreadTest>();
+            Repository.AddComponent<Test2C>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                MultithreadTest Test = (MultithreadTest)Container.ResolveInstance<ITestFacade1>();
+                ITestFacade2 Dependency = Container.ResolveInstance<ITestFacade2>();
+
+                Assert.That(Test.Dependency1, Is.SameAs(Dependency));
+                Assert.That(Test.Dependency2, Is.SameAs(Dependency));
+                Assert.That(Test.Dependency3, Is.EquivalentTo(new[] { Dependency }));
+                Assert.That(await Test.Dependency4, Is.SameAs(Dependency));
+                Assert.That(await Test.Dependency5, Is.EquivalentTo(new[] { Dependency }));
+
+                Assert.That(InstancesCreatedInUiThread, Is.EquivalentTo(new[] { Test }));
+            }
+        }
+
+        [Test]
+        public async Task Components_that_need_Ui_thread_because_of_attribute_must_be_created_in_this_way()
+        {
+            List<object> InstancesCreatedInUiThread = new List<object>();
+
+            Task<object> RunInMainThread(Func<Task<object>> func)
+            {
+                TaskCompletionSource<object> CompletionSource = new TaskCompletionSource<object>();
+                func().ContinueWith(_ =>
+                {
+                    InstancesCreatedInUiThread.Add(_.Result);
+                    CompletionSource.SetResult(_.Result);
+                });
+                return CompletionSource.Task;
+            }
+
+            ComponentRepository Repository = new ComponentRepository(type => false, RunInMainThread);
+            Repository.AddComponent<MultithreadTest>();
+            Repository.AddComponent<Test2Lazy>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                MultithreadTest Test = (MultithreadTest)Container.ResolveInstance<ITestFacade1>();
+                ITestFacade2 Dependency = Container.ResolveInstance<ITestFacade2>();
+
+                Assert.That(Test.Dependency1, Is.SameAs(Dependency));
+                Assert.That(Test.Dependency2, Is.SameAs(Dependency));
+                Assert.That(Test.Dependency3, Is.EquivalentTo(new[] { Dependency }));
+                Assert.That(await Test.Dependency4, Is.SameAs(Dependency));
+                Assert.That(await Test.Dependency5, Is.EquivalentTo(new[] { Dependency }));
+
+                Assert.That(InstancesCreatedInUiThread, Is.EquivalentTo(new object[] { Test.Dependency1, Test.Dependency2, Test.Dependency3[0], await Test.Dependency4, (await Test.Dependency5)[0], Dependency }));
             }
         }
     }

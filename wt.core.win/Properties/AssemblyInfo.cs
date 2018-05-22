@@ -26,9 +26,4 @@ using System.Windows.Markup;
     // app, or any theme specific resource dictionaries)
     )]
 
-[assembly: InternalsVisibleTo("wt.core-test, PublicKey=" +
-    "00240000048000009400000006020000002400005253413100040000010001003f60df4257cd72" +
-    "864fd20018aba54f9130ea2a3b9cc5ac54668d56566fc19f4bcdaf0426681a992661c282c7340c" +
-    "e85c7186019711ca93616c413cb612920539fe1131f904988d9a522f720106c6efb007f22a4a08" +
-    "fb18eae209ae7786a2237bae19452c770a7202c18faa9cd83d1fa0f53cc12f1f7967919710b6c4" +
-    "b48182d7")]
+[assembly: InternalsVisibleTo("wt.core-test")]

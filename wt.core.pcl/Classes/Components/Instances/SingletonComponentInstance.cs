@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Nito.AsyncEx;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -10,7 +13,7 @@ namespace WhileTrue.Classes.Components
     {
          private static readonly Dictionary<Type, SingletonInstanceWrapper> singletonInstances = new Dictionary<Type, SingletonInstanceWrapper>();
 
-         internal SingletonComponentInstance(ComponentDescriptor componentDescriptor)
+        internal SingletonComponentInstance(ComponentDescriptor componentDescriptor)
             : base(componentDescriptor)
         {
         }
@@ -41,13 +44,17 @@ namespace WhileTrue.Classes.Components
             }
         }
 
-        internal override object CreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback)
+        internal override async Task<object> CreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
-            if (this.InstanceReference == null)
+            using (await new AsyncMonitor().EnterAsync())
             {
-                this.InstanceReference = new SingletonInstanceWrapper(this.DoCreateInstance(interfaceType, componentContainer, progressCallback));
+                if (this.InstanceReference == null)
+                {
+                    this.InstanceReference = new SingletonInstanceWrapper(await this.DoCreateInstanceAsync(interfaceType, componentContainer, progressCallback, resolveStack));
+                }
+
+                return this.InstanceReference.AddReference(componentContainer);
             }
-            return this.InstanceReference.AddReference(componentContainer);
         }
 
         internal override void Dispose(ComponentContainer componentContainer)

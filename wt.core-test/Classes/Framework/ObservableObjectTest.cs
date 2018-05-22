@@ -9,8 +9,8 @@ namespace WhileTrue.Classes.Framework
     [TestFixture]
     public class ObservableObjectTest
     {
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             Logging.DebugLogger.EnableLogging(typeof(NotifyChangeExpression<>), LoggingLevel.Verbose);
             Logging.DebugLogger.EnableLogging(typeof(ObservableObject), LoggingLevel.Normal);
