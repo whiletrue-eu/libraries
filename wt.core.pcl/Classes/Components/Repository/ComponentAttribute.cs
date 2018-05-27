@@ -26,6 +26,9 @@ namespace WhileTrue.Classes.Components
 
         public ThreadAffinity ThreadAffinity { get; set; } = ThreadAffinity.Automatic;
 
+        /// <summary>
+        /// Returns the ComponenAttribute associated to the given type. Throws exception if there is not attribute defined
+        /// </summary>
         public static ComponentAttribute FromType(Type type)
         {
             ComponentAttribute[] Attributes = (ComponentAttribute[])type.GetCustomAttributes<ComponentAttribute>();

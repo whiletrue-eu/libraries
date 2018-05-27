@@ -314,7 +314,7 @@ namespace WhileTrue.Classes.Components
                 Assert.IsTrue(TestReference.IsAlive);
             }
 
-            GC.Collect();
+            GC.Collect(Int32.MaxValue,GCCollectionMode.Forced,true);
             GC.WaitForPendingFinalizers();
 
             Assert.IsFalse(TestReference.IsAlive);
@@ -450,10 +450,10 @@ namespace WhileTrue.Classes.Components
         public void resolving_an_instance_shall_throw_an_exception_if_multiple_components_of_that_type_are_registered()
         {
             ComponentRepository Repository = new ComponentRepository();
-            Repository.AddComponent<Test1>();
+           Test1 Test1 = new Test1();
             Repository.AddComponent<ConfigTest1>(new Config());
 
-            using (ComponentContainer Container = new ComponentContainer(Repository))
+            using (ComponentContainer Container = new ComponentContainer(Repository, Test1))
             {
                 Assert.Throws<ResolveComponentException>(() => Container.ResolveInstance<ITestFacade1>());
             }
@@ -843,6 +843,19 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
+        public void Exception_during_dispose_shall_be_ignored()
+        {
+            // in another test case, an exception was thrown in dispose because the instance did not construct properly.
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<DisposeCrashTest>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                Container.ResolveInstance<ITestFacade1>();
+            }
+        }
+
+        [Test]
         public void Exception_shall_be_thrown_if_no_suitable_constructor_is_found()
         {
             ComponentRepository Repository = new ComponentRepository();
@@ -871,6 +884,20 @@ namespace WhileTrue.Classes.Components
         public void Resolve_shall_include_external_instances()
         {
             ComponentRepository Repository = new ComponentRepository();
+            Test1 Test1 = new Test1();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository, Test1))
+            {
+                Test1 ResolvedTest1 = (Test1) Container.ResolveInstance<ITestFacade1>();
+
+                Assert.AreSame(Test1, ResolvedTest1);
+            }
+        }
+
+        [Test]
+        public void Resolve_constructor_dependency_shall_include_external_instances()
+        {
+            ComponentRepository Repository = new ComponentRepository();
             Repository.AddComponent<Test2>();
             Test1 Test1 = new Test1();
 
@@ -895,6 +922,19 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
+        public void Component_resolve_shall_work()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+               ITestFacade1 Test1 = Container.ResolveInstance<ITestFacade1>();
+                Assert.That(Test1, Is.Not.Null);
+            }
+        }
+
+        [Test]
         public void Component_resolve_shall_only_work_with_componentinterface()
         {
             ComponentRepository Repository = new ComponentRepository();
@@ -902,6 +942,19 @@ namespace WhileTrue.Classes.Components
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
                 Assert.Throws<ArgumentException>(() => Container.ResolveInstance<INoComponentInterfaceFacade>());
+            }
+        }
+
+        [Test]
+        public void Component_try_resolve_shall_work()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                ITestFacade1 Test1 = Container.TryResolveInstance<ITestFacade1>();
+                Assert.That(Test1, Is.Not.Null);
             }
         }
 
@@ -929,6 +982,20 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
+        public void ComponentArray_resolve_shall_work()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                ITestFacade1[] Test1 = Container.ResolveInstances<ITestFacade1>();
+                Assert.That(Test1.Length, Is.EqualTo(1));
+                Assert.That(Test1[0], Is.Not.Null);
+            }
+        }
+
+        [Test]
         public void ComponentArray_resolve_shall_only_work_with_componentinterface()
         {
             ComponentRepository Repository = new ComponentRepository();
@@ -936,6 +1003,91 @@ namespace WhileTrue.Classes.Components
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
                 Assert.Throws<ArgumentException>(() => Container.ResolveInstances<INoComponentInterfaceFacade>());
+            }
+        }
+
+        [Test]
+        public async Task Component_resolve_asnyc_shall_work()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                ITestFacade1 Test1 = await Container.ResolveInstanceAsync<ITestFacade1>();
+                Assert.That(Test1, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void Component_resolve_async_shall_only_work_with_componentinterface()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                Assert.ThrowsAsync<ArgumentException>(async () => await Container.ResolveInstanceAsync<INoComponentInterfaceFacade>());
+            }
+        }
+
+        [Test]
+        public async Task Component_try_resolve_async_shall_work()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                ITestFacade1 Test1 = await Container.TryResolveInstanceAsync<ITestFacade1>();
+                Assert.That(Test1, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void Component_try_resolve_asnyc_shall_only_work_with_componentinterface()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                Assert.ThrowsAsync<ArgumentException>(async () => await Container.TryResolveInstanceAsync<INoComponentInterfaceFacade>());
+            }
+        }
+
+        [Test]
+        public async Task Component_try_resolve_async_shall_return_null_if_no_component_is_found()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                ITestFacade1 Instance = await Container.TryResolveInstanceAsync<ITestFacade1>();
+                Assert.That(Instance, Is.Null);
+            }
+        }
+
+        [Test]
+        public async Task ComponentArray_resolve_async_shall_work()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                ITestFacade1[] Test1 = await Container.ResolveInstancesAsync<ITestFacade1>();
+                Assert.That(Test1.Length, Is.EqualTo(1));
+                Assert.That(Test1[0], Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void ComponentArray_resolve_asnyc_shall_only_work_with_componentinterface()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+
+            using (ComponentContainer Container = new ComponentContainer(Repository))
+            {
+                Assert.ThrowsAsync<ArgumentException>(async () => await Container.ResolveInstancesAsync<INoComponentInterfaceFacade>());
             }
         }
     

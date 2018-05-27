@@ -42,7 +42,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Properties\whiletrue.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
@@ -85,6 +86,7 @@
     <Compile Include="Classes\Components\TestComponents\ConfigTest2.cs" />
     <Compile Include="Classes\Components\TestComponents\DelegatedTest.cs" />
     <Compile Include="Classes\Components\TestComponents\Disposable.cs" />
+    <Compile Include="Classes\Components\TestComponents\DisposeCrashTest.cs" />
     <Compile Include="Classes\Components\TestComponents\DisposeTest.cs" />
     <Compile Include="Classes\Components\TestComponents\DisposeWithDependencyTest.cs" />
     <Compile Include="Classes\Components\TestComponents\INoComponentInterfaceFacade.cs" />
@@ -173,7 +175,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Properties\whiletrue.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">

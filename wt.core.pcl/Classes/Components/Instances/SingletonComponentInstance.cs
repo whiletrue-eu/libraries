@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Nito.AsyncEx;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -12,6 +11,7 @@ namespace WhileTrue.Classes.Components
     internal class SingletonComponentInstance : ComponentInstance
     {
          private static readonly Dictionary<Type, SingletonInstanceWrapper> singletonInstances = new Dictionary<Type, SingletonInstanceWrapper>();
+        private readonly SemaphoreSlim instanceLock = new SemaphoreSlim(1, 1);
 
         internal SingletonComponentInstance(ComponentDescriptor componentDescriptor)
             : base(componentDescriptor)
@@ -46,7 +46,8 @@ namespace WhileTrue.Classes.Components
 
         internal override async Task<object> CreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
-            using (await new AsyncMonitor().EnterAsync())
+            await this.instanceLock.WaitAsync();
+            try
             {
                 if (this.InstanceReference == null)
                 {
@@ -54,6 +55,10 @@ namespace WhileTrue.Classes.Components
                 }
 
                 return this.InstanceReference.AddReference(componentContainer);
+            }
+            finally
+            {
+                this.instanceLock.Release();
             }
         }
 

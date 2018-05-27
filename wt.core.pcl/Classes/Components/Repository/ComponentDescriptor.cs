@@ -22,7 +22,7 @@ namespace WhileTrue.Classes.Components
             this.Config = config;
             this.ConfigType = config?.GetType();
             this.PrivateRepository = privateRepository;
-            this.MustCreateOnUiThread = ComponentDescriptor.GetComponentUIThreadAffinity(type, this.Repository);
+            this.MustCreateOnUiThread = ComponentDescriptor.GetComponentUiThreadAffinity(type, this.Repository);
         }
 
 
@@ -50,6 +50,9 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public ComponentRepository PrivateRepository { get; }
 
+        /// <summary>
+        /// States whether the component instance can be created on any thread (including background) or if it must be done on the UI Thread
+        /// </summary>
         public bool MustCreateOnUiThread { get; private set; }
 
         private IEnumerable<PropertyInfo> GetProvidedDelegatedProperties()
@@ -137,7 +140,7 @@ namespace WhileTrue.Classes.Components
             return ComponentAttribute.FromType(type).Name ?? type.Name;
         }
 
-        private static bool GetComponentUIThreadAffinity(Type type, ComponentRepository repository)
+        private static bool GetComponentUiThreadAffinity(Type type, ComponentRepository repository)
         {
             ThreadAffinity ThreadAffinity = ComponentAttribute.FromType(type).ThreadAffinity;
             switch (ThreadAffinity)

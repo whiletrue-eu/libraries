@@ -2,13 +2,13 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
 
 namespace WhileTrue.Classes.Components
 {
     internal class SimpleComponentInstance : ComponentInstance
     {
         private object instance;
+        private readonly SemaphoreSlim instanceLock = new SemaphoreSlim(1, 1);
 
         internal SimpleComponentInstance(ComponentDescriptor componentDescriptor)
             : base(componentDescriptor)
@@ -17,9 +17,14 @@ namespace WhileTrue.Classes.Components
 
         internal override async Task<object> CreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback,ComponentDescriptor[] resolveStack)
         {
-            using (await new AsyncMonitor().EnterAsync())
+            await this.instanceLock.WaitAsync();
+            try
             {
                 return this.instance ?? (this.instance = await this.DoCreateInstanceAsync(interfaceType, componentContainer, progressCallback, resolveStack));
+            }
+            finally
+            {
+                this.instanceLock.Release();
             }
         }
 

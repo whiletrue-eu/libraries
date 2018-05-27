@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Nito.AsyncEx;
 using WhileTrue.Classes.Utilities;
@@ -54,7 +52,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public TInterface ResolveInstance<TInterface>(Action<string> progressCallback = null) where TInterface : class
         {
-            return this.UnwrapException(() => AsyncContext.Run(()=>this.InternalResolveInstanceAsync<TInterface>(true, progressCallback, new ComponentDescriptor[0])));
+            return AsyncContext.Run(()=>this.InternalResolveInstanceAsync<TInterface>(true, progressCallback, new ComponentDescriptor[0]));
         }
 
         /// <summary>
@@ -65,7 +63,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public TInterfaceType TryResolveInstance<TInterfaceType>(Action<string> progressCallback = null) where TInterfaceType : class
         {
-            return this.UnwrapException(() => AsyncContext.Run(() => this.InternalResolveInstanceAsync<TInterfaceType>(false, progressCallback, new ComponentDescriptor[0])));
+            return AsyncContext.Run(() => this.InternalResolveInstanceAsync<TInterfaceType>(false, progressCallback, new ComponentDescriptor[0]));
         }
 
         /// <summary>
@@ -76,7 +74,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public TInterface[] ResolveInstances<TInterface>(Action<string> progressCallback = null) where TInterface : class
         {
-            return this.UnwrapException(() => AsyncContext.Run(() => this.ResolveInstancesAsync<TInterface>(progressCallback)));
+            return AsyncContext.Run(() => this.ResolveInstancesAsync<TInterface>(progressCallback));
         }
 
         /// <summary>
@@ -87,7 +85,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public async Task<TInterface> ResolveInstanceAsync<TInterface>(Action<string> progressCallback = null) where TInterface : class
         {
-            return await this.UnwrapException(() => this.InternalResolveInstanceAsync<TInterface>(true, progressCallback, new ComponentDescriptor[0]));
+            return await this.InternalResolveInstanceAsync<TInterface>(true, progressCallback, new ComponentDescriptor[0]);
         }
 
         /// <summary>
@@ -98,7 +96,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public async Task<TInterfaceType> TryResolveInstanceAsync<TInterfaceType>(Action<string> progressCallback = null) where TInterfaceType : class
         {
-            return await this.UnwrapException(() => this.InternalResolveInstanceAsync<TInterfaceType>(false, progressCallback, new ComponentDescriptor[0]));
+            return await this.InternalResolveInstanceAsync<TInterfaceType>(false, progressCallback, new ComponentDescriptor[0]);
         }
 
         /// <summary>
@@ -123,25 +121,6 @@ namespace WhileTrue.Classes.Components
                     $"Interface given is not a component interface: {typeof(TInterface).Name}");
             }
         }
-
-        private TInterface UnwrapException<TInterface>(Func<TInterface> func)
-        {
-            try
-            {
-                return func();
-            }
-            catch (AggregateException AggregateException)
-            {
-                Exception Exception = AggregateException;
-                while (Exception is AggregateException)
-                {
-                    Exception = Exception.InnerException;
-                }
-                ExceptionDispatchInfo.Capture(Exception).Throw();
-                throw;//never happens
-            }
-        }
-
 
         #endregion
 

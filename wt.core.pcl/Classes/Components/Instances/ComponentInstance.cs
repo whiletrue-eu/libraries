@@ -1,7 +1,6 @@
  using System;
 using System.Collections.Generic;
  using System.Diagnostics;
- using System.Linq;
  using System.Linq.Expressions;
  using System.Reflection;
  using System.Threading.Tasks;
@@ -52,8 +51,7 @@ namespace WhileTrue.Classes.Components
 
             foreach (ConstructorInfo Constructor in this.Descriptor.Type.GetConstructors())
             {
-                string ConstructorDiagnosisInformation;
-                if (this.CanGetParametersFor(Constructor, componentContainer, out ConstructorDiagnosisInformation))
+                if (this.CanGetParametersFor(Constructor, componentContainer, out string ConstructorDiagnosisInformation))
                 {
                     if (OptimalConstructor == null ||
                         Constructor.GetParameters().Length > OptimalConstructor.GetParameters().Length)
@@ -89,7 +87,7 @@ namespace WhileTrue.Classes.Components
             }
             else
             {
-                string Message = $"No valid constructor could be found for component {this.Descriptor.Name}. Make sure, that all component interfaces are marked with the ComponentInterface attribute\n\nDetailed information for the different constructors:\n{string.Join("\n", DiagnosisInformation.ToArray())}";
+                string Message = $"No valid constructor could be found for component {this.Descriptor.Name}. Make sure, that all component interfaces are marked with the ComponentInterface attribute\n\nDetailed information for the different constructors:\n{String.Join("\n", DiagnosisInformation.ToArray())}";
                 throw new ResolveComponentException(Message);
             }
         }
@@ -102,6 +100,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         private async Task<object[]> GetParametersForAsync(ConstructorInfo constructor, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
+            // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
             async Task<object> CreateInstanceAsync(Type parameterType, string parameterName)
             {
                 object Instance = await componentContainer.InternalResolveInstanceAsync(parameterType, true, progressCallback,resolveStack);
@@ -126,7 +125,7 @@ namespace WhileTrue.Classes.Components
                 }
                 else if (ComponentInstance.IsValidInterfaceTaskReference(ParameterType))
                 {
-                    object Component = ComponentContainerUtils.DoDynamicCastAsync( ParameterType, CreateInstanceAsync(ParameterType.GenericTypeArguments[0], Parameter.Name));
+                    object Component = ComponentInstance.DoDynamicCastAsync( ParameterType, CreateInstanceAsync(ParameterType.GenericTypeArguments[0], Parameter.Name));
                     Parameters.Add(Task.FromResult(Component));
                 }
                 else if (ComponentInstance.IsValidFuncToInterfaceReference(ParameterType))
@@ -145,7 +144,7 @@ namespace WhileTrue.Classes.Components
                 }
                 else if (ComponentInstance.IsValidInterfaceArrayTaskReference(ParameterType))
                 {
-                    object Component = ComponentContainerUtils.DoDynamicCastAsync(ParameterType, CreateInstanceArrayAsync(ParameterType.GenericTypeArguments[0].GetElementType()));
+                    object Component = ComponentInstance.DoDynamicCastAsync(ParameterType, CreateInstanceArrayAsync(ParameterType.GenericTypeArguments[0].GetElementType()));
                     Parameters.Add(Task.FromResult(Component));
                 }
                 else if (ComponentInstance.IsValidFuncToInterfaceArrayReference(ParameterType))
@@ -168,7 +167,7 @@ namespace WhileTrue.Classes.Components
                 }
                 else if (ParameterType.IsAssignableFrom(this.Descriptor.ConfigType))
                 {
-                    Parameters.Add(Task.FromResult((object)this.Descriptor.Config));
+                    Parameters.Add(Task.FromResult(this.Descriptor.Config));
                 }
                 else
                 {
@@ -190,7 +189,7 @@ namespace WhileTrue.Classes.Components
                 if (ComponentInstance.IsValidInterfaceReference(ParameterType))
                 {
                     //Simple interface reference
-                    if (CheckInterfaceParameter(componentContainer, ParameterType, true, $"{ParameterType.Name} {Parameter.Name}", "a", out diagnosisInformation) == false)
+                    if (this.CheckInterfaceParameter(componentContainer, ParameterType, true, $"{ParameterType.Name} {Parameter.Name}", "a", out diagnosisInformation) == false)
                     {
                         return false;
                     }
@@ -198,7 +197,7 @@ namespace WhileTrue.Classes.Components
                 else if (ComponentInstance.IsValidInterfaceTaskReference(ParameterType))
                 {
                     //Task to Simple interface reference
-                    if (CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0], true, $"{ParameterType.Name} {Parameter.Name}", "a", out diagnosisInformation) == false)
+                    if (this.CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0], true, $"{ParameterType.Name} {Parameter.Name}", "a", out diagnosisInformation) == false)
                     {
                         return false;
                     }
@@ -206,7 +205,7 @@ namespace WhileTrue.Classes.Components
                 else if (ComponentInstance.IsValidFuncToInterfaceReference(ParameterType))
                 {
                     //Func<> Interface reference
-                    if( CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0], true, $"{ParameterType.Name} {Parameter.Name}", "Func<> returning a", out diagnosisInformation) == false)
+                    if( this.CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0], true, $"{ParameterType.Name} {Parameter.Name}", "Func<> returning a", out diagnosisInformation) == false)
                     {
                         return false;
                     }
@@ -214,7 +213,7 @@ namespace WhileTrue.Classes.Components
                 else if (ComponentInstance.IsValidInterfaceArrayReference(ParameterType))
                 {
                     //Array of interface
-                    if( CheckInterfaceParameter(componentContainer, ParameterType.GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "an array of a", out diagnosisInformation) == false)
+                    if( this.CheckInterfaceParameter(componentContainer, ParameterType.GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "an array of a", out diagnosisInformation) == false)
                     {
                         return false;
                     }
@@ -222,7 +221,7 @@ namespace WhileTrue.Classes.Components
                 else if (ComponentInstance.IsValidInterfaceArrayTaskReference(ParameterType))
                 {
                     //Task to Array of interface
-                    if (CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0].GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "an array of a", out diagnosisInformation) == false)
+                    if (this.CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0].GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "an array of a", out diagnosisInformation) == false)
                     {
                         return false;
                     }
@@ -230,7 +229,7 @@ namespace WhileTrue.Classes.Components
                 else if (ComponentInstance.IsValidFuncToInterfaceArrayReference(ParameterType))
                 {
                     //Func<> of Array of interface
-                    if( CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0].GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "a Func<> returning an array of a", out diagnosisInformation) == false)
+                    if( this.CheckInterfaceParameter(componentContainer, ParameterType.GenericTypeArguments[0].GetElementType(), false, $"{ParameterType.Name} {Parameter.Name}", "a Func<> returning an array of a", out diagnosisInformation) == false)
                     {
                         return false;
                     }
@@ -352,6 +351,56 @@ namespace WhileTrue.Classes.Components
         private void CheckDisposed()
         {
             this.disposed.DbC_Assure(value => value == false, new ObjectDisposedException(""));
+        }
+
+        private static object DoDynamicCastAsync(Type taskType, Task<object> value)
+        {
+            Type EncapsulatedType = taskType.GenericTypeArguments[0]; //parametertype is some Task<T>, encapsulated type is T
+            Type CompletionSourceType = typeof(TaskCompletionSource<>).MakeGenericType(EncapsulatedType);
+            ParameterExpression CompletionSource = Expression.Variable(CompletionSourceType,@"completionSource");
+            ParameterExpression CompletionSourceTask = Expression.Variable(taskType,@"task");
+            ParameterExpression ContinueWithArg = Expression.Parameter(typeof(Task<object>),@"continueWithResult");
+
+
+            /*
+             * Expression Code below:
+             * NewCompletionSource       CompletionSource = new TaskCompletionSource<T>()
+             * ContinueWith / ..lambda   value.ContinueWith(_=>CompletionSource.SetResult((T)_))
+             * GetTask / ReturnTask      return CommpletionsSource.Task
+             */
+
+            BinaryExpression NewCompletionSource = Expression.Assign(
+                CompletionSource,
+                Expression.New(CompletionSourceType)
+            );
+            LambdaExpression ContinueWithLambda = Expression.Lambda(
+                typeof(Action<Task<object>>),
+                Expression.Call(CompletionSource, nameof(TaskCompletionSource<object>.SetResult), null,
+                    Expression.Convert(
+                        Expression.Property(ContinueWithArg, nameof(Task<object>.Result)),
+                        EncapsulatedType)
+                ),
+                ContinueWithArg
+            );
+            MethodCallExpression ContinueWith = Expression.Call(Expression.Constant(value), nameof(Task<object>.ContinueWith), null,
+                ContinueWithLambda
+            );
+            BinaryExpression GetTask = Expression.Assign(
+                CompletionSourceTask,
+                Expression.Property(CompletionSource, CompletionSourceType.GetRuntimeProperty(nameof(TaskCompletionSource<object>.Task)))
+            );
+            ParameterExpression ReturnTask = CompletionSourceTask;
+
+
+            LambdaExpression Lambda = Expression.Lambda(
+                typeof(Func<>).MakeGenericType(taskType),
+                Expression.Block(
+                    taskType,
+                    new[] { CompletionSource, CompletionSourceTask},
+                    NewCompletionSource, ContinueWith, GetTask, ReturnTask
+                )
+            );
+            return ((Func<object>)Lambda.Compile())();
         }
     }
 }

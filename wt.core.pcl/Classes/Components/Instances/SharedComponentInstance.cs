@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
 
 namespace WhileTrue.Classes.Components
 {
     internal class SharedComponentInstance : ComponentInstance
     {
         private static readonly Dictionary<ComponentDescriptor, SharedInstanceWrapper> singletonInstances = new Dictionary<ComponentDescriptor, SharedInstanceWrapper>();
-
+        private readonly SemaphoreSlim instanceLock = new SemaphoreSlim(1, 1);
         internal SharedComponentInstance(ComponentDescriptor componentDescriptor)
             : base(componentDescriptor)
         {
@@ -44,7 +43,8 @@ namespace WhileTrue.Classes.Components
 
         internal override async Task<object> CreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
-            using (await new AsyncMonitor().EnterAsync())
+            await this.instanceLock.WaitAsync();
+            try
             {
                 if (this.InstanceReference == null)
                 {
@@ -52,6 +52,10 @@ namespace WhileTrue.Classes.Components
                 }
 
                 return this.InstanceReference.AddReference(componentContainer);
+            }
+            finally
+            {
+                this.instanceLock.Release();
             }
         }
 

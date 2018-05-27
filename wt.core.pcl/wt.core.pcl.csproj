@@ -84,7 +84,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Properties\SignKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyVersionInfo.cs">
@@ -93,7 +94,6 @@
     <Compile Include="Classes\CodeInspection\ExcludeFromCodeCoverage.cs" />
     <Compile Include="Classes\Commands\DelegateCommand.cs" />
     <Compile Include="Classes\Components\Instances\ComponentContainer.cs" />
-    <Compile Include="Classes\Components\Instances\ComponentContainerUtils.cs" />
     <Compile Include="Classes\Components\Instances\ComponentInstance.cs" />
     <Compile Include="Classes\Components\Instances\ComponentInstanceCollection.cs" />
     <Compile Include="Classes\Components\Instances\ComponentInstanceEvent.cs" />
@@ -146,7 +146,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Properties\SignKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">

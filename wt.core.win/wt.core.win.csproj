@@ -11,7 +11,8 @@
     <RootNamespace>WhileTrue</RootNamespace>
     <AssemblyName>wt.core.win</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>Properties\whiletrue.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -258,7 +259,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Classes\Wpf\OuterGlow.fx" />
-    <None Include="Properties\whiletrue.snk" />
     <None Include="Themes\generic.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>generic.xaml</LastGenOutput>
