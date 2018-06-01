@@ -10,8 +10,8 @@ namespace WhileTrue.Classes.Components
 {
     internal class SingletonComponentInstance : ComponentInstance
     {
-         private static readonly Dictionary<Type, SingletonInstanceWrapper> singletonInstances = new Dictionary<Type, SingletonInstanceWrapper>();
-        private readonly SemaphoreSlim instanceLock = new SemaphoreSlim(1, 1);
+        private static readonly Dictionary<Type, SingletonInstanceWrapper> singletonInstances = new Dictionary<Type, SingletonInstanceWrapper>();
+        private static readonly SemaphoreSlim instanceLock = new SemaphoreSlim(1, 1);
 
         internal SingletonComponentInstance(ComponentDescriptor componentDescriptor)
             : base(componentDescriptor)
@@ -46,19 +46,71 @@ namespace WhileTrue.Classes.Components
 
         internal override async Task<object> CreateInstanceAsync(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
-            await this.instanceLock.WaitAsync();
+            //We need to seperate locking on the instance reference collection (new wrapper) and setting/add-ref-ing because otherwise we can dead-lock
+            await SingletonComponentInstance.instanceLock.WaitAsync();
+            bool MustCreate = false;
             try
             {
-                if (this.InstanceReference == null)
+                try
                 {
-                    this.InstanceReference = new SingletonInstanceWrapper(await this.DoCreateInstanceAsync(interfaceType, componentContainer, progressCallback, resolveStack));
+                    if (this.InstanceReference == null)
+                    {
+                        this.InstanceReference = new SingletonInstanceWrapper();
+                        MustCreate = true;
+                    }
+
+                    await this.InstanceReference.Lock.WaitAsync();
+                }
+                finally
+                {
+                    SingletonComponentInstance.instanceLock.Release();
+                }
+
+                if (MustCreate)
+                {
+                    this.InstanceReference.SetInstance(await this.DoCreateInstanceAsync(interfaceType, componentContainer, progressCallback, resolveStack));
                 }
 
                 return this.InstanceReference.AddReference(componentContainer);
             }
             finally
             {
-                this.instanceLock.Release();
+                this.InstanceReference?.Lock.Release();
+            }
+        }
+
+        internal override object CreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
+        {
+            //We need to seperate locking on the instance reference collection (new wrapper) and setting/add-ref-ing because otherwise we can dead-lock
+            SingletonComponentInstance.instanceLock.Wait();
+            bool MustCreate = false;
+            try
+            {
+                try
+                {
+                    if (this.InstanceReference == null)
+                    {
+                        this.InstanceReference = new SingletonInstanceWrapper();
+                        MustCreate = true;
+                    }
+
+                    this.InstanceReference.Lock.Wait();
+                }
+                finally
+                {
+                    SingletonComponentInstance.instanceLock.Release();
+                }
+
+                if (MustCreate)
+                {
+                    this.InstanceReference.SetInstance(this.DoCreateInstance(interfaceType, componentContainer, progressCallback, resolveStack));
+                }
+
+                return this.InstanceReference.AddReference(componentContainer);
+            }
+            finally
+            {
+                this.InstanceReference?.Lock.Release();
             }
         }
 
@@ -79,13 +131,15 @@ namespace WhileTrue.Classes.Components
         private class SingletonInstanceWrapper
         {
             private readonly List<ComponentContainer> references = new List<ComponentContainer>();
+            public readonly SemaphoreSlim Lock = new SemaphoreSlim(1, 1);
 
-            public SingletonInstanceWrapper(object instance)
+            public void SetInstance(object instance)
             {
+                this.Target.DbC_AssureNull();
                 this.Target = instance;
             }
 
-            public object Target { get; }
+            public object Target { get; private set; }
 
             [UsedImplicitly]
             public object AddReference(ComponentContainer componentContainer)

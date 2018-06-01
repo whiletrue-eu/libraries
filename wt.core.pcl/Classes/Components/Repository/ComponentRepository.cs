@@ -19,25 +19,40 @@ namespace WhileTrue.Classes.Components
     public class ComponentRepository
     {
         private readonly ComponentRepository parentRepository;
-        private readonly Func<Type, bool> getMustRunOnUiThreadFunc;
         private readonly Collection<ComponentDescriptor> componentDescriptors = new Collection<ComponentDescriptor>();
 
         /// <summary/>
-        public ComponentRepository(Func<Type,bool> getMustRunOnUiThreadFunc=null, Func<Func<Task<object>>,Task<object>> runOnUiThreadFunc=null)
-            :this(null, getMustRunOnUiThreadFunc, runOnUiThreadFunc)
+        public ComponentRepository()
+            : this(null, (null, null, null))
+        {
+        }
+
+        /// <summary/>
+        public ComponentRepository((Func<Type,bool> getMustRunOnUiThreadFunc, Func<bool> isUiThreadFunc, Func<Func<Task<object>>,Task<object>> runOnUiThreadFunc) uiThreadHandling )
+            :this(null, uiThreadHandling)
         {
         }
 
         /// <summary>
         /// The parent repository is used when no matching component is found in the current repository
         /// </summary>
-        public ComponentRepository(ComponentRepository parentRepository, Func<Type, bool> getMustRunOnUiThreadFunc = null, Func<Func<Task<object>>, Task<object>> runOnUiThreadFunc=null)
+        public ComponentRepository(ComponentRepository parentRepository)
+            : this(parentRepository, (null, null, null))
+        {
+        }
+
+        /// <summary>
+            /// The parent repository is used when no matching component is found in the current repository
+            /// </summary>
+            public ComponentRepository(ComponentRepository parentRepository, (Func<Type, bool> getMustRunOnUiThreadFunc, Func<bool> isUiThreadFunc, Func<Func<Task<object>>, Task<object>> runOnUiThreadFunc) uiThreadHandling)
         {
             this.parentRepository = parentRepository;
-            this.getMustRunOnUiThreadFunc = getMustRunOnUiThreadFunc;
-            this.RunOnUiThread = runOnUiThreadFunc??(async _=> await _());
+            this.MustRunOnUiThread = uiThreadHandling.getMustRunOnUiThreadFunc??(_=>false);
+            this.IsUiThread = uiThreadHandling.isUiThreadFunc ?? (()=> true); //don't break compatibility with apps not supporting ui thread handling
+            this.RunOnUiThread = uiThreadHandling.runOnUiThreadFunc ??(async _=> await _());
         }
-        
+
+
 
         #region AddComponent
 
@@ -170,6 +185,8 @@ namespace WhileTrue.Classes.Components
         }
 
         internal Func<Func<Task<object>>, Task<object>> RunOnUiThread { get; }
+        internal Func<bool> IsUiThread { get; }
+        internal Func<Type, bool> MustRunOnUiThread { get; }
 
 
         /// <summary>
@@ -235,11 +252,6 @@ namespace WhileTrue.Classes.Components
                 Writer.WriteEndElement();
                 Writer.WriteEndDocument();
             }
-        }
-
-        internal bool GetMustCreateOnUiThread(Type type)
-        {
-            return this.getMustRunOnUiThreadFunc?.Invoke(type) ?? false;
         }
     }
 }

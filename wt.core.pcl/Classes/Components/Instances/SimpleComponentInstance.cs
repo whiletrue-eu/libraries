@@ -28,6 +28,19 @@ namespace WhileTrue.Classes.Components
             }
         }
 
+        internal override object CreateInstance(Type interfaceType, ComponentContainer componentContainer, Action<string> progressCallback,ComponentDescriptor[] resolveStack)
+        {
+            this.instanceLock.Wait();
+            try
+            {
+                return this.instance ?? (this.instance = this.DoCreateInstance(interfaceType, componentContainer, progressCallback, resolveStack));
+            }
+            finally
+            {
+                this.instanceLock.Release();
+            }
+        }
+
         internal override void Dispose(ComponentContainer componentContainer)
         {
             (this.instance as IDisposable)?.Dispose();

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
 using WhileTrue.Classes.Utilities;
 
 namespace WhileTrue.Classes.Components
@@ -52,7 +51,7 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public TInterface ResolveInstance<TInterface>(Action<string> progressCallback = null) where TInterface : class
         {
-            return AsyncContext.Run(()=>this.InternalResolveInstanceAsync<TInterface>(true, progressCallback, new ComponentDescriptor[0]));
+                return this.InternalResolveInstance<TInterface>(true, progressCallback, new ComponentDescriptor[0]);
         }
 
         /// <summary>
@@ -61,10 +60,12 @@ namespace WhileTrue.Classes.Components
         /// If a repository chain is used, first a lokkup is done in the directly referenced repository, then in its parent etc util the interface
         /// implementation is found. An exception is thrown, if multiple implementations are found in the same repository. If no implementaiton is found, null is returned
         /// </summary>
-        public TInterfaceType TryResolveInstance<TInterfaceType>(Action<string> progressCallback = null) where TInterfaceType : class
+        public TInterface TryResolveInstance<TInterface>(Action<string> progressCallback = null) where TInterface : class
         {
-            return AsyncContext.Run(() => this.InternalResolveInstanceAsync<TInterfaceType>(false, progressCallback, new ComponentDescriptor[0]));
+                return this.InternalResolveInstance<TInterface>(false, progressCallback, new ComponentDescriptor[0]);
         }
+
+
 
         /// <summary>
         /// returns all components that implement the given interface. If an component is not instantiated yet, it is created,
@@ -74,8 +75,14 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public TInterface[] ResolveInstances<TInterface>(Action<string> progressCallback = null) where TInterface : class
         {
-            return AsyncContext.Run(() => this.ResolveInstancesAsync<TInterface>(progressCallback));
+            this.CheckDisposed();
+            ComponentContainer.CheckIsComponentInterface<TInterface>();
+
+            return this.InternalResolveInstances(typeof(TInterface), progressCallback, new ComponentDescriptor[0])
+                .Cast<TInterface>()
+                .ToArray();
         }
+
 
         /// <summary>
         /// returns the one component that implements the given interface. If the component is not instantiated yet, it is created,
@@ -108,17 +115,19 @@ namespace WhileTrue.Classes.Components
         public async Task<TInterface[]> ResolveInstancesAsync<TInterface>(Action<string> progressCallback = null) where TInterface : class
         {
             this.CheckDisposed();
+            ComponentContainer.CheckIsComponentInterface<TInterface>();
 
-            if (ComponentRepository.IsComponentInterface(typeof(TInterface)))
-            {
-                return (await this.InternalResolveInstancesAsync(typeof(TInterface), progressCallback, new ComponentDescriptor[0]))
+            return (await this.InternalResolveInstancesAsync(typeof(TInterface), progressCallback, new ComponentDescriptor[0]))
                     .Cast<TInterface>()
                     .ToArray();
-            }
-            else
+        }
+
+
+        private static void CheckIsComponentInterface<TInterface>() where TInterface : class
+        {
+            if (!ComponentRepository.IsComponentInterface(typeof(TInterface)))
             {
-                throw new ArgumentException(
-                    $"Interface given is not a component interface: {typeof(TInterface).Name}");
+                throw new ArgumentException($"Interface given is not a component interface: {typeof(TInterface).Name}");
             }
         }
 
@@ -131,16 +140,17 @@ namespace WhileTrue.Classes.Components
         private async Task<TInterface> InternalResolveInstanceAsync<TInterface>(bool throwIfNotFound, Action<string> progressCallback, ComponentDescriptor[] resolveStack) where TInterface : class
         {
             this.CheckDisposed();
+            ComponentContainer.CheckIsComponentInterface<TInterface>();
+            object Instance = await this.InternalResolveInstanceAsync(typeof(TInterface), throwIfNotFound, progressCallback, resolveStack);
+            return (TInterface) Instance;
+        }
 
-            if (ComponentRepository.IsComponentInterface(typeof(TInterface)))
-            {
-                object Instance = await this.InternalResolveInstanceAsync(typeof(TInterface), throwIfNotFound, progressCallback, resolveStack);
-                return (TInterface) Instance;
-            }
-            else
-            {
-                throw new ArgumentException($"Interface given is not a component interface: {typeof(TInterface).Name}");
-            }
+        private TInterface InternalResolveInstance<TInterface>(bool throwIfNotFound, Action<string> progressCallback, ComponentDescriptor[] resolveStack) where TInterface : class
+        {
+            this.CheckDisposed();
+            ComponentContainer.CheckIsComponentInterface<TInterface>();
+            object Instance = this.InternalResolveInstance(typeof(TInterface), throwIfNotFound, progressCallback, resolveStack);
+            return (TInterface)Instance;
         }
 
         internal bool CanResolveComponent(Type interfaceType)
@@ -156,29 +166,21 @@ namespace WhileTrue.Classes.Components
             return this.Repository.GetComponentDescriptors(interfaceType).Any();
         }
 
-        internal async Task<IEnumerable<object>> InternalResolveInstancesAsync(Type interfaceType, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
-        {
-            List<object> Instances=new List<object>();
-            foreach (object Instance in this.ExternalInstances)
-            {
-                if (interfaceType.IsInstanceOfType(Instance))
-                {
-                    Instances.Add(Instance);
-                }
-            }
-
-            Instances.AddRange(
-                await Task.WhenAll(
-                    this.Repository.GetComponentDescriptors(interfaceType)
-                        .Select(descriptor=> this.CreateInstanceAsync(interfaceType, descriptor, progressCallback,resolveStack))
-                ));
-
-            return Instances;
-        }
 
         internal async Task<Array> InternalResolveInstancesAsArrayAsync(Type interfaceType, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
             object[] Components = (await this.InternalResolveInstancesAsync(interfaceType, progressCallback, resolveStack)).ToArray();
+            return ComponentContainer.ToTypedArray(interfaceType, Components);
+        }
+
+        internal Array InternalResolveInstancesAsArray(Type interfaceType, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
+        {
+            object[] Components =  this.InternalResolveInstances(interfaceType, progressCallback, resolveStack).ToArray();
+            return ComponentContainer.ToTypedArray(interfaceType, Components);
+        }
+
+        private static Array ToTypedArray(Type interfaceType, object[] Components)
+        {
             Array ComponentArray = Array.CreateInstance(interfaceType, Components.Length);
             Array.Copy(Components, ComponentArray, Components.Length);
             return ComponentArray;
@@ -187,15 +189,25 @@ namespace WhileTrue.Classes.Components
         internal async Task<object> InternalResolveInstanceAsync(Type interfaceType, bool throwIfNotFound, Action<string> progessCallback, ComponentDescriptor[] resolveStack)
         {
             object[] Instances = (await this.InternalResolveInstancesAsync(interfaceType, progessCallback, resolveStack)).ToArray();
-            if (Instances.Length == 1)
+            return this.ReturnSingleInstance(interfaceType, throwIfNotFound, Instances);
+        }
+        internal object InternalResolveInstance(Type interfaceType, bool throwIfNotFound, Action<string> progessCallback, ComponentDescriptor[] resolveStack)
+        {
+            object[] Instances = this.InternalResolveInstances(interfaceType, progessCallback, resolveStack).ToArray();
+            return this.ReturnSingleInstance(interfaceType, throwIfNotFound, Instances);
+        }
+
+        private object ReturnSingleInstance(Type interfaceType, bool throwIfNotFound, object[] instances)
+        {
+            if (instances.Length == 1)
             {
-                return Instances[0];
+                return instances[0];
             }
             else
             {
                 if (throwIfNotFound)
                 {
-                    if (Instances.Any() == false)
+                    if (instances.Any() == false)
                     {
                         string Message =
                             $"There is no component that implements the interface {interfaceType.FullName}.There must be exactly one.";
@@ -221,6 +233,47 @@ namespace WhileTrue.Classes.Components
             }
         }
 
+
+        internal async Task<IEnumerable<object>> InternalResolveInstancesAsync(Type interfaceType, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
+        {
+            List<object> Instances = new List<object>();
+            this.GetExternalInstances(interfaceType, Instances);
+
+
+            Instances.AddRange(
+                await Task.WhenAll(
+                    this.Repository.GetComponentDescriptors(interfaceType)
+                        .Select(descriptor => this.CreateInstanceAsync(interfaceType, descriptor, progressCallback, resolveStack))
+                ));
+
+            return Instances;
+        }
+
+        internal IEnumerable<object> InternalResolveInstances(Type interfaceType, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
+        {
+            List<object> Instances = new List<object>();
+            this.GetExternalInstances(interfaceType, Instances);
+
+
+            Instances.AddRange(
+                    this.Repository.GetComponentDescriptors(interfaceType)
+                        .Select(descriptor => this.CreateInstance(interfaceType, descriptor, progressCallback, resolveStack))
+               );
+
+            return Instances;
+        }
+
+        private void GetExternalInstances(Type interfaceType, List<object> instances)
+        {
+            foreach (object Instance in this.ExternalInstances)
+            {
+                if (interfaceType.IsInstanceOfType(Instance))
+                {
+                    instances.Add(Instance);
+                }
+            }
+        }
+
         private async Task<object> CreateInstanceAsync(Type interfaceType, ComponentDescriptor componentDescriptor, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
         {
             ComponentDescriptor[] ResolveStack = this.CheckPreventRecursion(resolveStack, componentDescriptor);
@@ -231,21 +284,35 @@ namespace WhileTrue.Classes.Components
             return Instance;
         }
 
+        private object CreateInstance(Type interfaceType, ComponentDescriptor componentDescriptor, Action<string> progressCallback, ComponentDescriptor[] resolveStack)
+        {
+            ComponentDescriptor[] ResolveStack = this.CheckPreventRecursion(resolveStack, componentDescriptor);
+            ComponentInstance ComponentInstance = this.instances[componentDescriptor];
+
+            if (componentDescriptor.MustCreateOnUiThread && this.Repository.IsUiThread() == false)
+            {
+                throw new ArgumentException(@"Attempting to synchronously create a compontent instance that needs to be created on the UI thread from a non-ui thread.\nEither marshal the creation to the UI Thread, or use the async creation method that implicitly marshals if needed");
+            }
+
+            object Instance = ComponentInstance.CreateInstance(interfaceType, this, progressCallback, ResolveStack);
+            return Instance;
+        }
+
         #endregion
 
         #region Recursion prevention
 
         private ComponentDescriptor[] CheckPreventRecursion(ComponentDescriptor[] resolveStack, ComponentDescriptor descriptor)
         {
-                if (resolveStack.Contains(descriptor))
-                {
-                    string Message = $"Recursion during creation of component '{descriptor.Name}':\n{string.Join(" -> ", resolveStack.Reverse().ConvertTo(value => value.ToString()).ToArray())}";
-                    throw new InvalidOperationException(Message);
-                }
-                else
-                {
-                    return resolveStack.Union(new[]{descriptor}).ToArray();
-                }
+            if (resolveStack.Contains(descriptor))
+            {
+                string Message = $"Recursion during creation of component '{descriptor.Name}':\n{string.Join(" -> ", resolveStack.Reverse().ConvertTo(value => value.ToString()).ToArray())}";
+                throw new InvalidOperationException(Message);
+            }
+            else
+            {
+                return resolveStack.Union(new[] {descriptor}).ToArray();
+            }
         }
 
         #endregion

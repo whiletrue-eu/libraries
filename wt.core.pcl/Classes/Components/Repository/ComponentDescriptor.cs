@@ -146,7 +146,7 @@ namespace WhileTrue.Classes.Components
             switch (ThreadAffinity)
             {
                 case ThreadAffinity.Automatic:
-                    return repository.GetMustCreateOnUiThread(type);
+                    return repository.MustRunOnUiThread(type);
                 case ThreadAffinity.NeedsUiThread:
                     return true;
                 case ThreadAffinity.SupportsBackground:

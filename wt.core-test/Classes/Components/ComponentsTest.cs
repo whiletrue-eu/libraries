@@ -178,6 +178,26 @@ namespace WhileTrue.Classes.Components
         }
 
         [Test]
+        public async Task SharedInstance_must_be_the_same_when_resolved_through_two_containers_async()
+        {
+            ComponentRepository Repository = new ComponentRepository();
+            Repository.AddComponent<Test1>(ComponentInstanceScope.Repository);
+
+            using( ComponentContainer Container1 = new ComponentContainer(Repository))
+            using (ComponentContainer Container2 = new ComponentContainer(Repository))
+            {
+                ITestFacade1[] Instances = await Task.WhenAll(Container1.ResolveInstanceAsync<ITestFacade1>(), Container2.ResolveInstanceAsync<ITestFacade1>());
+
+                ITestFacade1 TestFacade1 = Instances[0];
+                ITestFacade1 TestFacade2 = Instances[1];
+
+                Assert.IsNotNull(TestFacade1);
+                Assert.IsNotNull(TestFacade2);
+                Assert.AreEqual(TestFacade1, TestFacade2);
+            }
+        }
+
+        [Test]
         public void SharedInstance_must_differ_when_resolved_via_two_containers_with_two_separate_repositories()
         {
             ComponentRepository Repository1 = new ComponentRepository();
@@ -246,6 +266,29 @@ namespace WhileTrue.Classes.Components
             {
                 ITestFacade1 TestFacade1 = Container1.ResolveInstance<ITestFacade1>();
                 ITestFacade1 TestFacade2 = Container2.ResolveInstance<ITestFacade1>();
+
+                Assert.IsNotNull(TestFacade1);
+                Assert.IsNotNull(TestFacade2);
+                Assert.AreEqual(TestFacade1, TestFacade2);
+            }
+        }
+
+        [Test]
+        public async Task SingletonInstance_must_be_the_same_when_resolved_through_two_containers_with_two_separate_repositories_async()
+        {
+            ComponentRepository Repository1 = new ComponentRepository();
+            Repository1.AddComponent<Test1>(ComponentInstanceScope.Global);
+
+            ComponentRepository Repository2 = new ComponentRepository();
+            Repository2.AddComponent<Test1>(ComponentInstanceScope.Global);
+
+            using(ComponentContainer Container1 = new ComponentContainer(Repository1))
+            using (ComponentContainer Container2 = new ComponentContainer(Repository2))
+            {
+                ITestFacade1[] Instances = await Task.WhenAll(Container1.ResolveInstanceAsync<ITestFacade1>(), Container2.ResolveInstanceAsync<ITestFacade1>());
+
+                ITestFacade1 TestFacade1 = Instances[0];
+                ITestFacade1 TestFacade2 = Instances[1];
 
                 Assert.IsNotNull(TestFacade1);
                 Assert.IsNotNull(TestFacade2);
@@ -1149,14 +1192,14 @@ namespace WhileTrue.Classes.Components
                 return CompletionSource.Task;
             }
 
-            ComponentRepository Repository = new ComponentRepository(type=>typeof(ITestFacade1).IsAssignableFrom(type), RunInMainThread);
+            ComponentRepository Repository = new ComponentRepository((type=>typeof(ITestFacade1).IsAssignableFrom(type), () => false, RunInMainThread));
             Repository.AddComponent<MultithreadTest>();
             Repository.AddComponent<Test2C>();
 
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
-                MultithreadTest Test = (MultithreadTest)Container.ResolveInstance<ITestFacade1>();
-                ITestFacade2 Dependency = Container.ResolveInstance<ITestFacade2>();
+                MultithreadTest Test = (MultithreadTest)(await Container.ResolveInstanceAsync<ITestFacade1>());
+                ITestFacade2 Dependency = await Container.ResolveInstanceAsync<ITestFacade2>();
 
                 Assert.That(Test.Dependency1, Is.SameAs(Dependency));
                 Assert.That(Test.Dependency2, Is.SameAs(Dependency));
@@ -1184,14 +1227,14 @@ namespace WhileTrue.Classes.Components
                 return CompletionSource.Task;
             }
 
-            ComponentRepository Repository = new ComponentRepository(type => false, RunInMainThread);
+            ComponentRepository Repository = new ComponentRepository((type => false,()=>false, RunInMainThread));
             Repository.AddComponent<MultithreadTest>();
             Repository.AddComponent<Test2Lazy>();
 
             using (ComponentContainer Container = new ComponentContainer(Repository))
             {
-                MultithreadTest Test = (MultithreadTest)Container.ResolveInstance<ITestFacade1>();
-                ITestFacade2 Dependency = Container.ResolveInstance<ITestFacade2>();
+                MultithreadTest Test = (MultithreadTest)(await Container.ResolveInstanceAsync<ITestFacade1>());
+                ITestFacade2 Dependency =await  Container.ResolveInstanceAsync<ITestFacade2>();
 
                 Assert.That(Test.Dependency1, Is.SameAs(Dependency));
                 Assert.That(Test.Dependency2, Is.SameAs(Dependency));
