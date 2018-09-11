@@ -22,6 +22,7 @@ namespace WhileTrue.Classes.Components
             this.Config = config;
             this.ConfigType = config?.GetType();
             this.PrivateRepository = privateRepository;
+            this.providedInterfaces = new List<Type>(this.GetProvidedInterfaces());
         }
 
         /// <summary>
@@ -48,6 +49,8 @@ namespace WhileTrue.Classes.Components
         /// </summary>
         public ComponentRepository PrivateRepository { get; }
 
+        private List<Type> providedInterfaces;
+
         private IEnumerable<PropertyInfo> GetProvidedDelegatedProperties()
         {
             return from Property in this.Type.GetRuntimeProperties()
@@ -63,7 +66,7 @@ namespace WhileTrue.Classes.Components
         [ExcludeFromCodeCoverage]
         internal IEnumerable<Type> GetProvidedInterfaces()
         {
-            return (
+            var ImplementedInterfaces = (
                 from InterfaceType in this.Type.GetInterfaces()
                 where ComponentRepository.IsComponentInterface(InterfaceType)
                 select InterfaceType
@@ -71,6 +74,21 @@ namespace WhileTrue.Classes.Components
                 from Property in this.GetProvidedDelegatedProperties()
                 select Property.PropertyType
             );
+
+            return ImplementedInterfaces.SelectMany(interfaze => this.ResolvebaseInterfaces(interfaze));
+        }
+
+        private IEnumerable<Type> ResolvebaseInterfaces(Type interfaze)
+        {
+            yield return interfaze;
+            foreach(Type baseInterface in interfaze.GetInterfaces().Where(baseInterface=> ComponentRepository.IsComponentInterface(baseInterface)))
+            {
+                foreach( Type resolvedInterface in this.ResolvebaseInterfaces(baseInterface))
+                {
+                    yield return resolvedInterface;
+                }
+            }
+            
         }
 
         [ExcludeFromCodeCoverage]
@@ -94,8 +112,7 @@ namespace WhileTrue.Classes.Components
 
         internal bool ProvidesInterface(Type interfaceType)
         {
-            return interfaceType.IsAssignableFrom(this.Type) ||
-                   (from Property in this.GetProvidedDelegatedProperties() where interfaceType.IsAssignableFrom(Property.PropertyType) select Property).Any();
+            return this.providedInterfaces.Contains(interfaceType);
         }
 
         /// <summary>
