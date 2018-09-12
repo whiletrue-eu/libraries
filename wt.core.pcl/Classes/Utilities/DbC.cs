@@ -194,9 +194,19 @@ namespace WhileTrue.Classes.Utilities
         /// Throws an user defined exception if the <c>condition</c> yields false
         /// </summary>
         [AssertionMethod]
-        public static T DbC_Assure<T>(this T value, [AssertionCondition(AssertionConditionType.IS_TRUE)]Predicate<T> condition, Exception exception)
+        public static T DbC_Assure<T>(this T value, [AssertionCondition(AssertionConditionType.IS_TRUE)]Predicate<T> condition, Func<Exception> exception)
         {
             DbC.Assure(value, condition, exception);
+            return value;
+        }
+
+        /// <summary>
+        /// Throws an user defined exception if the <c>condition</c> yields false
+        /// </summary>
+        [AssertionMethod]
+        public static T DbC_Assure<T>(this T value, [AssertionCondition(AssertionConditionType.IS_TRUE)]Predicate<T> condition, Exception exception)
+        {
+            DbC.Assure(value, condition,()=> exception);
             return value;
         }
 
@@ -215,7 +225,16 @@ namespace WhileTrue.Classes.Utilities
         [AssertionMethod]
         public static void Assure<T>(T value, [AssertionCondition(AssertionConditionType.IS_TRUE)]Predicate<T> condition, Exception exception)
         {
-            DbC.Assure(()=>condition(value), exception);
+            DbC.Assure(()=>condition(value), ()=>exception);
+        }
+
+        /// <summary>
+        /// Throws an user defined exception if the <c>condition</c> yields false
+        /// </summary>
+        [AssertionMethod]
+        public static void Assure<T>(T value, [AssertionCondition(AssertionConditionType.IS_TRUE)]Predicate<T> condition, Func<Exception> exception)
+        {
+            DbC.Assure(() => condition(value), exception);
         }
 
         /// <summary>
@@ -224,14 +243,14 @@ namespace WhileTrue.Classes.Utilities
         [AssertionMethod]
         public static void Assure([AssertionCondition(AssertionConditionType.IS_TRUE)]Func<bool> condition, string message = "", params object[] parameters)
         {
-            DbC.Assure(condition, new InvalidOperationException(string.Format(message, parameters)));
+            DbC.Assure(condition, ()=>new InvalidOperationException(string.Format(message, parameters)));
         }
 
         /// <summary>
         /// Throws an user defined exception if the <c>condition</c> yields false
         /// </summary>
         [AssertionMethod]
-        public static void Assure([AssertionCondition(AssertionConditionType.IS_TRUE)]Func<bool> condition, Exception exception)
+        public static void Assure([AssertionCondition(AssertionConditionType.IS_TRUE)]Func<bool> condition, Func<Exception> exception)
         {
             DbC.Assure(condition(), exception);
         }
@@ -242,18 +261,18 @@ namespace WhileTrue.Classes.Utilities
         [AssertionMethod]
         public static void Assure([AssertionCondition(AssertionConditionType.IS_TRUE)]bool condition, string message = "", params object[] parameters)
         {
-            DbC.Assure(condition, new InvalidOperationException(string.Format(message, parameters)));
+            DbC.Assure(condition, ()=>new InvalidOperationException(string.Format(message, parameters)));
         }
 
         /// <summary>
         /// Throws an user defined exception if the <c>condition</c> yields false
         /// </summary>
         [AssertionMethod]
-        public static void Assure([AssertionCondition(AssertionConditionType.IS_TRUE)]bool condition, Exception exception)
+        public static void Assure([AssertionCondition(AssertionConditionType.IS_TRUE)]bool condition, Func<Exception> exception)
         {
             if (condition == false)
             {
-                throw exception;
+                throw exception();
             }
         }
 

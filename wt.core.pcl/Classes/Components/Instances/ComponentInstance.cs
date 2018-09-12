@@ -64,16 +64,16 @@ namespace WhileTrue.Classes.Components
 
             if (OptimalConstructor != null)
             {
-                DateTime Start = DateTime.Now;
+                DateTime Start = DateTime.UtcNow;
                 Debug.WriteLine($"{new string(' ',ComponentInstance.debugIndent*3)}Start instantiation of {this.Name}");
                 ComponentInstance.debugIndent++;
                 try
                 {
                     object[] ConstructorParameters = this.GetParametersFor(OptimalConstructor, componentContainer, progressCallback).ToArray();
-                    DateTime ParameterResolved = DateTime.Now;
+                    DateTime ParameterResolved = DateTime.UtcNow;
                     progressCallback?.Invoke(this.Descriptor.Name);
                     object Component = OptimalConstructor.Invoke(ConstructorParameters);
-                    DateTime ComponentCreated = DateTime.Now;
+                    DateTime ComponentCreated = DateTime.UtcNow;
                     ComponentInstance.debugIndent--;
                     Debug.WriteLine($"{new string(' ', ComponentInstance.debugIndent * 3)}Instantiation of {this.Name} took {ComponentInstance.Format(ComponentCreated - Start)} (params: {ComponentInstance.Format(ParameterResolved - Start)}, ctor: {ComponentInstance.Format(ComponentCreated - ParameterResolved)})");
                     return Component;
