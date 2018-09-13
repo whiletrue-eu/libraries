@@ -1,0 +1,14 @@
+<Pipeline xmlns="http://schema.gms-online.de/continuousintegration/2.0/configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schema.gms-online.de/continuousintegration/2.0/configuration http://schema.gms-online.de/continuousintegration/2.0/configuration">
+    <Stage name="Build">
+        <Job name="WtLibraries">
+            <Artifact dir="wt.core.ios\bin\Release" type="build"/>
+            <Artifact dir="wt.core.android\bin\Release" type="build"/>
+            <Artifact dir="wt.core.pcl\bin\Release" type="build"/>
+            <Artifact dir="wt.core.win\bin\v4.5_Release" type="build"/>
+            <Artifact dir="wt.core.xamarin\bin\Release" type="build"/>
+            <Tasks>
+                <MsBuild projectFile="wt.libraries.sln" configuration="Release" targets="wt.core.android\wt.core.android;wt.core.ios\wt.core.ios;wt.core.pcl\wt.core.pcl;wt.core.win\wt.core.win;wt.core.xamarin\wt.core.xamarin" needsXamarinLicense="true" />
+            </Tasks>
+        </Job>
+    </Stage>
+</Pipeline>
