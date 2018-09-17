@@ -7,7 +7,7 @@
             <Artifact dir="wt.core.win\bin\v4.5_Release" type="build"/>
             <Artifact dir="wt.core.xamarin\bin\Release" type="build"/>
             <Tasks>
-                <MsBuild projectFile="wt.libraries.sln" configuration="Release" needsXamarinLicense="true" />
+                <MsBuild projectFile="wt.libraries.sln" configuration="Release" targets="wt.core.ios\wt.core.ios:wt.core.ios\bin\Release;wt.core.android\wt.core.android:wt.core.android\bin\Release;wt.core.pcl\wt.core.pcl:wt.core.pcl\bin\Release;wt.core.win\wt.core.win:wt.core.win\bin\v4.5_Release;wt.core.xamarin\wt.core.xamarin:wt.core.xamarin\bin\Release" needsXamarinLicense="true" />
             </Tasks>
         </Job>
     </Stage>
