@@ -5,22 +5,22 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0C99520E-E813-4087-B803-45552FADEF8B}</ProjectGuid>
+    <ProjectGuid>{8F58CFF1-EB2F-43EA-87B6-F359C81390CD}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TemplateGuid>{9ef11e43-1701-4396-8835-8392d57abb70}</TemplateGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>wt</RootNamespace>
+    <RootNamespace>wt.core.android</RootNamespace>
     <AssemblyName>wt.core.android</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
+    <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
     <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -46,22 +46,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Forms\GestureViewRenderer.cs" />
+    <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="27.0.2.1" />
+    <None Include="Resources\AboutResources.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\strings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\drawable\" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Xamarin.Forms">
-      <Version>2.3.3.193</Version>
+      <Version>3.2.0.871581</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">
-      <Project>{3eb75e87-d032-4f44-98cb-9dd13d95aa36}</Project>
-      <Name>wt.core.pcl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\wt.core.xamarin\wt.core.xamarin.csproj">
-      <Project>{146109ff-84fb-4c6a-b022-56ddbb5b8886}</Project>
-      <Name>wt.core.xamarin</Name>
+    <ProjectReference Include="..\wt.libraries.core\wt.libraries.core.csproj">
+      <Project>{d2c64493-c240-45a9-9bee-d11117035153}</Project>
+      <Name>wt.libraries.core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

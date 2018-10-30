@@ -1,111 +1,102 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
-  <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">v4.5_Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{79135144-F37C-44E2-8CA6-B8742820E09A}</ProjectGuid>
+    <ProjectGuid>{59CA7151-0CFB-458B-8388-EC73221D3E69}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WhileTrue</RootNamespace>
+    <RootNamespace>wt.core.win</RootNamespace>
     <AssemblyName>wt.core.win</AssemblyName>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Properties\whiletrue.snk</AssemblyOriginatorKeyFile>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-    <TargetFrameworkProfile />
-    <OldToolsVersion>4.0</OldToolsVersion>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\Projects\Projects\Source\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworkVersion Condition="'$(Configuration.Substring(0,1))'=='v'">v4.6</TargetFrameworkVersion>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\v4.5_Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET4x;NET45</DefineConstants>
-    <DocumentationFile>bin\v4.0_Debug\WhileTrue.Core.XML</DocumentationFile>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\v4.5_Release\</OutputPath>
-    <DefineConstants>TRACE;NET4x;NET45;Release</DefineConstants>
-    <DocumentationFile>bin\v4.0_Release\WhileTrue.Core.XML</DocumentationFile>
-    <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="JetBrains.Annotations, Version=2018.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.2018.2.1\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UIAutomationProvider" />
-    <Reference Include="WindowsBase">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    <Reference Include="Win32Interop.Dwmapi, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Win32Interop.Dwmapi.1.0.1\lib\Win32Interop.Dwmapi.dll</HintPath>
     </Reference>
+    <Reference Include="Win32Interop.User32, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Win32Interop.User32.1.0.1\lib\Win32Interop.User32.dll</HintPath>
+    </Reference>
+    <Reference Include="Win32Interop.Uxtheme, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Win32Interop.Uxtheme.1.0.1\lib\Win32Interop.Uxtheme.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AssemblyVersionInfo.cs">
-      <Link>Properties\AssemblyVersionInfo.cs</Link>
-    </Compile>
+    <Compile Include="Classes\DragNDrop\DragDrop.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropAdornerTemplate.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropEffect.cs" />
     <Compile Include="Classes\DragNDrop\DragDropHelperAdapter.cs" />
     <Compile Include="Classes\DragNDrop\DragDropObjectWrapper.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropSourceAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropTarget.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropTargetAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropTargetFactory.cs" />
     <Compile Include="Classes\DragNDrop\DragDropUIHandler\DummyUIHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\ElementDragDropUiHandlerBase.cs" />
     <Compile Include="Classes\DragNDrop\DragDropUIHandler\FrameworkContentElementDragDropUiHandler.cs" />
     <Compile Include="Classes\DragNDrop\DragDropUIHandler\FrameworkElementDragDropUiHandler.cs" />
     <Compile Include="Classes\DragNDrop\DragDropUIHandler\FrameworkElementDragDropUIHelper.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\ItemsControlDragDropUIHandler.cs" />
     <Compile Include="Classes\DragNDrop\DragDropUIHandler\PanelDragDropUiHandler.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropUIHandler\TabPanelDragDropUiHandler.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropUIHandler\VirtualizingStackPanelDragDropUiHandler.cs" />
-    <Compile Include="Classes\DragNDrop\SystemDragDropTypes\FileDropDataTypeConverter.cs" />
-    <Compile Include="Classes\DragNDrop\SystemDragDropTypes\FileDropDataType.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\StackPanelDragDropUIHandler.cs" />
     <Compile Include="Classes\DragNDrop\DragDropUIHandler\TabControlDragDropHelper.cs" />
     <Compile Include="Classes\DragNDrop\DragDropUIHandler\TabControlDragDropUIHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\TabPanelDragDropUiHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragDropUIHandler\VirtualizingStackPanelDragDropUiHandler.cs" />
+    <Compile Include="Classes\DragNDrop\DragPosition.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropSource.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropSourceAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropTarget.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropTargetAdapter.cs" />
+    <Compile Include="Classes\DragNDrop\IDragDropUIHandler.cs" />
+    <Compile Include="Classes\DragNDrop\SystemDragDropTypes\FileDropDataType.cs" />
+    <Compile Include="Classes\DragNDrop\SystemDragDropTypes\FileDropDataTypeConverter.cs" />
     <Compile Include="Classes\Installer\AdminProcessConnector.cs" />
     <Compile Include="Classes\Installer\IAdminProcessConnector.cs" />
     <Compile Include="Classes\Installer\InstallationProcessException.cs" />
@@ -119,128 +110,114 @@
     <Compile Include="Classes\Installer\PrerequisiteInstaller.cs" />
     <Compile Include="Classes\Installer\ProcessLaunchPrerequisiteInstaller.cs" />
     <Compile Include="Classes\Installer\ZipExtractPrerequisiteInstaller.cs" />
+    <Compile Include="Classes\SettingStorage\FileSettingStore.cs" />
+    <Compile Include="Classes\SettingStorage\IFileSettingStore.cs" />
+    <Compile Include="Classes\SettingStorage\IsolatedSettingStorage.cs" />
+    <Compile Include="Classes\SettingStorage\ITagValueSettingStore.cs" />
+    <Compile Include="Classes\SettingStorage\TagValueSettingStore.cs" />
+    <Compile Include="Classes\UIFeatures\FeatureEnabledExtension.cs" />
+    <Compile Include="Classes\UIFeatures\FeatureReadOnlyExtension.cs" />
+    <Compile Include="Classes\UIFeatures\FeatureVisibleExtension.cs" />
+    <Compile Include="Classes\UIFeatures\UIFeatureBindingExtensionBase.cs" />
+    <Compile Include="Classes\UIFeatures\UIFeatureManagement.cs" />
+    <Compile Include="Classes\Utilities\AttributeUtils.cs" />
+    <Compile Include="Classes\Utilities\CodingUtils.cs" />
     <Compile Include="Classes\Utilities\FileHelper.cs" />
     <Compile Include="Classes\Utilities\LimitedConcurrencyLevelTaskScheduler[Net4x].cs" />
+    <Compile Include="Classes\Utilities\PrivateAccess.cs" />
     <Compile Include="Classes\Utilities\Resources.cs" />
+    <Compile Include="Classes\Utilities\Screen.cs" />
+    <Compile Include="Classes\Utilities\TaskbarLocation.cs" />
+    <Compile Include="Classes\Utilities\ThreadBase.cs" />
     <Compile Include="Classes\Utilities\ThreadPoolWaiter.cs" />
+    <Compile Include="Classes\Utilities\UserCancelException.cs" />
+    <Compile Include="Classes\Utilities\VisualTreeHelperEx.cs" />
     <Compile Include="Classes\Utilities\XmlUrlResolverEx.cs" />
+    <Compile Include="Classes\Win32\DwmAPI.cs" />
     <Compile Include="Classes\Win32\DwmWindowHelper.cs" />
+    <Compile Include="Classes\Win32\GlassWindowHelper.cs" />
     <Compile Include="Classes\Win32\NonClientArea.cs" />
+    <Compile Include="Classes\Win32\Win32.cs" />
     <Compile Include="Classes\Wpf\AttachedDependencyPropertyEventManager.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoDataTemplateSelector.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateKey.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateSelectorExtension.cs" />
+    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateSelectorKeyExtension.cs" />
+    <Compile Include="Classes\Wpf\CollectionViewConverter.cs" />
     <Compile Include="Classes\Wpf\CollectionViewSource.cs" />
+    <Compile Include="Classes\Wpf\ComponentApplication.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CollectionWrapper.cs" />
     <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CommandWrapper.cs" />
+    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CrossThreadCollectionWrapper.cs" />
     <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CrossThreadCommandWrapper.cs" />
+    <Compile Include="Classes\Wpf\DesignDataAdapter.cs" />
     <Compile Include="Classes\Wpf\DoubleToGridLengthConverter.cs" />
     <Compile Include="Classes\Wpf\DynamicPropertyGroupDescription.cs" />
+    <Compile Include="Classes\Wpf\FormatStringConverter.cs" />
     <Compile Include="Classes\Wpf\HexAsciiConverter.cs" />
     <Compile Include="Classes\Wpf\IconConverter.cs" />
     <Compile Include="Classes\Wpf\LinearGradientBrushAnimation.cs" />
     <Compile Include="Classes\Wpf\NegateBoolConverter.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupConverter.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupItem.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupItemBase.cs" />
+    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupOtherwiseItem.cs" />
     <Compile Include="Classes\Wpf\OuterGlowEffect.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentProperty.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyExtension.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PropertyAdapter.cs" />
+    <Compile Include="Classes\Wpf\PersistentProperties\PropertyStoreAdapter.cs" />
     <Compile Include="Classes\Wpf\PropertyChangedEvent.cs" />
     <Compile Include="Classes\Wpf\PropertyChangedEventExtension.cs" />
     <Compile Include="Classes\Wpf\PropertyChangedRoutedEventFactory.cs" />
-    <Compile Include="Classes\Wpf\ValidationMessageConverter.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropAdornerTemplate.cs" />
-    <Compile Include="Classes\DragNDrop\DragPosition.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropUIHandler\StackPanelDragDropUIHandler.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropUIHandler\ItemsControlDragDropUIHandler.cs" />
-    <Compile Include="Classes\DragNDrop\DragDrop.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropEffect.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropSourceAdapter.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropTarget.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropTargetAdapter.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropTargetFactory.cs" />
-    <Compile Include="Classes\DragNDrop\IDragDropSource.cs" />
-    <Compile Include="Classes\DragNDrop\IDragDropSourceAdapter.cs" />
-    <Compile Include="Classes\DragNDrop\IDragDropTarget.cs" />
-    <Compile Include="Classes\DragNDrop\IDragDropTargetAdapter.cs" />
-    <Compile Include="Classes\DragNDrop\IDragDropUIHandler.cs" />
-    <Compile Include="Classes\DragNDrop\DragDropUIHandler\ElementDragDropUiHandlerBase.cs" />
-    <Compile Include="Classes\SettingStorage\IFileSettingStore.cs" />
-    <Compile Include="Classes\SettingStorage\ITagValueSettingStore.cs" />
-    <Compile Include="Classes\UIFeatures\FeatureEnabledExtension.cs" />
-    <Compile Include="Classes\UIFeatures\FeatureReadOnlyExtension.cs" />
-    <Compile Include="Classes\UIFeatures\UIFeatureBindingExtensionBase.cs" />
-    <Compile Include="Classes\Utilities\PrivateAccess.cs" />
-    <Compile Include="Classes\Utilities\UserCancelException.cs" />
-    <Compile Include="Classes\Utilities\VisualTreeHelperEx.cs" />
-    <Compile Include="Classes\Wpf\ComponentApplication.cs" />
-    <Compile Include="Classes\Wpf\PersistentProperties\PropertyAdapter.cs" />
-    <Compile Include="Classes\Wpf\PersistentProperties\PropertyStoreAdapter.cs" />
     <Compile Include="Classes\Wpf\TemplatedAdorner.cs" />
+    <Compile Include="Classes\Wpf\ValidationMessageConverter.cs" />
     <Compile Include="Classes\Wpf\ValidationMessageSeverityConverter.cs" />
     <Compile Include="Classes\Wpf\Validation\ValidatingBinding.cs" />
     <Compile Include="Classes\Wpf\WpfUtils.cs" />
-    <Compile Include="Classes\Wpf\CollectionViewConverter.cs" />
     <Compile Include="Classes\XTransformer\FileExtensionMethods.cs" />
     <Compile Include="Classes\XTransformer\StylesheetExtensionMethods.cs" />
     <Compile Include="Classes\XTransformer\XmlExtensionMethods.cs" />
     <Compile Include="Classes\XTransformer\XTransformer.cs" />
     <Compile Include="Components\SystemDialogs\SystemDialogsProvider.cs" />
+    <Compile Include="Components\UIFeatures\UIFeatureManager.cs" />
     <Compile Include="Components\WebServer\SimpleWebServer.cs" />
     <Compile Include="Components\WebServer\SimpleWebserverOptions.cs" />
+    <Compile Include="Controls\AnimatedImage\AnimatedImage.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentAvailability.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentAvailabilityConverter.cs" />
-    <Compile Include="Controls\SpecializedWindows\NonClientAreaRegion.cs" />
-    <Compile Include="Controls\SpecializedWindows\NonClientResizeBorder.cs" />
-    <Compile Include="Controls\SpecializedWindows\Window.cs" />
-    <Compile Include="Controls\SpecializedWindows\WindowBorder.cs" />
-    <Compile Include="Controls\SplashScreen\SplashScreenWindow.cs" />
-    <Compile Include="Controls\SplashScreen\SplashScreenEx.cs" />
-    <Compile Include="Controls\TablePanel\TablePanelRow.cs" />
-    <Compile Include="Controls\TablePanel\TablePanelRoot.cs" />
-    <Compile Include="Controls\DialogPanel\DialogPanel.SynchronisationRoot.cs" />
-    <Compile Include="Controls\NotificationLabel\NotificationTypeTypeConverter.cs" />
-    <Compile Include="Controls\NotificationLabel\ValidationResultBanner.cs" />
-    <Compile Include="Controls\Progress\Progress.cs" />
-    <Compile Include="Controls\AnimatedImage\AnimatedImage.cs" />
     <Compile Include="Controls\ContentUnavailableControl\ContentUnavailableControl.cs" />
+    <Compile Include="Controls\DialogPanel\DialogPanel.cs" />
+    <Compile Include="Controls\DialogPanel\DialogPanel.SynchronisationRoot.cs" />
     <Compile Include="Controls\DialogPanel\DialogPanelModeStyle.cs" />
+    <Compile Include="Controls\FocusHelper.cs" />
+    <Compile Include="Controls\Menu\AutoSeparator.cs" />
     <Compile Include="Controls\NotificationLabel\NotificationBanner.cs" />
     <Compile Include="Controls\NotificationLabel\NotificationType.cs" />
-    <Compile Include="Controls\SpecializedWindows\WindowCloseBehaviour.cs" />
-    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupItem.cs" />
-    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupItemBase.cs" />
-    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupOtherwiseItem.cs" />
+    <Compile Include="Controls\NotificationLabel\NotificationTypeTypeConverter.cs" />
+    <Compile Include="Controls\NotificationLabel\ValidationResultBanner.cs" />
+    <Compile Include="Controls\NotifyIcon\IMouseHookOwner.cs" />
     <Compile Include="Controls\NotifyIcon\INotifyIconCallback.cs" />
-    <Compile Include="Controls\NotifyIcon\NotifyIconInteropWrapper.cs" />
-    <Compile Include="Controls\SpecializedWindows\PopupNotificationMessageWindow.cs" />
-    <Compile Include="Controls\SpecializedWindows\NotificationMessageWindow.cs" />
-    <Compile Include="Controls\NotifyIcon\NotifyIcon.cs">
-    </Compile>
+    <Compile Include="Controls\NotifyIcon\NotifyIcon.cs" />
     <Compile Include="Controls\NotifyIcon\NotifyIconInteropHelper.cs" />
-    <Compile Include="Classes\SettingStorage\FileSettingStore.cs" />
-    <Compile Include="Classes\SettingStorage\IsolatedSettingStorage.cs" />
-    <Compile Include="Classes\SettingStorage\TagValueSettingStore.cs" />
-    <Compile Include="Controls\SpecializedWindows\DataBoundGlassMargin.cs" />
-    <Compile Include="Controls\SpecializedWindows\GlassMarginTypeConverter.cs" />
-    <Compile Include="Classes\Utilities\CodingUtils.cs" />
-    <Compile Include="Classes\Utilities\AttributeUtils.cs" />
-    <Compile Include="Classes\Utilities\Screen.cs" />
-    <Compile Include="Classes\Utilities\TaskbarLocation.cs" />
-    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateKey.cs" />
-    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoDataTemplateSelector.cs" />
-    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateSelectorExtension.cs" />
-    <Compile Include="Classes\Wpf\AutoTemplateSelection\AutoTemplateSelectorKeyExtension.cs" />
-    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CrossThreadCollectionWrapper.cs" />
-    <Compile Include="Classes\Wpf\CrossThreadCollectionWrapper\CollectionWrapper.cs" />
-    <Compile Include="Controls\DialogPanel\DialogPanel.cs" />
-    <Compile Include="Controls\SpecializedWindows\DialogWindow.cs" />
-    <Compile Include="Controls\FocusHelper.cs" />
-    <Compile Include="Classes\Win32\Win32.cs" />
-    <Compile Include="Controls\Menu\AutoSeparator.cs" />
-    <Compile Include="Classes\Wpf\FormatStringConverter.cs" />
-    <Compile Include="Classes\Wpf\ObjectLookupConverter\ObjectLookupConverter.cs" />
-    <Compile Include="Controls\SpecializedWindows\GlassMargin.cs" />
-    <Compile Include="Classes\Utilities\ThreadBase.cs" />
-    <Compile Include="Classes\Win32\DwmAPI.cs" />
-    <Compile Include="Classes\Wpf\PersistentProperties\PersistentProperty.cs" />
-    <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyExtension.cs" />
-    <Compile Include="Classes\UIFeatures\UIFeatureManagement.cs" />
-    <Compile Include="Classes\UIFeatures\FeatureVisibleExtension.cs" />
-    <Compile Include="Components\UIFeatures\UIFeatureManager.cs" />
+    <Compile Include="Controls\NotifyIcon\NotifyIconInteropWrapper.cs" />
+    <Compile Include="Controls\Progress\Progress.cs" />
     <Compile Include="Controls\Progress\ProgressControl.cs" />
+    <Compile Include="Controls\SpecializedWindows\DataBoundGlassMargin.cs" />
+    <Compile Include="Controls\SpecializedWindows\DialogWindow.cs" />
+    <Compile Include="Controls\SpecializedWindows\GlassMargin.cs" />
+    <Compile Include="Controls\SpecializedWindows\GlassMarginTypeConverter.cs" />
+    <Compile Include="Controls\SpecializedWindows\NonClientAreaRegion.cs" />
+    <Compile Include="Controls\SpecializedWindows\NonClientResizeBorder.cs" />
+    <Compile Include="Controls\SpecializedWindows\NotificationMessageWindow.cs" />
+    <Compile Include="Controls\SpecializedWindows\PopupNotificationMessageWindow.cs" />
+    <Compile Include="Controls\SpecializedWindows\Window.cs" />
+    <Compile Include="Controls\SpecializedWindows\WindowBorder.cs" />
+    <Compile Include="Controls\SpecializedWindows\WindowCloseBehaviour.cs" />
+    <Compile Include="Controls\SplashScreen\SplashScreenEx.cs" />
+    <Compile Include="Controls\SplashScreen\SplashScreenWindow.cs" />
+    <Compile Include="Controls\TablePanel\TablePanelRoot.cs" />
+    <Compile Include="Controls\TablePanel\TablePanelRow.cs" />
     <Compile Include="Facades\ProgressOutput\IProgress.cs" />
     <Compile Include="Facades\SystemDialogs\ISystemDialogsProvider.cs" />
     <Compile Include="Facades\SystemDialogs\OpenFileDialogResult.cs" />
@@ -250,83 +227,86 @@
     <Compile Include="Facades\WebServer\ISimpleWebServer.cs" />
     <Compile Include="Facades\WebServer\ISimpleWebServerContentRetriever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Classes\Wpf\OuterGlow.fx" />
-    <None Include="Properties\whiletrue.snk" />
-    <None Include="Themes\generic.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>generic.xaml</LastGenOutput>
-    </None>
-    <Resource Include="Classes\Wpf\OuterGlow.ps" />
+    <None Include="Classes\Wpf\OuterGlow.ps" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <Type>Resx</Type>
-      <WithCulture>false</WithCulture>
-    </EmbeddedResource>
+    <ProjectReference Include="..\wt.libraries.core\wt.libraries.core.csproj">
+      <Project>{d2c64493-c240-45a9-9bee-d11117035153}</Project>
+      <Name>wt.libraries.core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Classes\DragNDrop\Templates.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\AnimatedImage\Templates.xaml">
+    <Page Include="Classes\DragNDrop\Templates.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\ContentUnavailableControl\Templates.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SpecializedWindows\Templates\DialogWindow.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SpecializedWindows\Templates\NonClientResizeBorder.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SpecializedWindows\Templates\NotificationMessageWindow.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SpecializedWindows\Templates\WindowSupplements.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SpecializedWindows\Templates\Window.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SpecializedWindows\Templates\WindowBorder.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\Progress\Templates_V3.5.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SplashScreen\Templates.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\TablePanel\Templates.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\SpecializedWindows\Templates\PopupNotificationMessageWindow.xaml">
-      <SubType>Designer</SubType>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\NotifyIcon\Templates.xaml">
+    </Page>
+    <Page Include="Controls\AnimatedImage\Templates.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ContentUnavailableControl\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\Templates.xaml">
+    </Page>
+    <Page Include="Controls\NotificationLabel\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </None>
+    </Page>
+    <Page Include="Controls\NotifyIcon\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Progress\Templates_V3.5.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Progress\Templates_V4.x.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\Templates\DialogWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\Templates\NonClientResizeBorder.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\Templates\NotificationMessageWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\Templates\PopupNotificationMessageWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\Templates\Window.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\Templates\WindowBorder.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\Templates\WindowSupplements.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SplashScreen\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TablePanel\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\Drawings.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -335,7 +315,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\generic.xaml">
+    <Page Include="Themes\generic1.xaml">
       <Generator>MSBuild:Compile</Generator>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -344,48 +324,22 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Controls\NotificationLabel\Templates.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Controls\Progress\Templates_V4.x.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <SubType>Designer</SubType>
-    </None>
+    <Content Include="Classes\Wpf\OuterGlow.fx" />
+    <Content Include="Resources\waitcursor.gif" />
+    <Content Include="Themes\generic.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>generic1.xaml</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\Resources\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\waitcursor.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\wt.core.pcl\wt.core.pcl.csproj">
-      <Project>{4b85d721-9148-4bc5-933b-84e6c51e3f86}</Project>
-      <Name>wt.core.pcl</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-    <Error Condition="!Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.1\build\NUnit.props'))" />
   </Target>
 </Project>

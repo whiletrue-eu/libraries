@@ -1,46 +1,46 @@
-﻿using Android.Views;
+﻿using Android.Content;
+using Android.Views;
 using wt.Classes.Forms;
 using WhileTrue.Classes.Forms;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
+using View = Android.Views.View;
 
 [assembly: ExportRenderer(typeof(GestureView), typeof(GestureViewRenderer))]
 
 namespace wt.Classes.Forms
 {
-    public class GestureViewRenderer : Xamarin.Forms.Platform.Android.AppCompat.ViewRenderer<GestureView, Android.Views.View>
+    public class GestureViewRenderer : Xamarin.Forms.Platform.Android.AppCompat.ViewRenderer<GestureView, View>
     {
+        public GestureViewRenderer(Context context) : base(context)
+        {
+        }
+
         protected override void OnElementChanged(ElementChangedEventArgs<GestureView> e)
         {
             base.OnElementChanged(e);
-
-            if (this.Control == null)
-            {
-                this.SetNativeControl(new Android.Views.View(this.Context));
-            }
-
+            if (Control == null)
+                SetNativeControl(new View(Context));
 
             if (e.OldElement != null)
             {
                 e.OldElement.IsPressed = false;
-                this.Control.Touch -= this.Control_Touch;
+                Control.Touch -= Control_Touch;
             }
-            if (e.NewElement != null)
-            {
-                this.Control.Touch += this.Control_Touch;
-            }
-        }
 
+            if (e.NewElement != null)
+                Control.Touch += Control_Touch;
+        }
 
         private void Control_Touch(object sender, TouchEventArgs e)
         {
             switch (e.Event.Action)
             {
                 case MotionEventActions.Down:
-                    this.Element.IsPressed = true;
+                    Element.IsPressed = true;
                     break;
                 case MotionEventActions.Up:
-                    this.Element.IsPressed = false;
+                    Element.IsPressed = false;
                     break;
             }
         }

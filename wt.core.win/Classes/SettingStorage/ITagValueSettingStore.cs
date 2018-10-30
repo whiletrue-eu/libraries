@@ -3,15 +3,17 @@
 namespace WhileTrue.Classes.SettingStorage
 {
     /// <summary>
-    /// Provides isolated storage of tag-value data
+    ///     Provides isolated storage of tag-value data
     /// </summary>
     public interface ITagValueSettingStore
     {
-        /// <summary/>
+        /// <summary />
         object this[string key] { get; set; }
-        /// <summary/>
+
+        /// <summary />
         bool ContainsKey(string key);
-        /// <summary/>
+
+        /// <summary />
         IDictionaryEnumerator GetEnumerator();
     }
 }

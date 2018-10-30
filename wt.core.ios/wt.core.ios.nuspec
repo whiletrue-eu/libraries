@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>wt.core.ios</id>
+    <version>0.0.0</version>
+    <title>wt.core.ios</title>
+    <authors>WhileTrue</authors>
+    <owners>WhileTrue</owners>
+    <licenseUrl>http://www.whiletrue.com/</licenseUrl>
+    <projectUrl>http://www.whiletrue.com/</projectUrl>
+    <iconUrl>http://www.whiletrue.com/</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>WhileTrue iOS Libraries</description>
+    <releaseNotes>Initial release.</releaseNotes>
+	<dependencies>
+	  <dependency id="wt.libraries.core" version="1.0.2"/>
+    </dependencies>
+  </metadata>
+  	<files>
+		<file src="bin\Release\wt.core.ios.dll" target="lib/xamarin.ios10" />
+		<file src="bin\Release\wt.core.ios.pdb" target="lib/xamarin.ios10" />
+	</files>
+</package>

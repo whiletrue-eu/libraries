@@ -884,12 +884,16 @@ namespace WhileTrue.Classes.Framework
         [Test]
         public void weak_property_adapter_shall_allow_adapter_to_be_released()
         {
-            TestObject TestObject = new TestObject();
-            WeakAdapter WeakAdapter = new WeakAdapter(TestObject);
+            WeakReference Create(TestObject testObject)
+            {
+                WeakAdapter WeakAdapter = new WeakAdapter(testObject);
 
-            WeakReference WeakAdapterReference = new WeakReference(WeakAdapter);
-            // ReSharper disable once RedundantAssignment
-            WeakAdapter = null;
+                WeakReference weakAdapterReference = new WeakReference(WeakAdapter);
+                return weakAdapterReference;
+            }
+
+            TestObject TestObject = new TestObject();
+            WeakReference WeakAdapterReference = Create(TestObject);
 
             GC.Collect();
 

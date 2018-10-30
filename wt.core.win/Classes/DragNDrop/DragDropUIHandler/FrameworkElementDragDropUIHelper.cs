@@ -22,7 +22,7 @@ namespace WhileTrue.Classes.DragNDrop.DragDropUIHandler
         private class Helper : IDragDropUiHelperInstance
         {
             private readonly FrameworkElement element;
-            
+
             public Helper(FrameworkElement element)
             {
                 this.element = element;
@@ -34,30 +34,25 @@ namespace WhileTrue.Classes.DragNDrop.DragDropUIHandler
 
             public void NotifyDrag(DragPosition position)
             {
-                FrameworkElement Element = this.element;
-                if( this.element is IScrollInfo )
+                var Element = element;
+                if (element is IScrollInfo) HandleAutoScroll((IScrollInfo) Element, position);
+                if (element is ScrollViewer)
                 {
-                    Helper.HandleAutoScroll((IScrollInfo) Element, position);
-                }
-                if (this.element is ScrollViewer)
-                {
-                    IScrollInfo Scroller = this.element.GetVisualDescendantsDepthFirst<IScrollInfo>().FirstOrDefault();
-                    if (Scroller != null)
-                    {
-                        Helper.HandleAutoScroll(Scroller, position);
-                    }
+                    var Scroller = element.GetVisualDescendantsDepthFirst<IScrollInfo>().FirstOrDefault();
+                    if (Scroller != null) HandleAutoScroll(Scroller, position);
                 }
             }
 
             private static void HandleAutoScroll(IScrollInfo element, DragPosition position)
             {
-                if ( ((element.CanHorizontallyScroll) || (element.CanVerticallyScroll)) && element is Visual && element is IInputElement)
+                if ((element.CanHorizontallyScroll || element.CanVerticallyScroll) && element is Visual &&
+                    element is IInputElement)
                 {
-                    Visual Child = ((Visual)element).GetHitChild(position.GetPosition((IInputElement)element));
-                    if( Child is IInputElement)
+                    var Child = ((Visual) element).GetHitChild(position.GetPosition((IInputElement) element));
+                    if (Child is IInputElement)
                     {
-                        Point Position = position.GetPosition((IInputElement) Child);
-                        Rect RectangleToShow = Helper.GetRectangleToShowFromDragPosition(Position);
+                        var Position = position.GetPosition((IInputElement) Child);
+                        var RectangleToShow = GetRectangleToShowFromDragPosition(Position);
                         element.MakeVisible(Child, RectangleToShow);
                     }
                 }
@@ -65,8 +60,8 @@ namespace WhileTrue.Classes.DragNDrop.DragDropUIHandler
 
             private static Rect GetRectangleToShowFromDragPosition(Point position)
             {
-                double RectangleRadiusX = SystemParameters.IconWidth;
-                double RectangleRadiusY = SystemParameters.IconHeight;
+                var RectangleRadiusX = SystemParameters.IconWidth;
+                var RectangleRadiusY = SystemParameters.IconHeight;
                 return new Rect(
                     position.X - RectangleRadiusX,
                     position.Y - RectangleRadiusY,

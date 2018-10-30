@@ -10,14 +10,17 @@ namespace WhileTrue.Classes.XTransformer
 {
     internal class StylesheetExtensionMethods
     {
-        private readonly Dictionary<string, StylesheetTransformer> stylesheets = new Dictionary<string, StylesheetTransformer>();
-        private readonly XmlResolver resolver;
-        private readonly Dictionary<string, object> extensions;
         private readonly string dataBaseUri;
+        private readonly Dictionary<string, object> extensions;
+        private readonly XmlResolver resolver;
         private readonly Stack<StylesheetTransformer> stylesheetCallstack = new Stack<StylesheetTransformer>();
 
-        /// <summary/>
-        public StylesheetExtensionMethods(XmlResolver resolver, Dictionary<string, object> extensions, string dataBaseUri)
+        private readonly Dictionary<string, StylesheetTransformer> stylesheets =
+            new Dictionary<string, StylesheetTransformer>();
+
+        /// <summary />
+        public StylesheetExtensionMethods(XmlResolver resolver, Dictionary<string, object> extensions,
+            string dataBaseUri)
         {
             this.extensions = extensions;
             this.dataBaseUri = dataBaseUri;
@@ -26,88 +29,59 @@ namespace WhileTrue.Classes.XTransformer
 
         internal void LoadStylesheet(string id, Uri path)
         {
-            if (this.stylesheets.ContainsKey(id))
-            {
+            if (stylesheets.ContainsKey(id))
                 throw new InvalidOperationException($"stylesheet with id '{id}' is already loaded");
-            }
-            StylesheetTransformer Transformer = new StylesheetTransformer(path, this.resolver, this.dataBaseUri);
-            this.stylesheets.Add(id, Transformer);
+            var Transformer = new StylesheetTransformer(path, resolver, dataBaseUri);
+            stylesheets.Add(id, Transformer);
         }
-
-        // ReSharper disable InconsistentNaming
-        public string transform(string stylesheetFile, IXPathNavigable input)
-        {
-            return this.Transform(stylesheetFile, input, new Dictionary<string, object>());
-        }
-
-        public string resolve(string uri)
-        {
-            Uri Uri = this.resolver.ResolveUri(this.stylesheetCallstack.Peek().StylesheetUri, uri);
-            using (StreamReader Reader = new StreamReader((Stream)this.resolver.GetEntity(Uri, null, typeof(Stream))))
-            {
-                return Reader.ReadToEnd();
-            }
-        }
-
-        public object eval(XPathNavigator context, string xpath)
-        {
-            return context.Evaluate(xpath);
-        }
-        // ReSharper restore InconsistentNaming
 
         internal string Transform(string stylesheetFile, IXPathNavigable input, Dictionary<string, object> arguments)
         {
-            if (this.stylesheets.ContainsKey(stylesheetFile) == false)
-            {
-                this.LoadStylesheet(stylesheetFile, new Uri(stylesheetFile, UriKind.RelativeOrAbsolute));
-            }
+            if (stylesheets.ContainsKey(stylesheetFile) == false)
+                LoadStylesheet(stylesheetFile, new Uri(stylesheetFile, UriKind.RelativeOrAbsolute));
 
-            this.stylesheetCallstack.Push(this.stylesheets[stylesheetFile]);
+            stylesheetCallstack.Push(stylesheets[stylesheetFile]);
 
             try
             {
-                return this.stylesheetCallstack.Peek().Transform(input, arguments, this.extensions);
+                return stylesheetCallstack.Peek().Transform(input, arguments, extensions);
             }
             finally
             {
-                this.stylesheetCallstack.Pop();
+                stylesheetCallstack.Pop();
             }
-            
         }
+
         private class StylesheetTransformer
         {
             private readonly XmlResolver resolver;
             private readonly XslCompiledTransform transform;
 
-            /// <summary/>
+            /// <summary />
             public StylesheetTransformer(Uri stylesheetUri, XmlResolver resolver, string dataBaseUri)
             {
-                this.StylesheetUri = stylesheetUri;
+                StylesheetUri = stylesheetUri;
                 this.resolver = resolver;
-                this.transform = new XslCompiledTransform(Debugger.IsAttached);
-                XmlReader Reader = XmlReader.Create(stylesheetUri.ToString(), new XmlReaderSettings { XmlResolver = resolver });
-                this.transform.Load(Reader, XsltSettings.TrustedXslt, resolver);
+                transform = new XslCompiledTransform(Debugger.IsAttached);
+                var Reader = XmlReader.Create(stylesheetUri.ToString(), new XmlReaderSettings {XmlResolver = resolver});
+                transform.Load(Reader, XsltSettings.TrustedXslt, resolver);
             }
 
             public Uri StylesheetUri { get; }
 
 
-            public string Transform(IXPathNavigable input, Dictionary<string, object> parameter, Dictionary<string, object> extensions)
+            public string Transform(IXPathNavigable input, Dictionary<string, object> parameter,
+                Dictionary<string, object> extensions)
             {
-                using (MemoryStream OutputStream = new MemoryStream())
+                using (var OutputStream = new MemoryStream())
                 {
-                    XsltArgumentList Arguments = new XsltArgumentList();
-                    foreach (KeyValuePair<string, object> Parameter in parameter)
-                    {
+                    var Arguments = new XsltArgumentList();
+                    foreach (var Parameter in parameter)
                         Arguments.AddParam(Parameter.Key, string.Empty, Parameter.Value);
-                    }
-                    foreach (KeyValuePair<string, object> Extension in extensions)
-                    {
-                        Arguments.AddExtensionObject(Extension.Key, Extension.Value);
-                    }
-                    Arguments.XsltMessageEncountered += StylesheetTransformer.XsltMessageEncountered;
+                    foreach (var Extension in extensions) Arguments.AddExtensionObject(Extension.Key, Extension.Value);
+                    Arguments.XsltMessageEncountered += XsltMessageEncountered;
 
-                    this.transform.Transform(input, Arguments, new XmlTextWriter(new StreamWriter(OutputStream)), this.resolver);
+                    transform.Transform(input, Arguments, new XmlTextWriter(new StreamWriter(OutputStream)), resolver);
 
                     OutputStream.Seek(0, SeekOrigin.Begin);
 
@@ -120,10 +94,30 @@ namespace WhileTrue.Classes.XTransformer
 
             private static void XsltMessageEncountered(object sender, XsltMessageEncounteredEventArgs e)
             {
-                string Message = e.Message.Trim();
+                var Message = e.Message.Trim();
                 Trace.WriteLine(Message);
             }
         }
 
+        // ReSharper disable InconsistentNaming
+        public string transform(string stylesheetFile, IXPathNavigable input)
+        {
+            return Transform(stylesheetFile, input, new Dictionary<string, object>());
+        }
+
+        public string resolve(string uri)
+        {
+            var Uri = resolver.ResolveUri(stylesheetCallstack.Peek().StylesheetUri, uri);
+            using (var Reader = new StreamReader((Stream) resolver.GetEntity(Uri, null, typeof(Stream))))
+            {
+                return Reader.ReadToEnd();
+            }
+        }
+
+        public object eval(XPathNavigator context, string xpath)
+        {
+            return context.Evaluate(xpath);
+        }
+        // ReSharper restore InconsistentNaming
     }
 }

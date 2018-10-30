@@ -14,43 +14,42 @@ namespace WhileTrue.Classes.DragNDrop
         private DragDropHelperAdapter(UIElement element)
         {
             this.element = element;
-            System.Windows.DragDrop.AddPreviewDragOverHandler(this.element, this.DragOver);
-            System.Windows.DragDrop.AddPreviewDragLeaveHandler(this.element, this.DragLeave);
+            System.Windows.DragDrop.AddPreviewDragOverHandler(this.element, DragOver);
+            System.Windows.DragDrop.AddPreviewDragLeaveHandler(this.element, DragLeave);
         }
 
         private void DragLeave(object sender, DragEventArgs e)
         {
-            this.DisposeHelpers();
+            DisposeHelpers();
         }
 
         private void DragOver(object sender, DragEventArgs e)
         {
-            this.UpdateHelpers(sender, e);
+            UpdateHelpers(sender, e);
 
-            DragPosition Position = new DragPosition(e);
-            this.uiHelper.ForEach(helper=>helper.NotifyDrag(Position));
+            var Position = new DragPosition(e);
+            uiHelper.ForEach(helper => helper.NotifyDrag(Position));
         }
 
         private void UpdateHelpers(object sender, DragEventArgs e)
         {
-            DependencyObject HitObject = e.OriginalSource as DependencyObject;
+            var HitObject = e.OriginalSource as DependencyObject;
 
             //this.HandleAutoScroll(sender, e);
 
-            if (this.hitObject != HitObject)
+            if (hitObject != HitObject)
             {
-                this.hitObject = HitObject;
+                hitObject = HitObject;
 
                 //Dispose old helper
-                this.DisposeHelpers();
+                DisposeHelpers();
 
                 //Get new list of helper
-                while (HitObject != null && HitObject != this.element)
+                while (HitObject != null && HitObject != element)
                 {
                     if (HitObject is UIElement)
-                    {
-                        this.uiHelper.AddRange((from Helper in DragDrop.GetDragDropUiHelper(HitObject.GetType()) select Helper.Create((UIElement) HitObject)).ToArray());
-                    }
+                        uiHelper.AddRange((from Helper in DragDrop.GetDragDropUiHelper(HitObject.GetType())
+                            select Helper.Create((UIElement) HitObject)).ToArray());
                     HitObject = VisualTreeHelper.GetParent(HitObject);
                 }
             }
@@ -58,8 +57,8 @@ namespace WhileTrue.Classes.DragNDrop
 
         private void DisposeHelpers()
         {
-            this.uiHelper.ForEach(helper => helper.Dispose());
-            this.uiHelper.Clear();
+            uiHelper.ForEach(helper => helper.Dispose());
+            uiHelper.Clear();
         }
 
         public static DragDropHelperAdapter Create(UIElement element)

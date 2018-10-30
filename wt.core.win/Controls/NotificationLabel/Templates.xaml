@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:WhileTrue.Controls"
     xmlns:Wpf="clr-namespace:WhileTrue.Classes.Wpf"
-    xmlns:wtpcl="clr-namespace:WhileTrue.Classes.Framework;assembly=wt.core.pcl">
+    xmlns:wtpcl="clr-namespace:WhileTrue.Classes.Framework;assembly=wt.libraries.core">
     <Style TargetType="{x:Type Controls:NotificationBanner}">
         <Setter Property='Template'>
             <Setter.Value>

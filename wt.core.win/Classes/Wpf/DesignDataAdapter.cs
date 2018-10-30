@@ -18,7 +18,7 @@ namespace WhileTrue.Classes.Wpf
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            return new TypeWrapper(this.baseType);
+            return new TypeWrapper(baseType);
         }
 
         private class TypeWrapper : ICustomTypeDescriptor
@@ -30,6 +30,124 @@ namespace WhileTrue.Classes.Wpf
                 this.baseType = baseType;
             }
 
+            private class PropertyWrapper : PropertyDescriptor
+            {
+                private static readonly Dictionary<Type, Func<string, object>> valueCreators;
+
+                private readonly PropertyInfo propertyInfo;
+
+                static PropertyWrapper()
+                {
+                    try
+                    {
+                        valueCreators = new Dictionary<Type, Func<string, object>>
+                        {
+                            {typeof(bool), _ => false},
+                            {typeof(bool[]), _ => new[] {false, true}},
+                            {typeof(byte), _ => (byte) 42},
+                            {typeof(byte[]), _ => new byte[] {42, 21}},
+                            {typeof(char), _ => 'A'},
+                            {typeof(char[]), _ => new[] {'A', 'B', 'C'}},
+                            {typeof(DateTime), _ => DateTime.Now},
+                            {typeof(DateTime[]), _ => new[] {DateTime.Now, DateTime.Now.AddDays(1)}},
+                            {typeof(TimeSpan), _ => DateTime.Now - DateTime.Today},
+                            {
+                                typeof(TimeSpan[]),
+                                _ => new[] {DateTime.Now - DateTime.Today, DateTime.Now - DateTime.UtcNow}
+                            },
+                            {typeof(DateTimeOffset), _ => (DateTimeOffset) DateTime.Now},
+                            {typeof(DateTimeOffset[]), _ => new DateTimeOffset[] {DateTime.Now, DateTime.Today}},
+                            {typeof(decimal), _ => (decimal) 42},
+                            {typeof(decimal[]), _ => new decimal[] {42, 21}},
+                            {typeof(double), _ => (double) 42},
+                            {typeof(double[]), _ => new[] {42, 4.2}},
+                            {typeof(Guid), _ => Guid.NewGuid()},
+                            {typeof(Guid[]), _ => new[] {Guid.NewGuid(), Guid.NewGuid()}},
+                            {typeof(short), _ => (short) 42},
+                            {typeof(short[]), _ => new short[] {42, 21}},
+                            {typeof(int), _ => 42},
+                            {typeof(int[]), _ => new[] {42, 21}},
+                            {typeof(long), _ => (long) 42},
+                            {typeof(long[]), _ => new long[] {42, 21}},
+                            {typeof(sbyte), _ => (sbyte) 42},
+                            {typeof(sbyte[]), _ => new sbyte[] {42, 21}},
+                            {typeof(float), _ => (float) 42},
+                            {typeof(float[]), _ => new[] {42, 4.2f}},
+                            {typeof(ushort), _ => (ushort) 42},
+                            {typeof(ushort[]), _ => new ushort[] {42, 21}},
+                            {typeof(uint), _ => (uint) 42},
+                            {typeof(uint[]), _ => new uint[] {42, 21}},
+                            {typeof(ulong), _ => (ulong) 42},
+                            {typeof(ulong[]), _ => new ulong[] {42, 21}},
+                            {typeof(string), property => string.Format("[{0}]", property)}
+                        };
+                    }
+// ReSharper disable EmptyGeneralCatchClause
+                    catch
+                    {
+                    }
+// ReSharper restore EmptyGeneralCatchClause
+                }
+
+                public PropertyWrapper(Type ownerType, PropertyInfo propertyInfo)
+                    : base(propertyInfo.Name, new Attribute[0])
+                {
+                    ComponentType = ownerType;
+                    this.propertyInfo = propertyInfo;
+                }
+
+                private static object CreateValue(Type type, string propertyName)
+                {
+                    if (valueCreators.ContainsKey(type))
+                        return valueCreators[type](propertyName);
+                    if (type.IsGenericType && typeof(Nullable<>) == type.GetGenericTypeDefinition())
+                        return CreateValue(type.GetGenericArguments()[0], propertyName);
+                    if (type.IsEnum)
+                        return Enum.GetValues(type).Length == 0 ? 0 : Enum.GetValues(type).GetValue(0);
+                    return new TypeWrapper(type);
+                }
+
+                #region Overrides of PropertyDescriptor
+
+                public override bool CanResetValue(object component)
+                {
+                    return false;
+                }
+
+                public override object GetValue(object component)
+                {
+                    return CreateValue(propertyInfo.PropertyType, propertyInfo.Name);
+                }
+
+                public override void ResetValue(object component)
+                {
+                }
+
+                public override void SetValue(object component, object value)
+                {
+                }
+
+                public override bool ShouldSerializeValue(object component)
+                {
+                    return false;
+                }
+
+                public override Type ComponentType { get; }
+
+                public override bool IsReadOnly => true;
+
+                public override Type PropertyType => propertyInfo.PropertyType;
+
+                public override PropertyDescriptorCollection GetChildProperties(object instance, Attribute[] filter)
+                {
+                    if (instance is ICustomTypeDescriptor)
+                        return ((ICustomTypeDescriptor) instance).GetProperties(filter);
+                    return base.GetChildProperties(instance, filter);
+                }
+
+                #endregion
+            }
+
             #region Implementation of ICustomTypeDescriptor
 
             public AttributeCollection GetAttributes()
@@ -39,7 +157,7 @@ namespace WhileTrue.Classes.Wpf
 
             public string GetClassName()
             {
-                return this.baseType.FullName;
+                return baseType.FullName;
             }
 
             public string GetComponentName()
@@ -80,14 +198,15 @@ namespace WhileTrue.Classes.Wpf
             public PropertyDescriptorCollection GetProperties()
             {
                 return new PropertyDescriptorCollection((
-                                                            from Property in this.baseType.GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
-                                                            select new PropertyWrapper(this.baseType, Property)
-                                                        ).ToArray());
+                    from Property in baseType.GetProperties(BindingFlags.Instance | BindingFlags.FlattenHierarchy |
+                                                            BindingFlags.Public)
+                    select new PropertyWrapper(baseType, Property)
+                ).ToArray());
             }
 
             public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
             {
-                return this.GetProperties();
+                return GetProperties();
             }
 
             public object GetPropertyOwner(PropertyDescriptor pd)
@@ -96,143 +215,6 @@ namespace WhileTrue.Classes.Wpf
             }
 
             #endregion
-
-            private class PropertyWrapper : PropertyDescriptor
-            {
-                private static readonly Dictionary<Type, Func<string, object>> valueCreators;
-                static PropertyWrapper()
-                {
-                    try
-                    {
-                        valueCreators = new Dictionary<Type, Func<string, object>>
-                                                                                      {
-                                                                                          {typeof (Boolean), _ => false},
-                                                                                          {typeof (Boolean[]), _ => new[]{false,true}},
-                                                                                          {typeof (Byte), _ => (Byte) 42},
-                                                                                          {typeof (Byte[]), _ => new byte[]{42,21}},
-                                                                                          {typeof (Char), _ => 'A'},
-                                                                                          {typeof (Char[]), _ => new[]{'A','B','C'}},
-                                                                                          {typeof (DateTime), _ => DateTime.Now},
-                                                                                          {typeof (DateTime[]), _ => new[]{DateTime.Now,DateTime.Now.AddDays(1)}},
-                                                                                          {typeof (TimeSpan), _ => DateTime.Now - DateTime.Today},
-                                                                                          {typeof (TimeSpan[]), _ => new[]{DateTime.Now - DateTime.Today, DateTime.Now-DateTime.UtcNow}},
-                                                                                          {typeof (DateTimeOffset), _ => (DateTimeOffset) DateTime.Now},
-                                                                                          {typeof (DateTimeOffset[]), _ => new DateTimeOffset[]{DateTime.Now,DateTime.Today}},
-                                                                                          {typeof (Decimal), _ => (Decimal) 42},
-                                                                                          {typeof (Decimal[]), _ => new Decimal[]{ 42,21 }},
-                                                                                          {typeof (Double), _ => (Double) 42},
-                                                                                          {typeof (Double[]), _ => new[]{42,4.2}},
-                                                                                          {typeof (Guid), _ => Guid.NewGuid()},
-                                                                                          {typeof (Guid[]), _ => new[]{Guid.NewGuid(),Guid.NewGuid()}},
-                                                                                          {typeof (Int16), _ => (Int16) 42},
-                                                                                          {typeof (Int16[]), _ => new Int16[]{ 42,21}},
-                                                                                          {typeof (Int32), _ => 42},
-                                                                                          {typeof (Int32[]), _ => new[]{ 42,21}},
-                                                                                          {typeof (Int64), _ => (Int64) 42},
-                                                                                          {typeof (Int64[]), _ => new Int64[]{ 42,21}},
-                                                                                          {typeof (SByte), _ => (SByte) 42},
-                                                                                          {typeof (SByte[]), _ => new SByte[]{ 42,21}},
-                                                                                          {typeof (Single), _ => (Single) 42},
-                                                                                          {typeof (Single[]), _ => new[]{ 42, 4.2f}},
-                                                                                          {typeof (UInt16), _ => (UInt16) 42},
-                                                                                          {typeof (UInt16[]), _ => new UInt16[]{ 42,21}},
-                                                                                          {typeof (UInt32), _ => (UInt32) 42},
-                                                                                          {typeof (UInt32[]), _ => new UInt32[]{ 42,21}},
-                                                                                          {typeof (UInt64), _ => (UInt64) 42},
-                                                                                          {typeof (UInt64[]), _ => new UInt64[]{ 42,21}},
-                                                                                          {typeof (string), property => string.Format("[{0}]", property)},
-                                                                                      };
-                    }
-// ReSharper disable EmptyGeneralCatchClause
-                    catch { }
-// ReSharper restore EmptyGeneralCatchClause
-                }
-
-                private static object CreateValue(Type type, string propertyName)
-                {
-                    if (valueCreators.ContainsKey(type))
-                    {
-                        return valueCreators[type](propertyName);
-                    }
-                    else if (type.IsGenericType && typeof(Nullable<>) == type.GetGenericTypeDefinition() ) 
-                    {
-                        return CreateValue(type.GetGenericArguments()[0],propertyName);
-                    }
-                    else if (type.IsEnum)
-                    {
-                        return Enum.GetValues(type).Length == 0 ? 0 : Enum.GetValues(type).GetValue(0);
-                    }
-                    else
-                    {
-                        return new TypeWrapper(type);
-                    }
-                }
-
-                private readonly Type ownerType;
-                private readonly PropertyInfo propertyInfo;
-
-                public PropertyWrapper(Type ownerType, PropertyInfo propertyInfo)
-                    : base(propertyInfo.Name, new Attribute[0])
-                {
-                    this.ownerType = ownerType;
-                    this.propertyInfo = propertyInfo;
-                }
-
-                #region Overrides of PropertyDescriptor
-
-                public override bool CanResetValue(object component)
-                {
-                    return false;
-                }
-
-                public override object GetValue(object component)
-                {
-                    return CreateValue(this.propertyInfo.PropertyType, this.propertyInfo.Name);
-                }
-
-                public override void ResetValue(object component)
-                {
-                }
-
-                public override void SetValue(object component, object value)
-                {
-                }
-
-                public override bool ShouldSerializeValue(object component)
-                {
-                    return false;
-                }
-
-                public override Type ComponentType
-                {
-                    get { return this.ownerType; }
-                }
-
-                public override bool IsReadOnly
-                {
-                    get { return true; }
-                }
-
-                public override Type PropertyType
-                {
-                    get { return this.propertyInfo.PropertyType; }
-                }
-
-                public override PropertyDescriptorCollection GetChildProperties(object instance, Attribute[] filter)
-                {
-                    if (instance is ICustomTypeDescriptor)
-                    {
-                        return ((ICustomTypeDescriptor) instance).GetProperties(filter);
-                    }
-                    else
-                    {
-                        return base.GetChildProperties(instance, filter);
-                    }
-                }
-                
-                #endregion
-            }
         }
-
     }
 }

@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
+  <Import Project="..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" />
+  <Import Project="..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.props" Condition="Exists('..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{37A84D33-BB65-4112-B83A-70CA36FA03D2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>wt.core.win_test</RootNamespace>
+    <AssemblyName>wt.core.win-test</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MSTest.TestFramework.1.3.2\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MSTest.TestFramework.1.3.2\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.10.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\Installer\InstallWindowModelTest.cs" />
+    <Compile Include="Classes\UIFeatures\UIFeatureManagementControlTree.xaml.cs">
+      <DependentUpon>UIFeatureManagementControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\UIFeatures\UIFeatureManagementTest.cs" />
+    <Compile Include="Classes\Wpf\CollectionViewBackingData.cs" />
+    <Compile Include="Classes\Wpf\CollectionViewControlTree.xaml.cs">
+      <DependentUpon>CollectionViewControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\CollectionViewTest.cs" />
+    <Compile Include="Classes\Wpf\CrossThread\CrossThreadCollectionWrapperTest.cs" />
+    <Compile Include="Classes\Wpf\CrossThread\CrossThreadCollectionWrapperWindow.xaml.cs">
+      <DependentUpon>CrossThreadCollectionWrapperWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyControlTree.xaml.cs">
+      <DependentUpon>PersistentPropertyControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Wpf\PersistentProperties\PersistentPropertyTest.cs" />
+    <Compile Include="Classes\Wpf\Validation\BackingData.cs" />
+    <Compile Include="Classes\Wpf\Validation\ValidationTest.cs" />
+    <Compile Include="Classes\Wpf\Validation\ValidationTestControlTree.xaml.cs">
+      <DependentUpon>ValidationTestControlTree.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\UIFeatures\UIFeatureManagerTest.cs" />
+    <Compile Include="Controls\ContentUnavailableControl\ContentUnavailableTestContainer.xaml.cs">
+      <DependentUpon>ContentUnavailableTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DialogPanel\DialogPanelTestContainer.xaml.cs">
+      <DependentUpon>DialogPanelTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NotificationLabel\BannerTestContainer.xaml.cs">
+      <DependentUpon>BannerTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Progress\ProgressTestWindow.xaml.cs">
+      <DependentUpon>ProgressTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SpecializedWindows\DialogWindowTest.cs" />
+    <Compile Include="Controls\SpecializedWindows\DialogWindowTestWindow.xaml.cs">
+      <DependentUpon>DialogWindowTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SpecializedWindows\WindowTest.cs" />
+    <Compile Include="Controls\SpecializedWindows\WindowTestWindow.xaml.cs">
+      <DependentUpon>WindowTestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TablePanel\TablePanelTestContainer.xaml.cs">
+      <DependentUpon>TablePanelTestContainer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wt.core.win\wt.core.win.csproj">
+      <Project>{59ca7151-0cfb-458b-8388-ec73221d3e69}</Project>
+      <Name>wt.core.win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\wt.libraries.core\wt.libraries.core.csproj">
+      <Project>{d2c64493-c240-45a9-9bee-d11117035153}</Project>
+      <Name>wt.libraries.core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Classes\UIFeatures\UIFeatureManagementControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\CollectionViewControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\CrossThread\CrossThreadCollectionWrapperWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\PersistentProperties\PersistentPropertyControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Classes\Wpf\Validation\ValidationTestControlTree.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ContentUnavailableControl\ContentUnavailableTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\DialogPanel\DialogPanelTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\NotificationLabel\BannerTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Progress\ProgressTestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\DialogWindowTestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SpecializedWindows\WindowTestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TablePanel\TablePanelTestContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Controls\Progress\1403_Globe.png" />
+    <Content Include="Controls\SpecializedWindows\info.png" />
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.props'))" />
+    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets'))" />
+    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.10.0\build\net35\NUnit3TestAdapter.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.1\build\NUnit.props'))" />
+  </Target>
+  <Import Project="..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets')" />
+</Project>

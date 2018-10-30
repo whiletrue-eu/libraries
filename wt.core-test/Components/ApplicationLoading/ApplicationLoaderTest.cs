@@ -35,10 +35,7 @@ namespace WhileTrue.Components.ApplicationLoading
                 Assert.IsTrue(SplashScreen.ShowCalled);
                 Assert.IsTrue(SplashScreen.HideCalled);
 
-                Assert.AreEqual(2, SplashScreen.StatusTexts.Count);
-
-                Assert.AreEqual("Status: Test2", SplashScreen.StatusTexts[0]);
-                Assert.AreEqual("Status: Test1", SplashScreen.StatusTexts[1]);
+                Assert.That(SplashScreen.StatusTexts, Is.EquivalentTo(new[]{ "Status: Test1" , "Status: Test2" }));
             }
         }
     }
