@@ -8,45 +8,46 @@ using JetBrains.Annotations;
 namespace WhileTrue.Classes.XTransformer
 {
     /// <summary>
-    /// Implements an XSL stylsheet processor that can be easily extended by extension functions
+    ///     Implements an XSL stylsheet processor that can be easily extended by extension functions
     /// </summary>
     [PublicAPI]
     public class XTransformer
     {
-        private readonly XmlResolver resolver;
         private readonly Dictionary<string, object> extensions = new Dictionary<string, object>();
+        private readonly XmlResolver resolver;
         private readonly StylesheetExtensionMethods styleSheetExtension;
 
-        /// <summary/>
+        /// <summary />
         public XTransformer(Uri mainStylesheetFile, XmlResolver resolver)
-            :this(mainStylesheetFile,resolver, resolver.ResolveUri(mainStylesheetFile,"").IsFile?resolver.ResolveUri(mainStylesheetFile,"").LocalPath:null)
+            : this(mainStylesheetFile, resolver,
+                resolver.ResolveUri(mainStylesheetFile, "").IsFile
+                    ? resolver.ResolveUri(mainStylesheetFile, "").LocalPath
+                    : null)
         {
-
         }
 
-        /// <summary/>
+        /// <summary />
         public XTransformer(Uri mainStylesheetFile, XmlResolver resolver, string dataBaseUri)
         {
             this.resolver = resolver;
 
-            this.styleSheetExtension = new StylesheetExtensionMethods(this.resolver, this.extensions, dataBaseUri);
+            styleSheetExtension = new StylesheetExtensionMethods(this.resolver, extensions, dataBaseUri);
 
-            this.extensions.Add("ext:stylesheets", this.styleSheetExtension);
-            this.extensions.Add("ext:xml", new XmlExtensionMethods());
-            if (dataBaseUri != null)
-            {
-                this.extensions.Add("ext:file", new FileExtensionMethods(dataBaseUri));
-            }
+            extensions.Add("ext:stylesheets", styleSheetExtension);
+            extensions.Add("ext:xml", new XmlExtensionMethods());
+            if (dataBaseUri != null) extensions.Add("ext:file", new FileExtensionMethods(dataBaseUri));
 
-            this.styleSheetExtension.LoadStylesheet(string.Empty, mainStylesheetFile);
+            styleSheetExtension.LoadStylesheet(string.Empty, mainStylesheetFile);
         }
 
         /// <summary>
-        /// Transforms the string input and returns the resulting document
+        ///     Transforms the string input and returns the resulting document
         /// </summary>
-        public string Transform(string input, Dictionary<string, object> arguments=null)
+        public string Transform(string input, Dictionary<string, object> arguments = null)
         {
-            return this.styleSheetExtension.Transform(string.Empty, new XPathDocument(new XmlTextReader(new StringReader(input))), arguments?? new Dictionary<string, object>());
+            return styleSheetExtension.Transform(string.Empty,
+                new XPathDocument(new XmlTextReader(new StringReader(input))),
+                arguments ?? new Dictionary<string, object>());
         }
     }
 }

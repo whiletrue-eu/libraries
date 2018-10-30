@@ -1,19 +1,23 @@
 namespace WhileTrue.Classes.Utilities
 {
     /// <summary>
-    /// Specifies where the taskbar is located around the workspace
+    ///     Specifies where the taskbar is located around the workspace
     /// </summary>
     public enum TaskbarLocation
     {
-        /// <summary/>
+        /// <summary />
         None,
-        /// <summary/>
+
+        /// <summary />
         Left,
-        /// <summary/>
+
+        /// <summary />
         Right,
-        /// <summary/>
+
+        /// <summary />
         Top,
-        /// <summary/>
+
+        /// <summary />
         Bottom
     }
 }

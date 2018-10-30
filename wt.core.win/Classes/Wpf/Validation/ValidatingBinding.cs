@@ -2,7 +2,6 @@
 // ReSharper disable MemberCanBePrivate.Global
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -17,81 +16,87 @@ using JetBrains.Annotations;
 using WhileTrue.Classes.Framework;
 using WhileTrue.Classes.Utilities;
 
-
 namespace WhileTrue.Classes.Wpf
 {
-    ///<summary>
-    /// The ValidationBinding class wraps a normal binding, but setting the standard validation
-    /// classes, and additionally adds support for the <see cref="IObjectValidation"/> interface
-    ///</summary>
+    /// <summary>
+    ///     The ValidationBinding class wraps a normal binding, but setting the standard validation
+    ///     classes, and additionally adds support for the <see cref="IObjectValidation" /> interface
+    /// </summary>
     /// <remarks>
-    /// <para>
-    /// The <see cref="IObjectValidation"/> enables validation of values on TextBoxes while typing 
-    /// to get an immediate feedback on error conditions.
-    /// </para>
-    /// <para>
-    /// Otherwise, the binding acts like a standard Binding where the <c>ValidatesOnDataErrors</c> and
-    /// <c>ValidatesOnExceptions</c> properties are set to <c>true</c>.
-    /// </para>
+    ///     <para>
+    ///         The <see cref="IObjectValidation" /> enables validation of values on TextBoxes while typing
+    ///         to get an immediate feedback on error conditions.
+    ///     </para>
+    ///     <para>
+    ///         Otherwise, the binding acts like a standard Binding where the <c>ValidatesOnDataErrors</c> and
+    ///         <c>ValidatesOnExceptions</c> properties are set to <c>true</c>.
+    ///     </para>
     /// </remarks>
     [PublicAPI]
     public class ValidatingBinding : MarkupExtension
     {
-        ///<summary/>
+        /// <summary />
         public ValidatingBinding()
         {
         }
 
-        ///<summary/>
+        /// <summary />
         public ValidatingBinding(string path)
         {
-            this.Path = path;
+            Path = path;
         }
 
         /// <summary>
-        /// Path to the property. <see cref="Binding.Path"/>
+        ///     Path to the property. <see cref="Binding.Path" />
         /// </summary>
         [ConstructorArgument("path")]
         public string Path { get; set; }
 
-        ///<summary/>
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            IProvideValueTarget Target = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));
-
-            if (Target.TargetObject is DependencyObject)
-            {
-                Binding Binding = this.Path!=null?new Binding(this.Path):new Binding();
-                Binding.UpdateSourceTrigger = this.UpdateSourceTrigger;
-
-                ObjectValidationRule ObjectValidationRule = new ObjectValidationRule((DependencyObject) Target.TargetObject, Target.TargetProperty as DependencyProperty, this.UpdateSourceTrigger, Binding);
-                Binding.ValidationRules.Add(ObjectValidationRule);
-
-                BindingExpression Expression = (BindingExpression) Binding.ProvideValue(serviceProvider);
-                ObjectValidationRule.BindingExpression = Expression;
-                return Expression;
-            }
-            else
-            {
-                //This is done e.g. in case of control/data templates. Then the ProvideValue will be called later for each instance of the template seperately
-                return this;
-            }
-        }
-
         // ReSharper disable UnusedAutoPropertyAccessor.Global
         /// <summary>
-        /// Gets or sets a value that determines the timing of binding source updates.
+        ///     Gets or sets a value that determines the timing of binding source updates.
         /// </summary>
         public UpdateSourceTrigger UpdateSourceTrigger { get; set; }
         // ReSharper restore UnusedAutoPropertyAccessor.Global
 
-
-        private class ObjectValidationRule:ValidationRule
+        /// <summary />
+        public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            public ObjectValidationRule(DependencyObject dependencyObject, DependencyProperty dependencyProperty, UpdateSourceTrigger updateSourceTrigger, Binding binding)
+            var Target = (IProvideValueTarget) serviceProvider.GetService(typeof(IProvideValueTarget));
+
+            if (Target.TargetObject is DependencyObject)
             {
-                this.ValidationStep = ValidationStep.UpdatedValue;
-                this.ValidatesOnTargetUpdated = true;
+                var Binding = Path != null ? new Binding(Path) : new Binding();
+                Binding.UpdateSourceTrigger = UpdateSourceTrigger;
+
+                var ObjectValidationRule = new ObjectValidationRule((DependencyObject) Target.TargetObject,
+                    Target.TargetProperty as DependencyProperty, UpdateSourceTrigger, Binding);
+                Binding.ValidationRules.Add(ObjectValidationRule);
+
+                var Expression = (BindingExpression) Binding.ProvideValue(serviceProvider);
+                ObjectValidationRule.BindingExpression = Expression;
+                return Expression;
+            }
+
+            //This is done e.g. in case of control/data templates. Then the ProvideValue will be called later for each instance of the template seperately
+            return this;
+        }
+
+
+        private class ObjectValidationRule : ValidationRule
+        {
+            private readonly DependencyObject dependencyObject;
+            private readonly DependencyProperty dependencyProperty;
+            private IDataErrorInfo dataErrorSourceItem;
+
+            private INotifyDataErrorInfo notifyDataErrorSourceItem;
+            private string sourcePropertyName;
+
+            public ObjectValidationRule(DependencyObject dependencyObject, DependencyProperty dependencyProperty,
+                UpdateSourceTrigger updateSourceTrigger, Binding binding)
+            {
+                ValidationStep = ValidationStep.UpdatedValue;
+                ValidatesOnTargetUpdated = true;
 
                 this.dependencyObject = dependencyObject;
                 this.dependencyProperty = dependencyProperty;
@@ -99,121 +104,32 @@ namespace WhileTrue.Classes.Wpf
                 //Set notification if target is changed (i.e. WPF control is updated with new value) to be able to re-register to validation change notifications
                 binding.NotifyOnTargetUpdated = true;
                 binding.NotifyOnValidationError = true;
-                Binding.AddTargetUpdatedHandler(dependencyObject, this.TargetUpdated);
+                Binding.AddTargetUpdatedHandler(dependencyObject, TargetUpdated);
 
                 //Register for eception handling
-                binding.UpdateSourceExceptionFilter = ObjectValidationRule.HandleSourceUpdateException;
+                binding.UpdateSourceExceptionFilter = HandleSourceUpdateException;
 
 
                 //Special handling for text boxes; only apply if not validated on every change
                 if (updateSourceTrigger != UpdateSourceTrigger.PropertyChanged && dependencyObject is TextBoxBase)
                 {
-                    TextBoxBase TextBox = (TextBoxBase)dependencyObject;
-                    TextBox.TextChanged += this.HandleTextChanged;
+                    var TextBox = (TextBoxBase) dependencyObject;
+                    TextBox.TextChanged += HandleTextChanged;
                 }
 
                 //Special handling to work around the error template disappearing
                 if (this.dependencyObject is UIElement)
-                {
-                    ((UIElement) this.dependencyObject).IsVisibleChanged += this.ObjectValidationRule_IsVisibleChanged;
-                }
+                    ((UIElement) this.dependencyObject).IsVisibleChanged += ObjectValidationRule_IsVisibleChanged;
                 if (this.dependencyObject is UIElement3D)
-                {
-                    ((UIElement3D) this.dependencyObject).IsVisibleChanged += this.ObjectValidationRule_IsVisibleChanged;
-                }
+                    ((UIElement3D) this.dependencyObject).IsVisibleChanged += ObjectValidationRule_IsVisibleChanged;
             }
+
+            public BindingExpression BindingExpression { private get; set; }
 
             private void ObjectValidationRule_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
             {
-                this.ScheduleValidationResultRefresh();
+                ScheduleValidationResultRefresh();
             }
-
-            private readonly DependencyObject dependencyObject;
-            private readonly DependencyProperty dependencyProperty;
-            public BindingExpression BindingExpression { private get; set; }
-
-            private INotifyDataErrorInfo notifyDataErrorSourceItem;
-            private IDataErrorInfo dataErrorSourceItem;
-            private string sourcePropertyName;
-
-            #region Overrides of ValidationRule
-
-            public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-            {
-                BindingExpression Binding = value as BindingExpression;
-                if (Binding != null)
-                {
-                return this.Validate(Binding);
-                }
-                else
-                {
-                    return ValidationResult.ValidResult;
-                }
-            }
-
-            private ValidationResult Validate(BindingExpression bindingExpression)
-            {
-                bindingExpression.DbC_Assure(binding => binding==this.BindingExpression);
-
-                return this.Validate();
-            }
-
-            private ValidationResult Validate()
-            {
-                IEnumerable DataErrors = this.notifyDataErrorSourceItem?.GetErrors(this.sourcePropertyName)??this.dataErrorSourceItem?[this.sourcePropertyName];
-                ValidationMessage[] Errors = DataErrors?.Cast<object>().Select(_ => (ValidationMessage)_.ToString()).ToArray();
-                return this.ProcessValidationResults(Errors);
-            }
-
-            private ValidationResult ProcessValidationResults(ValidationMessage[] errors)
-            {
-                // Use internal method implemented for INotifyDataErrorInfo handling in BindingExpressionBase
-                this.BindingExpression.PrivateMembers().Call("UpdateNotifyDataErrorValidationErrors", new List<object>(errors??new object[0]));
-                return ValidationResult.ValidResult;
-            }
-
-            private ValidationResult Validate(BindingExpression bindingExpression, object value)
-            {
-                bindingExpression.DbC_Assure(binding => binding == this.BindingExpression);
-
-                IObjectValidation ObjectValidation = this.notifyDataErrorSourceItem as IObjectValidation;
-                if (ObjectValidation != null)
-                {
-                    ValidationMessage[] Errors = ObjectValidation.PreviewErrors(this.sourcePropertyName,value).ToArray();
-                    return this.ProcessValidationResults(Errors);
-                }
-                else
-                {
-                    return ValidationResult.ValidResult;
-                }
-            }
-
-            /// <summary>
-            /// Work around framework issue:
-            /// http://connect.microsoft.com/VisualStudio/feedback/details/295933/tabcontrol-doesnt-display-validation-error-information-correctly-when-switching-tabs-back-and-forth
-            /// </summary>
-            private void ScheduleValidationResultRefresh()
-            {
-                if (Validation.GetHasError(this.dependencyObject))
-                {
-                    DependencyObject ErrorTarget = this.dependencyObject;
-                    object CurrentErrorTemplate = ErrorTarget.ReadLocalValue(Validation.ErrorTemplateProperty);
-                    ErrorTarget.Dispatcher.BeginInvoke(
-                        DispatcherPriority.Normal,
-                        (Action) delegate
-                                     {
-                                         ErrorTarget.SetValue(Validation.ErrorTemplateProperty, new ControlTemplate());
-                                     });
-                    ErrorTarget.Dispatcher.BeginInvoke(
-                        DispatcherPriority.Normal,
-                        (Action) delegate
-                                     {
-                                         ErrorTarget.SetValue(Validation.ErrorTemplateProperty, CurrentErrorTemplate);
-                                     });
-                }
-            }
-
-            #endregion
 
             private static object HandleSourceUpdateException(object bindexpression, Exception exception)
             {
@@ -222,70 +138,132 @@ namespace WhileTrue.Classes.Wpf
 
             private void HandleTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
             {
-                ValidationResult Result = this.Validate(this.BindingExpression, ((TextBox)sender).Text);
-                this.UpdateValidationResult(Result);
+                var Result = Validate(BindingExpression, ((TextBox) sender).Text);
+                UpdateValidationResult(Result);
             }
 
             private void UpdateValidationResult(ValidationResult result)
             {
                 if (result.IsValid == false)
-                {
-                    Validation.MarkInvalid(this.BindingExpression, new ValidationError(this,this.BindingExpression, result.ErrorContent, null));
-                }
+                    Validation.MarkInvalid(BindingExpression,
+                        new ValidationError(this, BindingExpression, result.ErrorContent, null));
                 else
-                {
-                    Validation.ClearInvalid(this.BindingExpression);
-                }
+                    Validation.ClearInvalid(BindingExpression);
             }
 
             private void TargetUpdated(object sender, DataTransferEventArgs e)
             {
                 // ReSharper disable once PossibleUnintendedReferenceComparison
-                if (e.TargetObject == this.dependencyObject && e.Property == this.dependencyProperty)
-                {
-                    this.ReRegisterValidationChangedEvent();
-                }
-
+                if (e.TargetObject == dependencyObject && e.Property == dependencyProperty)
+                    ReRegisterValidationChangedEvent();
             }
 
             private void ReRegisterValidationChangedEvent()
             {
-                this.UnregisterValidationChangedEvent();
-                this.RegisterValidationChangedEvent();
+                UnregisterValidationChangedEvent();
+                RegisterValidationChangedEvent();
 
-                ValidationResult Result = this.Validate();
-                this.UpdateValidationResult(Result);
+                var Result = Validate();
+                UpdateValidationResult(Result);
             }
 
             private void RegisterValidationChangedEvent()
             {
-                object SourceItem = this.BindingExpression.PrivateMembers().GetProperty<object>("SourceItem");
-                this.notifyDataErrorSourceItem = SourceItem as INotifyDataErrorInfo;
-                this.dataErrorSourceItem = SourceItem as IDataErrorInfo;
-                this.sourcePropertyName = this.BindingExpression.PrivateMembers().GetProperty<string>("SourcePropertyName");
+                var SourceItem = BindingExpression.PrivateMembers().GetProperty<object>("SourceItem");
+                notifyDataErrorSourceItem = SourceItem as INotifyDataErrorInfo;
+                dataErrorSourceItem = SourceItem as IDataErrorInfo;
+                sourcePropertyName = BindingExpression.PrivateMembers().GetProperty<string>("SourcePropertyName");
 
-                if (this.notifyDataErrorSourceItem != null)
-                {
-                    this.notifyDataErrorSourceItem.ErrorsChanged += this.ErrorsChanged;
-                }
+                if (notifyDataErrorSourceItem != null) notifyDataErrorSourceItem.ErrorsChanged += ErrorsChanged;
             }
 
             private void ErrorsChanged(object sender, DataErrorsChangedEventArgs dataErrorsChangedEventArgs)
             {
-                if (dataErrorsChangedEventArgs.PropertyName == this.sourcePropertyName)
+                if (dataErrorsChangedEventArgs.PropertyName == sourcePropertyName)
                 {
-                    ValidationResult Result = this.Validate(); 
-                    this.UpdateValidationResult(Result);
+                    var Result = Validate();
+                    UpdateValidationResult(Result);
                 }
             }
 
             private void UnregisterValidationChangedEvent()
             {
-                if (this.notifyDataErrorSourceItem != null)
+                if (notifyDataErrorSourceItem != null) notifyDataErrorSourceItem.ErrorsChanged -= ErrorsChanged;
+            }
+
+            #region Overrides of ValidationRule
+
+            public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+            {
+                var Binding = value as BindingExpression;
+                if (Binding != null)
+                    return Validate(Binding);
+                return ValidationResult.ValidResult;
+            }
+
+            private ValidationResult Validate(BindingExpression bindingExpression)
+            {
+                bindingExpression.DbC_Assure(binding => binding == BindingExpression);
+
+                return Validate();
+            }
+
+            private ValidationResult Validate()
+            {
+                var DataErrors = notifyDataErrorSourceItem?.GetErrors(sourcePropertyName) ??
+                                 dataErrorSourceItem?[sourcePropertyName];
+                var Errors = DataErrors?.Cast<object>().Select(_ => (ValidationMessage) _.ToString()).ToArray();
+                return ProcessValidationResults(Errors);
+            }
+
+            private ValidationResult ProcessValidationResults(ValidationMessage[] errors)
+            {
+                // Use internal method implemented for INotifyDataErrorInfo handling in BindingExpressionBase
+                BindingExpression.PrivateMembers().Call("UpdateNotifyDataErrorValidationErrors",
+                    new List<object>(errors ?? new object[0]));
+                return ValidationResult.ValidResult;
+            }
+
+            private ValidationResult Validate(BindingExpression bindingExpression, object value)
+            {
+                bindingExpression.DbC_Assure(binding => binding == BindingExpression);
+
+                var ObjectValidation = notifyDataErrorSourceItem as IObjectValidation;
+                if (ObjectValidation != null)
                 {
-                    this.notifyDataErrorSourceItem.ErrorsChanged -= this.ErrorsChanged;
+                    var Errors = ObjectValidation.PreviewErrors(sourcePropertyName, value).ToArray();
+                    return ProcessValidationResults(Errors);
+                }
+
+                return ValidationResult.ValidResult;
+            }
+
+            /// <summary>
+            ///     Work around framework issue:
+            ///     http://connect.microsoft.com/VisualStudio/feedback/details/295933/tabcontrol-doesnt-display-validation-error-information-correctly-when-switching-tabs-back-and-forth
+            /// </summary>
+            private void ScheduleValidationResultRefresh()
+            {
+                if (Validation.GetHasError(dependencyObject))
+                {
+                    var ErrorTarget = dependencyObject;
+                    var CurrentErrorTemplate = ErrorTarget.ReadLocalValue(Validation.ErrorTemplateProperty);
+                    ErrorTarget.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Normal,
+                        (Action) delegate
+                        {
+                            ErrorTarget.SetValue(Validation.ErrorTemplateProperty, new ControlTemplate());
+                        });
+                    ErrorTarget.Dispatcher.BeginInvoke(
+                        DispatcherPriority.Normal,
+                        (Action) delegate
+                        {
+                            ErrorTarget.SetValue(Validation.ErrorTemplateProperty, CurrentErrorTemplate);
+                        });
                 }
             }
+
+            #endregion
         }
     }
 }

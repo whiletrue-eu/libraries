@@ -6,68 +6,66 @@ namespace WhileTrue.Classes.SettingStorage
 {
     internal class TagValueSettingStore : ITagValueSettingStore
     {
+        private readonly string file;
         private readonly string path;
         private readonly Hashtable tagValues;
-        private readonly string file;
 
         internal TagValueSettingStore(string path, string name)
         {
             try
             {
                 this.path = path;
-                this.file = name + ".settings";
+                file = name + ".settings";
                 Directory.CreateDirectory(path);
-                using (FileStream FileStream = new FileStream(Path.Combine(path, this.file), FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read))
+                using (var FileStream = new FileStream(Path.Combine(path, file), FileMode.OpenOrCreate, FileAccess.Read,
+                    FileShare.Read))
                 {
                     if (FileStream.Length > 0)
-                    {
                         try
                         {
-                            this.tagValues = (Hashtable)XamlServices.Load(FileStream);
+                            tagValues = (Hashtable) XamlServices.Load(FileStream);
                         }
                         catch
                         {
-                            this.tagValues = new Hashtable();
+                            tagValues = new Hashtable();
                         }
-                    }
                     else
-                    {
-                        this.tagValues = new Hashtable();
-                    }
+                        tagValues = new Hashtable();
                 }
             }
             catch
             {
-                this.tagValues = new Hashtable();
+                tagValues = new Hashtable();
             }
         }
 
         public object this[string key]
         {
-            get { return this.tagValues[key]; }
+            get => tagValues[key];
             set
             {
-                this.tagValues[key] = value;
-                this.Save();
-            }
-        }
-
-        private void Save()
-        {
-            using (FileStream FileStream = new FileStream(Path.Combine(this.path, this.file), FileMode.Create, FileAccess.Write, FileShare.Write))
-            {
-                XamlServices.Save(FileStream, this.tagValues);
+                tagValues[key] = value;
+                Save();
             }
         }
 
         public bool ContainsKey(string key)
         {
-            return this.tagValues.ContainsKey(key);
+            return tagValues.ContainsKey(key);
         }
 
         public IDictionaryEnumerator GetEnumerator()
         {
-            return this.tagValues.GetEnumerator();
+            return tagValues.GetEnumerator();
+        }
+
+        private void Save()
+        {
+            using (var FileStream = new FileStream(Path.Combine(path, file), FileMode.Create, FileAccess.Write,
+                FileShare.Write))
+            {
+                XamlServices.Save(FileStream, tagValues);
+            }
         }
     }
 }

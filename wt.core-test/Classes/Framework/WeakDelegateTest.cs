@@ -54,12 +54,17 @@ namespace WhileTrue.Classes.Framework
         [Test]
         public void target_shall_be_collected_if_only_event_handler_is_a_reference()
         {
+            WeakReference<EventSink> Create(EventSource eventSource)
+            {
+                EventSink EventSink = new EventSink(eventSource);
+
+                WeakReference<EventSink> sinkReference = new WeakReference<EventSink>(EventSink);
+                return sinkReference;
+            }
+
             EventSource EventSource = new EventSource();
-            EventSink EventSink = new EventSink(EventSource);
+            WeakReference<EventSink> SinkReference = Create(EventSource);
 
-            WeakReference<EventSink> SinkReference = new WeakReference<EventSink>(EventSink);
-
-            EventSink = null;
             GC.Collect();
 
             EventSink Target;
@@ -80,9 +85,14 @@ namespace WhileTrue.Classes.Framework
         [Test]
         public void eventhandler_shall_be_unregistered_on_next_event_if_target_was_collected()
         {
+            void Create(EventSource eventSource)
+            {
+                new EventSink(eventSource);
+            }
+
             EventSource EventSource = new EventSource();
             
-            new EventSink(EventSource);
+            Create(EventSource);
             GC.Collect(); //should collect the instance created but not saved
 
             EventSource.InvokeEvent();

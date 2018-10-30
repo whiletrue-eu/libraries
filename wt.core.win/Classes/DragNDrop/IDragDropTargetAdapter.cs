@@ -2,8 +2,8 @@
 
 namespace WhileTrue.Classes.DragNDrop
 {
-    /// <summary/>
-    public interface IDragDropTargetAdapter: IDisposable
+    /// <summary />
+    public interface IDragDropTargetAdapter : IDisposable
     {
     }
 }

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 
 namespace WhileTrue.Classes.DragNDrop
 {
     internal class DragDropTargetAdapter : IDragDropTargetAdapter
     {
-        private readonly IDragDropTarget targetHandler;
         //private readonly DependencyObject target;
         private readonly IDragDropUiTargetHandlerInstance dragTargetHandler;
-        private bool isDragging;
         private readonly DependencyObject target;
+        private readonly IDragDropTarget targetHandler;
+        private bool isDragging;
 
         //private readonly Popup popup = new Popup();
         //private Point dragLocation;
@@ -20,12 +19,13 @@ namespace WhileTrue.Classes.DragNDrop
         {
             this.targetHandler = targetHandler;
             this.target = target;
-            this.dragTargetHandler = DragDrop.GetDragDropUITargetHandler(target.GetType()).Create(target, this, makeDroppable);
+            dragTargetHandler = DragDrop.GetDragDropUITargetHandler(target.GetType())
+                .Create(target, this, makeDroppable);
 
-            System.Windows.DragDrop.AddDragEnterHandler(this.target, this.DragEnter);
-            System.Windows.DragDrop.AddDragLeaveHandler(this.target, this.DragLeave);
-            System.Windows.DragDrop.AddDragOverHandler(this.target, this.DragOver);
-            System.Windows.DragDrop.AddDropHandler(this.target, this.Drop);
+            System.Windows.DragDrop.AddDragEnterHandler(this.target, DragEnter);
+            System.Windows.DragDrop.AddDragLeaveHandler(this.target, DragLeave);
+            System.Windows.DragDrop.AddDragOverHandler(this.target, DragOver);
+            System.Windows.DragDrop.AddDropHandler(this.target, Drop);
 
 
             /*
@@ -47,6 +47,16 @@ namespace WhileTrue.Classes.DragNDrop
                 this.popup.VerticalOffset = 10;*/
         }
 
+        public void Dispose()
+        {
+            System.Windows.DragDrop.RemoveDragEnterHandler(target, DragEnter);
+            System.Windows.DragDrop.RemoveDragLeaveHandler(target, DragLeave);
+            System.Windows.DragDrop.RemoveDragOverHandler(target, DragOver);
+            System.Windows.DragDrop.RemoveDropHandler(target, Drop);
+
+            dragTargetHandler.Dispose();
+        }
+
         /*
             private CustomPopupPlacement[] HandlePopupPlacement(Size popupsize, Size targetsize, Point offset)
             {
@@ -57,24 +67,23 @@ namespace WhileTrue.Classes.DragNDrop
 
         private void DragEnter(object sender, DragEventArgs e)
         {
-            DragDropEffects Effect = this.GetDropEffect(e.AllowedEffects, e.KeyStates, e.Data);
+            var Effect = GetDropEffect(e.AllowedEffects, e.KeyStates, e.Data);
 
-            this.HandleDragStart(DragDropTargetAdapter.ToDropEffect(Effect));
-            this.HandleDragUpdate(DragDropTargetAdapter.ToDropEffect(Effect), new DragPosition(e));
+            HandleDragStart(ToDropEffect(Effect));
+            HandleDragUpdate(ToDropEffect(Effect), new DragPosition(e));
 
             e.Effects = Effect;
             e.Handled = true;
-
         }
 
         private void DragOver(object sender, DragEventArgs e)
         {
-            DragDropEffects Effect = this.GetDropEffect(e.AllowedEffects, e.KeyStates, e.Data);
+            var Effect = GetDropEffect(e.AllowedEffects, e.KeyStates, e.Data);
 
             e.Effects = Effect;
             e.Handled = true;
 
-            this.HandleDragUpdate(DragDropTargetAdapter.ToDropEffect(Effect), new DragPosition(e));
+            HandleDragUpdate(ToDropEffect(Effect), new DragPosition(e));
 
 
             /*Window Window = Window.GetWindow(this.target);
@@ -84,33 +93,33 @@ namespace WhileTrue.Classes.DragNDrop
 
         private void DragLeave(object sender, DragEventArgs e)
         {
-            this.HandleDragEnd();
+            HandleDragEnd();
         }
 
         private void HandleDragStart(DragDropEffect effect)
         {
-            if (this.isDragging == false)
+            if (isDragging == false)
             {
-                this.OpenPopup();
-                this.dragTargetHandler.NotifyDragStarted(effect);
+                OpenPopup();
+                dragTargetHandler.NotifyDragStarted(effect);
 
-                this.isDragging = true;
+                isDragging = true;
             }
         }
 
         private void HandleDragUpdate(DragDropEffect effect, DragPosition position)
         {
-            this.dragTargetHandler.NotifyDragChanged(effect, position);
+            dragTargetHandler.NotifyDragChanged(effect, position);
         }
 
         private void HandleDragEnd()
         {
-            if (this.isDragging)
+            if (isDragging)
             {
-                this.ClosePopup();
-                this.dragTargetHandler.NotifyDragEnded();
+                ClosePopup();
+                dragTargetHandler.NotifyDragEnded();
 
-                this.isDragging = false;
+                isDragging = false;
             }
         }
 
@@ -125,17 +134,14 @@ namespace WhileTrue.Classes.DragNDrop
 
         private static object GetData(IDataObject dataObject)
         {
-            foreach( string DataFormat in dataObject.GetFormats() )
+            foreach (var DataFormat in dataObject.GetFormats())
+            foreach (var Assembly in AppDomain.CurrentDomain.GetAssemblies().Reverse()
+            ) //Reverse because it is mor likely to find the type in the user code that is loaded after the framework
             {
-                foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies().Reverse()) //Reverse because it is mor likely to find the type in the user code that is loaded after the framework
-                {
-                    Type Type = Assembly.GetType(DataFormat, false);
-                    if (Type != null)
-                    {
-                        return dataObject.GetData(Type);
-                    }
-                }
+                var Type = Assembly.GetType(DataFormat, false);
+                if (Type != null) return dataObject.GetData(Type);
             }
+
             return null;
         }
 
@@ -150,14 +156,15 @@ namespace WhileTrue.Classes.DragNDrop
 
         private void Drop(object sender, DragEventArgs e)
         {
-            e.Effects = this.GetDropEffect(e.AllowedEffects, e.KeyStates, e.Data);
+            e.Effects = GetDropEffect(e.AllowedEffects, e.KeyStates, e.Data);
 
-            DragDropEffects DropEffects = this.GetDropEffect(e.Effects, e.KeyStates, e.Data);
-            this.targetHandler.DoDrop(e.Data, DragDropTargetAdapter.ToDropEffect(DropEffects), this.dragTargetHandler.GetAdditionalDropInfo(new DragPosition(e)));
+            var DropEffects = GetDropEffect(e.Effects, e.KeyStates, e.Data);
+            targetHandler.DoDrop(e.Data, ToDropEffect(DropEffects),
+                dragTargetHandler.GetAdditionalDropInfo(new DragPosition(e)));
 
             e.Handled = true;
 
-            this.HandleDragEnd();
+            HandleDragEnd();
         }
 
         private static DragDropEffect ToDropEffect(DragDropEffects dropEffects)
@@ -181,66 +188,49 @@ namespace WhileTrue.Classes.DragNDrop
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             return DropEffect;
         }
 
-        private DragDropEffects GetDropEffect(DragDropEffects allowedEffects, DragDropKeyStates keyStates, IDataObject data)
+        private DragDropEffects GetDropEffect(DragDropEffects allowedEffects, DragDropKeyStates keyStates,
+            IDataObject data)
         {
-            DragDropEffects AcceptedEffects = this.targetHandler.GetDropEffects(data);
-            DragDropKeyStates KeyboardStates = keyStates & (DragDropKeyStates.AltKey | DragDropKeyStates.ShiftKey | DragDropKeyStates.ControlKey);
-            DragDropKeyStates MouseStates = keyStates & (DragDropKeyStates.LeftMouseButton|DragDropKeyStates.RightMouseButton|DragDropKeyStates.MiddleMouseButton);
+            var AcceptedEffects = targetHandler.GetDropEffects(data);
+            var KeyboardStates =
+                keyStates & (DragDropKeyStates.AltKey | DragDropKeyStates.ShiftKey | DragDropKeyStates.ControlKey);
+            var MouseStates = keyStates & (DragDropKeyStates.LeftMouseButton | DragDropKeyStates.RightMouseButton |
+                                           DragDropKeyStates.MiddleMouseButton);
 
-            if (AcceptedEffects == DragDropEffects.Scroll)
-            {
-                return DragDropEffects.Scroll;
-            }
+            if (AcceptedEffects == DragDropEffects.Scroll) return DragDropEffects.Scroll;
 
             if (KeyboardStates == DragDropKeyStates.None)
             {
-                DragDropEffect DefaultEffect = this.targetHandler.GetDefaultEffect(data);
-                if( (allowedEffects & (DragDropEffects)DefaultEffect) != 0)
-                {
-                    return (DragDropEffects)DefaultEffect;
-                }
+                var DefaultEffect = targetHandler.GetDefaultEffect(data);
+                if ((allowedEffects & (DragDropEffects) DefaultEffect) != 0) return (DragDropEffects) DefaultEffect;
             }
             else if ((KeyboardStates & DragDropKeyStates.ControlKey) != 0)
             {
                 if ((allowedEffects & DragDropEffects.Copy) != 0 && (AcceptedEffects & DragDropEffects.Copy) != 0)
-                {
                     return DragDropEffects.Copy;
-                }
             }
             else if ((KeyboardStates & DragDropKeyStates.ShiftKey) != 0)
             {
                 if ((allowedEffects & DragDropEffects.Move) != 0 && (AcceptedEffects & DragDropEffects.Move) != 0)
-                {
                     return DragDropEffects.Move;
-                }
             }
             else if ((KeyboardStates & DragDropKeyStates.AltKey) != 0)
             {
                 if ((allowedEffects & DragDropEffects.Link) != 0 && (AcceptedEffects & DragDropEffects.Link) != 0)
-                {
                     return DragDropEffects.Link;
-                }
             }
 
             return DragDropEffects.None;
         }
 
-        public static DragDropTargetAdapter Create(IDragDropTarget dragDropTarget, DependencyObject dependencyObject, bool makeDroppable)
+        public static DragDropTargetAdapter Create(IDragDropTarget dragDropTarget, DependencyObject dependencyObject,
+            bool makeDroppable)
         {
-            return new DragDropTargetAdapter(dragDropTarget,dependencyObject, makeDroppable);
-        }
-
-        public void Dispose()
-        {
-            System.Windows.DragDrop.RemoveDragEnterHandler(this.target, this.DragEnter);
-            System.Windows.DragDrop.RemoveDragLeaveHandler(this.target, this.DragLeave);
-            System.Windows.DragDrop.RemoveDragOverHandler(this.target, this.DragOver);
-            System.Windows.DragDrop.RemoveDropHandler(this.target, this.Drop);
-
-            this.dragTargetHandler.Dispose();
+            return new DragDropTargetAdapter(dragDropTarget, dependencyObject, makeDroppable);
         }
     }
 }

@@ -5,28 +5,30 @@ namespace WhileTrue.Classes.Installer
     public partial class InstallWindowModel
     {
         /// <summary>
-        /// State before installation that informs the user that prerequisite setup is needed
+        ///     State before installation that informs the user that prerequisite setup is needed
         /// </summary>
         public class PreperationStatus : StatusBase
         {
-            /// <summary/>
+            /// <summary />
             public PreperationStatus(string[] missingSoftware, bool isAdminRequired, ICommand setUpSystemCommand)
             {
-                this.MissingSoftware = missingSoftware;
-                this.IsAdminRequired = isAdminRequired;
-                this.SetUpSystemCommand = setUpSystemCommand;
+                MissingSoftware = missingSoftware;
+                IsAdminRequired = isAdminRequired;
+                SetUpSystemCommand = setUpSystemCommand;
             }
 
             /// <summary>
-            /// List of prerequisites that need to be installed
+            ///     List of prerequisites that need to be installed
             /// </summary>
             public string[] MissingSoftware { get; }
+
             /// <summary>
-            /// true if administrative rights are required for (part of) the installation
+            ///     true if administrative rights are required for (part of) the installation
             /// </summary>
             public bool IsAdminRequired { get; }
+
             /// <summary>
-            /// Runs the prerequisite installation
+            ///     Runs the prerequisite installation
             /// </summary>
             public ICommand SetUpSystemCommand { get; }
         }

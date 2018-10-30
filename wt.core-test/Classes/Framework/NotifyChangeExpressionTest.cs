@@ -15,8 +15,8 @@ namespace WhileTrue.Classes.Framework
     [TestFixture]
     public class NotifyChangeExpressionTest
     {
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             Logging.DebugLogger.EnableLogging(typeof(NotifyChangeExpression<>), LoggingLevel.Verbose);
         }
@@ -202,15 +202,19 @@ namespace WhileTrue.Classes.Framework
         {
             TestObject TestObject = new TestObject();
             TestObject InnerTestObject = new TestObject();
-            TestObject.ObjectCollection.Add(InnerTestObject);
 
-            NotifyChangeExpression<Func<TestObject, string>> Expr = new NotifyChangeExpression<Func<TestObject, string>>(test => test.ObjectCollection[0].Property);
+            WeakReference Create() //Scope to allow garbage collection
+            {
+                TestObject.ObjectCollection.Add(InnerTestObject);
 
-            Expr.Invoke(TestObject);
-            WeakReference WeakExpression = new WeakReference(Expr);
+                NotifyChangeExpression<Func<TestObject, string>> Expr = new NotifyChangeExpression<Func<TestObject, string>>(test => test.ObjectCollection[0].Property);
 
-            // ReSharper disable RedundantAssignment
-            Expr = null;
+                Expr.Invoke(TestObject);
+                return new WeakReference(Expr);
+            }
+
+            WeakReference WeakExpression = Create();
+
             GC.Collect();
             // ReSharper restore RedundantAssignment
 

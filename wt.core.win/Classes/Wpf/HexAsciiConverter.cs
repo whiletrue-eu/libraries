@@ -8,13 +8,13 @@ using WhileTrue.Classes.Utilities;
 namespace WhileTrue.Classes.Wpf
 {
     /// <summary>
-    /// Converts a byte array to an hexadecimal representation, using the parameter string to separate bytes
+    ///     Converts a byte array to an hexadecimal representation, using the parameter string to separate bytes
     /// </summary>
     /// <remarks>
-    /// namespace: wt = http://schemas.whiletrue.eu/xaml<br/>
-    /// <br/>
-    /// Usage:
-    /// <code>
+    ///     namespace: wt = http://schemas.whiletrue.eu/xaml<br />
+    ///     <br />
+    ///     Usage:
+    ///     <code>
     /// &lt;ResourceDictionary>
     ///   &lt;wt:HexAsciiConverter x:Key="hexAsciiConverter"/>
     /// &lt;/ResourceDictionary>
@@ -26,26 +26,22 @@ namespace WhileTrue.Classes.Wpf
     {
         #region IValueConverter Members
 
-        /// <summary/>
+        /// <summary />
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (targetType != typeof(string) && targetType != typeof(IEnumerable<byte>))
-            {
                 throw new InvalidOperationException("Converter only supports strings as targetType");
-            }
 
             if (value != null)
             {
-                string Separator = parameter.ToString();
+                var Separator = parameter.ToString();
                 return ((IEnumerable<byte>) value).ToArray().ToHexString(Separator);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
-        /// <summary/>
+        /// <summary />
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

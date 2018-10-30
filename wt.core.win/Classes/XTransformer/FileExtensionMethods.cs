@@ -15,29 +15,26 @@ namespace WhileTrue.Classes.XTransformer
 
         public string Read(string path)
         {
-            return File.ReadAllText(FileHelper.EnsureAbsolutePath(path, this.baseDir));
+            return File.ReadAllText(FileHelper.EnsureAbsolutePath(path, baseDir));
         }
 
         public string Write(string path, string content)
         {
-            string FilePath = FileHelper.EnsureAbsolutePath(path, this.baseDir);
-            string DirectoryPath = Path.GetDirectoryName(FilePath);
-            if (Directory.Exists(DirectoryPath)==false)
-            {
-                Directory.CreateDirectory(DirectoryPath);
-            }
+            var FilePath = FileHelper.EnsureAbsolutePath(path, baseDir);
+            var DirectoryPath = Path.GetDirectoryName(FilePath);
+            if (Directory.Exists(DirectoryPath) == false) Directory.CreateDirectory(DirectoryPath);
             File.WriteAllText(FilePath, content);
             return "";
         }
 
         public IXPathNavigable ReadXml(string path)
         {
-            return new XPathDocument( new StringReader(this.Read(path)));
+            return new XPathDocument(new StringReader(Read(path)));
         }
 
         public string WriteXml(string path, IXPathNavigable content)
         {
-            return this.Write(path, content.CreateNavigator().OuterXml);
+            return Write(path, content.CreateNavigator().OuterXml);
         }
     }
 }

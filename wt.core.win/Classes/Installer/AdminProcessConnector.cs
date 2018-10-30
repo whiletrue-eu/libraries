@@ -9,34 +9,34 @@ namespace WhileTrue.Classes.Installer
 {
     internal class AdminProcessConnector : IAdminProcessConnector
     {
-        private NamedPipeServerStream pipeServer;
         private Process adminInstall;
+        private NamedPipeServerStream pipeServer;
         private StreamReader reader;
 
         public void LaunchProcess()
         {
-            string PipeName = Guid.NewGuid().ToString("X");
-            this.pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte);
+            var PipeName = Guid.NewGuid().ToString("X");
+            pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte);
 
-            ProcessStartInfo AdminInstallStartInfo = new ProcessStartInfo(Environment.GetCommandLineArgs()[0], PipeName)
-                                                     {
-                                                         WorkingDirectory = Environment.CurrentDirectory,
-                                                         Verb = "runas",
-                                                         CreateNoWindow = true,
-                                                         WindowStyle = ProcessWindowStyle.Hidden
-                                                     };
-            this.adminInstall = Process.Start(AdminInstallStartInfo);
-            this.pipeServer.WaitForConnection();
-            this.reader = new StreamReader(this.pipeServer);
+            var AdminInstallStartInfo = new ProcessStartInfo(Environment.GetCommandLineArgs()[0], PipeName)
+            {
+                WorkingDirectory = Environment.CurrentDirectory,
+                Verb = "runas",
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            adminInstall = Process.Start(AdminInstallStartInfo);
+            pipeServer.WaitForConnection();
+            reader = new StreamReader(pipeServer);
         }
 
         public void EndIfStartedAndWaitForExit()
         {
-            if (this.adminInstall != null)
+            if (adminInstall != null)
             {
-                this.pipeServer.Close();
-                this.adminInstall.WaitForExit();
-                if (this.adminInstall.ExitCode != 0)
+                pipeServer.Close();
+                adminInstall.WaitForExit();
+                if (adminInstall.ExitCode != 0)
                 {
                     //TODO: issue error? or don't care -> everything is already installed
                 }
@@ -46,14 +46,11 @@ namespace WhileTrue.Classes.Installer
         public void DoInstallRemote(PrerequisiteBase prerequisite)
         {
             IFormatter Serializer = new BinaryFormatter();
-            Serializer.Serialize(this.pipeServer, prerequisite);
-            this.pipeServer.WaitForPipeDrain();
+            Serializer.Serialize(pipeServer, prerequisite);
+            pipeServer.WaitForPipeDrain();
 
-            string Result = this.reader.ReadLine();
-            if (string.IsNullOrEmpty(Result) == false)
-            {
-                throw new Exception(Result);
-            }
+            var Result = reader.ReadLine();
+            if (string.IsNullOrEmpty(Result) == false) throw new Exception(Result);
         }
     }
 }

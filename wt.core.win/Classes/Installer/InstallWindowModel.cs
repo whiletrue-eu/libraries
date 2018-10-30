@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using WhileTrue.Classes.Commands;
 using WhileTrue.Classes.Framework;
 using WhileTrue.Classes.Utilities;
@@ -13,227 +11,212 @@ using WhileTrue.Classes.Utilities;
 namespace WhileTrue.Classes.Installer
 {
     /// <summary>
-    /// View Model for prerequisite installation wizard
+    ///     View Model for prerequisite installation wizard
     /// </summary>
-    public partial class InstallWindowModel: ObservableObject
+    public partial class InstallWindowModel : ObservableObject
     {
-        /// <summary>
-        /// base class for state specific models
-        /// </summary>
-        public abstract class StatusBase
-        {
-        }
+        private readonly IAdminProcessConnector adminProcessConnector;
+        private readonly Action<string, Action<string, double>, Action<string>> downloadFunc;
 
 
         private readonly PrerequisiteBase[] prerequisites;
-        private readonly Action<string, Action<string, double>, Action<string>> downloadFunc;
-        private readonly IAdminProcessConnector adminProcessConnector;
         private StatusBase status;
-        private object statusLock= new object();
+        private object statusLock = new object();
 
-        /// <summary/>
-        public InstallWindowModel(PrerequisiteBase[] prerequisites, Action<string, Action<string, double>, Action<string>> downloadFunc )
-            :this(prerequisites,downloadFunc, new AdminProcessConnector())
+        /// <summary />
+        public InstallWindowModel(PrerequisiteBase[] prerequisites,
+            Action<string, Action<string, double>, Action<string>> downloadFunc)
+            : this(prerequisites, downloadFunc, new AdminProcessConnector())
         {
-        }     
-        
-        /// <summary/>
-        internal InstallWindowModel(PrerequisiteBase[] prerequisites, Action<string,Action<string,double>, Action<string>> downloadFunc, IAdminProcessConnector adminProcessConnector )
+        }
+
+        /// <summary />
+        internal InstallWindowModel(PrerequisiteBase[] prerequisites,
+            Action<string, Action<string, double>, Action<string>> downloadFunc,
+            IAdminProcessConnector adminProcessConnector)
         {
-            Contract.Requires(prerequisites.All(_=>_.IsAlreadyInstalled==false));
+            Contract.Requires(prerequisites.All(_ => _.IsAlreadyInstalled == false));
 
             this.prerequisites = prerequisites;
             this.downloadFunc = downloadFunc;
             this.adminProcessConnector = adminProcessConnector;
 
-            this.status = new PreperationStatus(
+            status = new PreperationStatus(
                 prerequisites.Select(_ => _.Name).ToArray(),
                 prerequisites.Any(_ => _.RequiresAdmin),
-                new DelegateCommand(this.SetUpSystem));
+                new DelegateCommand(SetUpSystem));
         }
 
         /// <summary>
-        /// Current status
+        ///     Current status
         /// </summary>
         public StatusBase Status
         {
-            get { return this.status; }
-            private set { this.SetAndInvoke(ref this.status, value); }
+            get => status;
+            private set => SetAndInvoke(ref status, value);
         }
 
         private void SetUpSystem()
         {
             new Task(() =>
-                     {
-                         int PackagesToInstall = this.prerequisites.Length;
-                         int PackagesToDownload = this.prerequisites.Count(_ => _.DownloadId != null);
-                         int PackagesDownloaded = 0;
-                         int PackagesInstalled = 0;
+            {
+                var PackagesToInstall = prerequisites.Length;
+                var PackagesToDownload = prerequisites.Count(_ => _.DownloadId != null);
+                var PackagesDownloaded = 0;
+                var PackagesInstalled = 0;
 
-                         //Set up initial status for download and imnstallation
-                         bool IsAdminRequired = this.prerequisites.Any(_ => _.RequiresAdmin);
-                         bool DownloadsNeeded = PackagesToDownload>0;
-                         bool MustWaitForDownload = PackagesToInstall == PackagesToDownload;
-                         this.Status = new InstallationStatus(
-                             MustWaitForDownload
-                                 ? (InstallationStatus.InstallationStatusBase) new InstallationStatus.InstallationWaitingForDownloadStatus()
-                                 : new InstallationStatus.InstallingStatus(PackagesToInstall, 0, null),
-                             DownloadsNeeded
-                                 ? new InstallationStatus.DownloadingStatus(PackagesToDownload, 0, null)
-                                 : default(InstallationStatus.DownloadStatusBase));
+                //Set up initial status for download and imnstallation
+                var IsAdminRequired = prerequisites.Any(_ => _.RequiresAdmin);
+                var DownloadsNeeded = PackagesToDownload > 0;
+                var MustWaitForDownload = PackagesToInstall == PackagesToDownload;
+                Status = new InstallationStatus(
+                    MustWaitForDownload
+                        ? (InstallationStatus.InstallationStatusBase)
+                        new InstallationStatus.InstallationWaitingForDownloadStatus()
+                        : new InstallationStatus.InstallingStatus(PackagesToInstall, 0, null),
+                    DownloadsNeeded
+                        ? new InstallationStatus.DownloadingStatus(PackagesToDownload, 0, null)
+                        : default(InstallationStatus.DownloadStatusBase));
 
-                         //Set up queue for installable packages. All packages that do not need to be downloaded are added right now as installation can directly start
-                         Queue<PrerequisiteBase> InstallQueue = new Queue<PrerequisiteBase>();
-                         AutoResetEvent InstallQueueAdded = new AutoResetEvent(false);
-                         this.prerequisites.Where(_=>_.DownloadId==null).ForEach(_=>InstallQueue.Enqueue(_));
-
-
-                         //If administrative rights are required,set up client process to delegate those installations to.
-                         if (IsAdminRequired)
-                         {
-                             this.adminProcessConnector.LaunchProcess();
-                         }
-
-                         //Start download for all packages in parallel
-                         foreach (PrerequisiteBase Prerequisite in this.prerequisites.Where(_=>_.DownloadId!=null))
-                         {
-                             this.downloadFunc(
-                                 Prerequisite.DownloadId,
-                                 (id, progress) =>
-                                 {
-                                     lock (this.statusLock)
-                                     {
-                                         this.prerequisites.First(_ => _.DownloadId == id).DownloadProgress = progress;
-                                         double OverallProgress = this.prerequisites.Where(_ => _.DownloadId != null).Sum(_ => _.DownloadProgress);
-                                         lock (this.statusLock)
-                                         {
-                                             if (this.Status is InstallationErrorStatus)
-                                             {
-                                                 //Ignore if there is already an error reported. Can happen if multiple downloads are pending and one has a failure
-                                                 return;
-                                             }
-                                         }
-                                         // Update download status
-                                         this.Status = new InstallationStatus(((InstallationStatus)this.Status).Installation, new InstallationStatus.DownloadingStatus(PackagesToDownload, OverallProgress, null));
-                                     }
-                                 },
-                                 id =>
-                                 {
-                                     //TODO: Handle download errors
-                                     lock (this.statusLock)
-                                     {
-                                         if (this.Status is InstallationErrorStatus)
-                                         {
-                                             //Ignore if there is already an error reported. Can happen if multiple downloads are pending and one has a failure
-                                             return;
-                                         }
-                                     }
-                                     lock (InstallQueue)
-                                     {
-                                         InstallQueue.Enqueue(this.prerequisites.First(_ => _.DownloadId == id));
-                                         InstallQueueAdded.Set();
-                                         PackagesDownloaded++;
-                                         lock (this.statusLock)
-                                         {
-                                             if (PackagesToDownload != PackagesDownloaded)
-                                             {
-                                                 // Update download status
-                                                 this.Status = new InstallationStatus(((InstallationStatus) this.Status).Installation, new InstallationStatus.DownloadingStatus(PackagesToDownload, PackagesDownloaded, null));
-                                             }
-                                             else
-                                             {
-                                                 // All downloads finished
-                                                 this.Status = new InstallationStatus(((InstallationStatus) this.Status).Installation, new InstallationStatus.DownloadFinishedStatus());
-                                             }
-                                         }
-                                     }
-                                 });
-                         }
+                //Set up queue for installable packages. All packages that do not need to be downloaded are added right now as installation can directly start
+                var InstallQueue = new Queue<PrerequisiteBase>();
+                var InstallQueueAdded = new AutoResetEvent(false);
+                prerequisites.Where(_ => _.DownloadId == null).ForEach(_ => InstallQueue.Enqueue(_));
 
 
-                         //repeat until all prerequisites are installed
-                         while (this.prerequisites.Any(_ => _.WasInstalled == false))
-                         {
-                             PrerequisiteBase Prerequisite = null;
-                             do
-                             {
-                                 lock (InstallQueue)
-                                 {
-                                     if (InstallQueue.Count > 0)
-                                     {
-                                         Prerequisite = InstallQueue.Dequeue();
-                                     }
-                                 }
-                                 if (Prerequisite == null)
-                                 {
-                                     lock (this.statusLock)
-                                     {
-                                         this.Status = new InstallationStatus(
-                                             new InstallationStatus.InstallationWaitingForDownloadStatus(),
-                                             ((InstallationStatus) this.Status).Download
-                                             );
-                                     }
-                                     InstallQueueAdded.WaitOne();
-                                 }
-                             } while (Prerequisite == null);
+                //If administrative rights are required,set up client process to delegate those installations to.
+                if (IsAdminRequired) adminProcessConnector.LaunchProcess();
+
+                //Start download for all packages in parallel
+                foreach (var Prerequisite in prerequisites.Where(_ => _.DownloadId != null))
+                    downloadFunc(
+                        Prerequisite.DownloadId,
+                        (id, progress) =>
+                        {
+                            lock (statusLock)
+                            {
+                                prerequisites.First(_ => _.DownloadId == id).DownloadProgress = progress;
+                                var OverallProgress = prerequisites.Where(_ => _.DownloadId != null)
+                                    .Sum(_ => _.DownloadProgress);
+                                lock (statusLock)
+                                {
+                                    if (Status is InstallationErrorStatus) return;
+                                }
+
+                                // Update download status
+                                Status = new InstallationStatus(((InstallationStatus) Status).Installation,
+                                    new InstallationStatus.DownloadingStatus(PackagesToDownload, OverallProgress,
+                                        null));
+                            }
+                        },
+                        id =>
+                        {
+                            //TODO: Handle download errors
+                            lock (statusLock)
+                            {
+                                if (Status is InstallationErrorStatus) return;
+                            }
+
+                            lock (InstallQueue)
+                            {
+                                InstallQueue.Enqueue(prerequisites.First(_ => _.DownloadId == id));
+                                InstallQueueAdded.Set();
+                                PackagesDownloaded++;
+                                lock (statusLock)
+                                {
+                                    if (PackagesToDownload != PackagesDownloaded)
+                                        Status = new InstallationStatus(((InstallationStatus) Status).Installation,
+                                            new InstallationStatus.DownloadingStatus(PackagesToDownload,
+                                                PackagesDownloaded, null));
+                                    else
+                                        Status = new InstallationStatus(((InstallationStatus) Status).Installation,
+                                            new InstallationStatus.DownloadFinishedStatus());
+                                }
+                            }
+                        });
 
 
-                             lock (this.statusLock)
-                             {
-                                 this.Status = new InstallationStatus(
-                                     new InstallationStatus.InstallingStatus(PackagesToInstall, PackagesInstalled, Prerequisite.Name),
-                                     ((InstallationStatus) this.Status).Download
-                                     );
-                             }
+                //repeat until all prerequisites are installed
+                while (prerequisites.Any(_ => _.WasInstalled == false))
+                {
+                    PrerequisiteBase Prerequisite = null;
+                    do
+                    {
+                        lock (InstallQueue)
+                        {
+                            if (InstallQueue.Count > 0) Prerequisite = InstallQueue.Dequeue();
+                        }
 
-                             try
-                             {
-                                 //if needed, run process with admin rights to execute installations
-                                 if (Prerequisite.RequiresAdmin)
-                                 {
-                                     this.adminProcessConnector.DoInstallRemote(Prerequisite);
-                                 }
-                                 else
-                                 {
-                                     Prerequisite.DoInstall();
-                                 }
-                                 Prerequisite.SetInstalled();
-                             }
-                             catch (Exception Error)
-                             {
-                                 lock (this.statusLock)
-                                 {
-                                     this.Status = new InstallationErrorStatus(Error.Message);
-                                 }
-                                 //TODO: Stop downloads
-                                 break;
-                             }
+                        if (Prerequisite == null)
+                        {
+                            lock (statusLock)
+                            {
+                                Status = new InstallationStatus(
+                                    new InstallationStatus.InstallationWaitingForDownloadStatus(),
+                                    ((InstallationStatus) Status).Download
+                                );
+                            }
 
-                             PackagesInstalled++;
-                             lock (this.statusLock)
-                             {
-                                 this.Status = new InstallationStatus(
-                                     new InstallationStatus.InstallingStatus(PackagesToInstall, PackagesInstalled, Prerequisite.Name),
-                                     ((InstallationStatus)this.Status).Download
-                                     );
-                             }
-                         }
+                            InstallQueueAdded.WaitOne();
+                        }
+                    } while (Prerequisite == null);
 
-                         //Installation finished or error occured. Close client program if it was started
-                         this.adminProcessConnector.EndIfStartedAndWaitForExit();
 
-                         lock (this.statusLock)
-                         {
-                             if (this.Status is InstallationStatus)
-                             {
-                                 this.Status = new InstallationSuccessStatus();
-                             }
-                             else
-                             {
-                                 //Error status, leave as is
-                             }
-                         }
-                     }).Start();
+                    lock (statusLock)
+                    {
+                        Status = new InstallationStatus(
+                            new InstallationStatus.InstallingStatus(PackagesToInstall, PackagesInstalled,
+                                Prerequisite.Name),
+                            ((InstallationStatus) Status).Download
+                        );
+                    }
+
+                    try
+                    {
+                        //if needed, run process with admin rights to execute installations
+                        if (Prerequisite.RequiresAdmin)
+                            adminProcessConnector.DoInstallRemote(Prerequisite);
+                        else
+                            Prerequisite.DoInstall();
+                        Prerequisite.SetInstalled();
+                    }
+                    catch (Exception Error)
+                    {
+                        lock (statusLock)
+                        {
+                            Status = new InstallationErrorStatus(Error.Message);
+                        }
+
+                        //TODO: Stop downloads
+                        break;
+                    }
+
+                    PackagesInstalled++;
+                    lock (statusLock)
+                    {
+                        Status = new InstallationStatus(
+                            new InstallationStatus.InstallingStatus(PackagesToInstall, PackagesInstalled,
+                                Prerequisite.Name),
+                            ((InstallationStatus) Status).Download
+                        );
+                    }
+                }
+
+                //Installation finished or error occured. Close client program if it was started
+                adminProcessConnector.EndIfStartedAndWaitForExit();
+
+                lock (statusLock)
+                {
+                    if (Status is InstallationStatus) Status = new InstallationSuccessStatus();
+                }
+            }).Start();
+        }
+
+        /// <summary>
+        ///     base class for state specific models
+        /// </summary>
+        public abstract class StatusBase
+        {
         }
     }
 }

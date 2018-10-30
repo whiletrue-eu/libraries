@@ -43,10 +43,16 @@ namespace WhileTrue.Classes.Utilities
                                                                                  return new object();
                                                                              });
 
-            Cache.GetObject(1);
+            void Create()
+            {
+                Cache.GetObject(1);
+            }
+            Create();
+
+
             Assert.AreEqual(1, CreateCalls);
 
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true,true);
+            GC.Collect();
             GC.GetTotalMemory(true);
             
             

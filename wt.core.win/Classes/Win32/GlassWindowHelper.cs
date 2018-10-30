@@ -4,119 +4,111 @@ using WhileTrue.Classes.Utilities;
 namespace WhileTrue.Classes.Win32
 {
     /// <summary>
-    /// Supports implementation of a glass aware window through callbacks when the glass effect is disabled/enabled.
+    ///     Supports implementation of a glass aware window through callbacks when the glass effect is disabled/enabled.
     /// </summary>
     internal class GlassWindowHelper
     {
         private const int WM_COMPOSITIONCHANGED = 0x031E;
         private const int WM_NCCALCSIZE = 0x0083;
         private const int WM_NCHITTEST = 0x0084;
-
-        private readonly IntPtr windowHandle;
-        private bool blurClientArea;
-        private readonly Action notifyDwmCompositionChanged;
         private readonly Func<ushort, ushort, NonClientArea> nonClientHitTest;
-        private bool dwmIsCompositionEnabled;
-        private DwmAPI.Margins margins;
+        private readonly Action notifyDwmCompositionChanged;
+
+        private bool blurClientArea;
+
+        private bool firstTimeNonClientCalc = true;
+        private DwmApi.Margins margins;
         private bool nonClientAreaDrawingEnabled;
 
-        internal GlassWindowHelper(IntPtr windowHandle, DwmAPI.Margins margins, bool blurClientArea, bool nonClientAreaDrawingEnabled, Action notifyDwmCompositionChanged, Func<ushort,ushort,NonClientArea> nonClientHitTest)
+        internal GlassWindowHelper(IntPtr windowHandle, DwmApi.Margins margins, bool blurClientArea,
+            bool nonClientAreaDrawingEnabled, Action notifyDwmCompositionChanged,
+            Func<ushort, ushort, NonClientArea> nonClientHitTest)
         {
-            this.windowHandle = windowHandle;
-            this.dwmIsCompositionEnabled = DwmAPI.IsCompositionEnabled();
+            WindowHandle = windowHandle;
+            DwmIsCompositionEnabled = DwmApi.IsCompositionEnabled();
             this.margins = margins;
             this.blurClientArea = blurClientArea;
             this.notifyDwmCompositionChanged = notifyDwmCompositionChanged;
-            this.UpdateGlassEffect();
-            this.UpdateNonClientArea(); 
+            UpdateGlassEffect();
+            UpdateNonClientArea();
             this.nonClientAreaDrawingEnabled = nonClientAreaDrawingEnabled;
             this.nonClientHitTest = nonClientHitTest;
-            this.UpdateNonClientArea();
+            UpdateNonClientArea();
         }
 
         /// <summary>
-        /// Sets the margin that is used for the glass effect. If <c>-1</c> is specified, the window is completely rendered with the glass effect ('sheet of glass')
+        ///     Sets the margin that is used for the glass effect. If <c>-1</c> is specified, the window is completely rendered
+        ///     with the glass effect ('sheet of glass')
         /// </summary>
-        public DwmAPI.Margins Margins
+        public DwmApi.Margins Margins
         {
             set
             {
-                this.margins = value;
-                this.UpdateGlassEffect();
+                margins = value;
+                UpdateGlassEffect();
             }
         }
 
         /// <summary>
-        /// Sets whether the client area should be blurred.
+        ///     Sets whether the client area should be blurred.
         /// </summary>
         public bool BlurClientArea
         {
             set
             {
-                this.blurClientArea = value;
-                this.UpdateGlassEffect();
+                blurClientArea = value;
+                UpdateGlassEffect();
             }
         }
 
 
-        public IntPtr WindowHandle
-        {
-            get { return this.windowHandle; }
-        }
+        public IntPtr WindowHandle { get; }
 
-        public bool DwmIsCompositionEnabled
-        {
-            get { return this.dwmIsCompositionEnabled; }
-        }
+        public bool DwmIsCompositionEnabled { get; private set; }
 
         private void UpdateGlassEffect()
         {
-            DwmAPI.EnableGlassEffect(this.windowHandle, this.margins);
-            DwmAPI.EnableBlurBehindWindow(this.windowHandle, this.blurClientArea);
+            DwmApi.EnableGlassEffect(WindowHandle, margins);
+            DwmApi.EnableBlurBehindWindow(WindowHandle, blurClientArea);
         }
 
         protected void NotifyCompositionChanged()
         {
-            this.dwmIsCompositionEnabled = DwmAPI.IsCompositionEnabled();
-            this.UpdateGlassEffect();
-            this.notifyDwmCompositionChanged();
+            DwmIsCompositionEnabled = DwmApi.IsCompositionEnabled();
+            UpdateGlassEffect();
+            notifyDwmCompositionChanged();
         }
 
-        private bool firstTimeNonClientCalc=true;
         public IntPtr PreviewWindowMessage(IntPtr hWindow, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             switch (message)
             {
                 case WM_COMPOSITIONCHANGED:
-                    this.NotifyCompositionChanged();
+                    NotifyCompositionChanged();
                     return IntPtr.Zero;
                 case WM_NCCALCSIZE:
-                    if (this.firstTimeNonClientCalc)
+                    if (firstTimeNonClientCalc)
                     {
                         // Suppress first time, otherwise glass effect will be messed up..
-                        this.firstTimeNonClientCalc = false;
+                        firstTimeNonClientCalc = false;
                         return IntPtr.Zero;
                     }
                     else
                     {
-                        if (this.nonClientAreaDrawingEnabled && wParam != IntPtr.Zero) //TRUE
+                        if (nonClientAreaDrawingEnabled && wParam != IntPtr.Zero) //TRUE
                         {
                             //no nonclient frame
                             handled = true;
                             return IntPtr.Zero;
                         }
-                        else
-                        {
-                            return IntPtr.Zero;
-                        }
+
+                        return IntPtr.Zero;
                     }
-            
-            case WM_NCHITTEST:
-                    IntPtr Result = IntPtr.Zero;
-                    if (this.dwmIsCompositionEnabled)
-                    {
-                        handled = DwmAPI.DwmDefWindowProc(hWindow, message, wParam, lParam, out Result);
-                    }
+
+                case WM_NCHITTEST:
+                    var Result = IntPtr.Zero;
+                    if (DwmIsCompositionEnabled)
+                        handled = DwmApi.DwmDefWindowProc(hWindow, message, wParam, lParam, out Result);
                     if (handled == false)
                     {
                         uint Coordinates;
@@ -125,13 +117,14 @@ namespace WhileTrue.Classes.Win32
                             Coordinates = (uint) lParam.ToInt32();
                         }
 
-                        NonClientArea NonClientArea = this.nonClientHitTest(Coordinates.GetLoUShort(), Coordinates.GetHiUShort());
+                        var NonClientArea = nonClientHitTest(Coordinates.GetLoUShort(), Coordinates.GetHiUShort());
                         if (NonClientArea != NonClientArea.HTNOWHERE)
                         {
                             Result = new IntPtr((int) NonClientArea);
                             handled = true;
                         }
                     }
+
                     return Result;
                 default:
                     return IntPtr.Zero;
@@ -141,12 +134,14 @@ namespace WhileTrue.Classes.Win32
 
         public void SetNonClientAreaDrawing(bool enabled)
         {
-            this.nonClientAreaDrawingEnabled = enabled;
-            this.UpdateNonClientArea();
+            nonClientAreaDrawingEnabled = enabled;
+            UpdateNonClientArea();
         }
+
         private void UpdateNonClientArea()
         {
-            DwmAPI.SetWindowPos(this.windowHandle, IntPtr.Zero, 0, 0, 0, 0, 0x27 /*SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED*/);
+            DwmApi.SetWindowPos(WindowHandle, IntPtr.Zero, 0, 0, 0, 0,
+                0x27 /*SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED*/);
         }
     }
 }

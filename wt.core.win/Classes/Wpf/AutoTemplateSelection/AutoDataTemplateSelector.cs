@@ -1,4 +1,5 @@
 // ReSharper disable UnusedMember.Global
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,31 +7,31 @@ using System.Windows.Controls;
 namespace WhileTrue.Classes.Wpf
 {
     /// <summary>
-    /// Provides data template variants (per 'view' string) by using the template selector capabilities of controls.
-    /// TO mark the dataTemplates, use <see cref="DataTemplateKey"/>s on the DataTemplates
+    ///     Provides data template variants (per 'view' string) by using the template selector capabilities of controls.
+    ///     TO mark the dataTemplates, use <see cref="DataTemplateKey" />s on the DataTemplates
     /// </summary>
     public class AutoDataTemplateSelector : DataTemplateSelector
     {
         private readonly FrameworkElement frameworkElement;
         private readonly string view;
 
-        ///<summary/>
+        /// <summary />
         public AutoDataTemplateSelector(FrameworkElement frameworkElement)
-            :this(frameworkElement,"")
+            : this(frameworkElement, "")
         {
         }
 
-        ///<summary/>
+        /// <summary />
         public AutoDataTemplateSelector(FrameworkElement frameworkElement, string view)
         {
             this.frameworkElement = frameworkElement;
             this.view = view;
         }
 
-        ///<summary/>
+        /// <summary />
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            DataTemplate Template = this.TryFindTemplate(item.GetType());
+            var Template = TryFindTemplate(item.GetType());
             return Template ?? base.SelectTemplate(item, container);
         }
 
@@ -38,28 +39,19 @@ namespace WhileTrue.Classes.Wpf
         {
             if (itemType != null)
             {
-                object Resource = this.frameworkElement.TryFindResource(new AutoTemplateKey(itemType, this.view));
-                if (Resource != null)
+                var Resource = frameworkElement.TryFindResource(new AutoTemplateKey(itemType, view));
+                if (Resource != null) return (DataTemplate) Resource;
+
+                foreach (var InterfaceType in itemType.GetInterfaces())
                 {
-                    return (DataTemplate) Resource;
+                    var Template = TryFindTemplate(InterfaceType);
+                    if (Template != null) return Template;
                 }
-                else
-                {
-                    foreach (Type InterfaceType in itemType.GetInterfaces())
-                    {
-                        DataTemplate Template = this.TryFindTemplate(InterfaceType);
-                        if (Template != null)
-                        {
-                            return Template;
-                        }
-                    }
-                    return this.TryFindTemplate(itemType.BaseType);
-                }
+
+                return TryFindTemplate(itemType.BaseType);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }
