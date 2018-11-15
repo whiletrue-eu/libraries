@@ -3,17 +3,20 @@
 namespace WhileTrue.Classes.DragNDrop
 {
     /// <summary>
-    /// Single Drop effect. Assignment compatible with <see cref="DragDropEffects"/>
+    ///     Single Drop effect. Assignment compatible with <see cref="DragDropEffects" />
     /// </summary>
     public enum DragDropEffect
     {
-        /// <summary/>
+        /// <summary />
         Copy = DragDropEffects.Copy,
-        /// <summary/>
+
+        /// <summary />
         Move = DragDropEffects.Move,
-        /// <summary/>
+
+        /// <summary />
         Link = DragDropEffects.Link,
-        /// <summary/>
-        None = DragDropEffects.None,
+
+        /// <summary />
+        None = DragDropEffects.None
     }
 }

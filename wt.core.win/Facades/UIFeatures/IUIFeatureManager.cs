@@ -4,16 +4,18 @@ using WhileTrue.Classes.Components;
 namespace WhileTrue.Facades.UIFeatures
 {
     /// <summary>
-    /// Supports UI feature Management
+    ///     Supports UI feature Management
     /// </summary>
     [ComponentInterface]
     public interface IUiFeatureManager
     {
-        /// <summary/>
+        /// <summary />
         bool IsVisible(string context);
-        /// <summary/>
+
+        /// <summary />
         bool IsEnabled(string context);
-        /// <summary/>
+
+        /// <summary />
         event EventHandler<EventArgs> FeaturesChanged;
     }
 }

@@ -12,20 +12,20 @@ namespace WhileTrue.Classes.SettingStorage
 
             Directory.CreateDirectory(this.path);
         }
+
         public FileStream CreateFile(string fileName, FileMode mode, FileAccess access, FileShare share)
         {
-
-            return new FileStream(Path.Combine(this.path,fileName), mode, access, share);
+            return new FileStream(Path.Combine(path, fileName), mode, access, share);
         }
 
         public FileInfo[] GetFileNames(string searchPattern)
         {
-            return new DirectoryInfo(this.path).GetFiles(searchPattern);
+            return new DirectoryInfo(path).GetFiles(searchPattern);
         }
 
         public void DeleteFile(string fileName)
         {
-            Directory.Delete(Path.Combine(this.path, fileName));
-        }  
+            Directory.Delete(Path.Combine(path, fileName));
+        }
     }
 }

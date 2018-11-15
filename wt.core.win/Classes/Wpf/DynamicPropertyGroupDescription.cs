@@ -22,38 +22,36 @@ namespace WhileTrue.Classes.Wpf
         public override object GroupNameFromItem(object item, int level, CultureInfo culture)
         {
             if (item is INotifyPropertyChanged)
-            {
-                ((INotifyPropertyChanged) item).PropertyChanged += this.MyPropertyGroupDescription_PropertyChanged;
-            }
+                ((INotifyPropertyChanged) item).PropertyChanged += MyPropertyGroupDescription_PropertyChanged;
             return base.GroupNameFromItem(item, level, culture);
         }
 
-        void MyPropertyGroupDescription_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void MyPropertyGroupDescription_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == this.groupname)
+            if (e.PropertyName == groupname)
             {
-                ((INotifyPropertyChanged) sender).PropertyChanged -= this.MyPropertyGroupDescription_PropertyChanged;
-                this.ScheduleRefreshView();
+                ((INotifyPropertyChanged) sender).PropertyChanged -= MyPropertyGroupDescription_PropertyChanged;
+                ScheduleRefreshView();
             }
         }
 
-        void ScheduleRefreshView()
+        private void ScheduleRefreshView()
         {
             lock (this)
             {
-                this.refreshNeeded = true;
-                this.viewSource.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, (Action) this.RefreshView);
+                refreshNeeded = true;
+                viewSource.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, (Action) RefreshView);
             }
         }
 
-        void RefreshView()
+        private void RefreshView()
         {
             lock (this)
             {
-                if (this.refreshNeeded)
+                if (refreshNeeded)
                 {
-                    this.viewSource.View.Refresh();
-                    this.refreshNeeded = false;
+                    viewSource.View.Refresh();
+                    refreshNeeded = false;
                 }
             }
         }

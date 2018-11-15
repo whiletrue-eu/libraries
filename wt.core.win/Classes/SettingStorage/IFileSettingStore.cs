@@ -3,15 +3,17 @@
 namespace WhileTrue.Classes.SettingStorage
 {
     /// <summary>
-    /// Provides isolated storage of files
+    ///     Provides isolated storage of files
     /// </summary>
     public interface IFileSettingStore
     {
-        /// <summary/>
+        /// <summary />
         FileStream CreateFile(string fileName, FileMode mode, FileAccess access, FileShare share);
-        /// <summary/>
+
+        /// <summary />
         FileInfo[] GetFileNames(string searchPattern);
-        /// <summary/>
+
+        /// <summary />
         void DeleteFile(string fileName);
     }
 }

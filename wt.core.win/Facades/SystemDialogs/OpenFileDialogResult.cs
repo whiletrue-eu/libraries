@@ -3,19 +3,19 @@ using JetBrains.Annotations;
 namespace WhileTrue.Facades.SystemDialogs
 {
     /// <summary>
-    /// Result of <see cref="ISystemDialogsProvider.ShowOpenFileDialog"/>
+    ///     Result of <see cref="ISystemDialogsProvider.ShowOpenFileDialog" />
     /// </summary>
     [PublicAPI]
     public class OpenFileDialogResult
     {
-        /// <summary/>
+        /// <summary />
         public OpenFileDialogResult(string fileName)
         {
-            this.FileName = fileName;
+            FileName = fileName;
         }
 
         /// <summary>
-        /// Selected filename
+        ///     Selected filename
         /// </summary>
         public string FileName { get; }
     }

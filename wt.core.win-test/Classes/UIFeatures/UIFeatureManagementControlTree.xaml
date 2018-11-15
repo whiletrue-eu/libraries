@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="WhileTrue.Classes.UIFeatures.UiFeatureManagementControlTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wt="clr-namespace:WhileTrue.Controls;assembly=wt.core.win"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:uiFeatures="clr-namespace:WhileTrue.Classes.UIFeatures;assembly=wt.core.win"
+             mc:Ignorable="d"
+             d:DesignHeight="100" d:DesignWidth="300"
+             uiFeatures:UiFeatureManagement.Context="One" Name="One">
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type system:Int32}">
+            <TextBox Name="TemplatedThree" uiFeatures:UiFeatureManagement.Context="TemplatedThree"
+                     Visibility="{uiFeatures:FeatureVisible}" IsEnabled="{uiFeatures:FeatureEnabled}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <ItemsControl uiFeatures:UiFeatureManagement.Context="Two" Name="Two">
+        <Button uiFeatures:UiFeatureManagement.Context="Three" Visibility="{uiFeatures:FeatureVisible}"
+                IsEnabled="{uiFeatures:FeatureEnabled}" Name="Three" />
+        <Button uiFeatures:UiFeatureManagement.Context="OtherThree" Visibility="{uiFeatures:FeatureVisible}"
+                IsEnabled="{uiFeatures:FeatureEnabled}" Name="OtherThree" />
+        <TextBox uiFeatures:UiFeatureManagement.Context="ReadonlyThree" IsReadOnly="{uiFeatures:FeatureReadOnly}"
+                 Name="ReadonlyThree" Text="NotADependencyProperty" />
+        <ContentControl Name="Templated">
+            <system:Int32>1</system:Int32>
+        </ContentControl>
+        <TextBlock>
+            <Hyperlink Name="Hyperlink" IsEnabled="{uiFeatures:FeatureEnabled}"
+                       uiFeatures:UiFeatureManagement.Context="Hyperlink" />
+        </TextBlock>
+    </ItemsControl>
+</UserControl>

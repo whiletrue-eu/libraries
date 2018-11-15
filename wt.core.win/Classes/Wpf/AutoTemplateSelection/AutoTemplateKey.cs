@@ -17,23 +17,21 @@ namespace WhileTrue.Classes.Wpf
         {
             if (other is AutoTemplateKey)
             {
-                AutoTemplateKey OtherKey = (AutoTemplateKey) other;
-                return this.type == OtherKey.type && this.view == OtherKey.view;
+                var OtherKey = (AutoTemplateKey) other;
+                return type == OtherKey.type && view == OtherKey.view;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public override int GetHashCode()
         {
-            return this.type.GetHashCode() & this.view.GetHashCode();
+            return type.GetHashCode() & view.GetHashCode();
         }
 
         public override string ToString()
         {
-            return $"Auto template for type {this.type}, view {this.view}";
+            return $"Auto template for type {type}, view {view}";
         }
     }
 }

@@ -191,16 +191,17 @@ namespace WhileTrue.Classes.Framework
             TestObject InnerTestObject = new TestObject();
             TestObject.ObjectCollection.Add(InnerTestObject);
 
-            Func<TestObject, ObservableExpressionFactory.EventSink, string> CompiledExpression = ObservableExpressionFactory.Compile((TestObject test) => test.ObjectCollection[0].Property);
+            (WeakReference , WeakReference) Create()
+            {
+                Func<TestObject, ObservableExpressionFactory.EventSink, string> CompiledExpression = ObservableExpressionFactory.Compile((TestObject test) => test.ObjectCollection[0].Property);
 
-            ObservableExpressionFactory.EventSink Callback = new ObservableExpressionFactory.EventSink(delegate{});
-            CompiledExpression(TestObject, Callback);
-            WeakReference WeakExpression = new WeakReference(CompiledExpression);
-            WeakReference WeakCallback = new WeakReference(Callback);
+                ObservableExpressionFactory.EventSink Callback = new ObservableExpressionFactory.EventSink(delegate { });
+                CompiledExpression(TestObject, Callback);
+                return (new WeakReference(CompiledExpression), new WeakReference(Callback));
+            }
 
-            // ReSharper disable RedundantAssignment
-            CompiledExpression = null;
-            Callback = null;
+            (WeakReference WeakExpression, WeakReference WeakCallback) = Create();
+
             GC.Collect();
             // ReSharper restore RedundantAssignment
 
@@ -211,6 +212,8 @@ namespace WhileTrue.Classes.Framework
             InnerTestObject.Property = "Hello, world";
             TestObject.ObjectCollection.Clear();
         }
+
+       
 
 
         [Test]

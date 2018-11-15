@@ -3,7 +3,7 @@ using WhileTrue.Classes.SettingStorage;
 
 namespace WhileTrue.Classes.Wpf
 {
-    internal class PropertyAdapter: ObservableObject
+    internal class PropertyAdapter : ObservableObject
     {
         private readonly string key;
         private readonly ITagValueSettingStore propertyStore;
@@ -13,19 +13,16 @@ namespace WhileTrue.Classes.Wpf
         {
             this.key = key;
             this.propertyStore = propertyStore;
-            this.value = this.propertyStore.ContainsKey(key) ? this.propertyStore[key] : defaultValue;
+            value = this.propertyStore.ContainsKey(key) ? this.propertyStore[key] : defaultValue;
         }
 
         public object Value
         {
-            get
-            {
-                return this.value;
-            }
+            get => value;
             set
             {
-                this.propertyStore[this.key] = value;
-                this.SetAndInvoke(nameof(this.Value), ref this.value, value);
+                propertyStore[key] = value;
+                SetAndInvoke(nameof(Value), ref this.value, value);
             }
         }
     }
