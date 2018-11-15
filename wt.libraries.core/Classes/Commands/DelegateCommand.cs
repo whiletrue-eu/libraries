@@ -54,6 +54,8 @@ namespace WhileTrue.Classes.Commands
 
             AttachRequerySuggestedEvent();
             canExecuteDelegateExpression.Changed += (_, __) => InvokeCanExecuteChanged();
+
+            ((ICommand)this).CanExecute(default(TParameterType));
         }
 
         /// <summary>
