@@ -315,21 +315,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\generic1.xaml">
+    <Page Include="Themes\generic.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>generic.tt</DependentUpon>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Classes\Wpf\OuterGlow.fx" />
     <Content Include="Resources\waitcursor.gif" />
-    <Content Include="Themes\generic.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>generic1.xaml</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
