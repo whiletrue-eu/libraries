@@ -8,7 +8,7 @@ using Xamarin.Forms;
 
 namespace WhileTrue.Classes.Forms
 {
-    internal class CollectionWrapper : IEnumerable, INotifyCollectionChanged
+    internal class CollectionWrapper : IEnumerable<object>, INotifyCollectionChanged
     {
         private static readonly Dictionary<IEnumerable, CollectionWrapper> collectionWrappers =
             new Dictionary<IEnumerable, CollectionWrapper>();
@@ -26,6 +26,11 @@ namespace WhileTrue.Classes.Forms
         }
 
         #region IEnumerable Members
+
+        IEnumerator<object> IEnumerable<object>.GetEnumerator()
+        {
+            return internalCollection.GetEnumerator();
+        }
 
         public IEnumerator GetEnumerator()
         {
