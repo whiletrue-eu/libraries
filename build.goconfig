@@ -3,11 +3,9 @@
         <Job name="WtLibraries">
             <Artifact dir="wt.core.ios\bin\Release" type="build"/>
             <Artifact dir="wt.core.android\bin\Release" type="build"/>
-            <Artifact dir="wt.core.pcl\bin\Release" type="build"/>
             <Artifact dir="wt.core.win\bin\v4.5_Release" type="build"/>
-            <Artifact dir="wt.core.xamarin\bin\Release" type="build"/>
             <Tasks>
-                <MsBuild projectFile="wt.libraries.sln" configuration="Release" targets="Source\wt.core.ios;Source\wt.core.android;Source\wt.core.pcl;Source\wt.core.win;Source\wt.core.xamarin" needsXamarinLicense="true" />
+                <MsBuild projectFile="wt.libraries.sln" configuration="Release" targets="Source\wt.core.ios;Source\wt.core.android;Source\wt.core.win" needsXamarinLicense="true" />
             </Tasks>
         </Job>
     </Stage>
