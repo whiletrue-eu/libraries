@@ -20,9 +20,15 @@ namespace WhileTrue.Classes.Forms
 
         private CollectionWrapper(IEnumerable collection)
         {
-            ((INotifyCollectionChanged) collection).CollectionChanged += CollectionWrapper_CollectionChanged;
-            originalCollection = collection;
-            originalCollection.ForEach(item => internalCollection.Add(item));
+            lock (collection)
+            {
+                ((INotifyCollectionChanged) collection).CollectionChanged += CollectionWrapper_CollectionChanged;
+                originalCollection = collection;
+                lock (this.internalCollection)
+                {
+                    originalCollection.ForEach(item => internalCollection.Add(item));
+                }
+            }
         }
 
         #region IEnumerable Members
@@ -90,73 +96,77 @@ namespace WhileTrue.Classes.Forms
                 e.OldItems != null && e.OldItems.Count > 1)
                 throw new InvalidOperationException(
                     "Collection Wrapper extension currently supports no batch add/remove/move");
-            switch (e.Action)
+
+            lock (this.internalCollection)
             {
-                case NotifyCollectionChangedAction.Add:
-                    if (e.NewStartingIndex == internalCollection.Count)
-                        internalCollection.Add(e.NewItems[0]);
-                    else
-                        internalCollection.Insert(e.NewStartingIndex, e.NewItems[0]);
-                    //foreach (ItemsControl ItemsControl in CollectionWrapper.RegisteredControls.Where(this.GetIsFadeAnimationEnabled))
-                    //{
-                    //    UIElement Element = ItemsControl.ItemContainerGenerator.ContainerFromItem(e.NewItems[0]) as UIElement;
-                    //    if (Element != null)
-                    //    {
-                    //        Storyboard Storyboard = CrossThreadCollectionWrapper.GetFadeInAnimation(Element);
-                    //        if (Storyboard != null)
-                    //        {
-                    //            Storyboard MyStoryboard = Storyboard.Clone();
-                    //            MyStoryboard.Freeze();
-                    //            MyStoryboard.Begin((FrameworkElement) Element);
-                    //        }
-                    //    }
-                    //}
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    //Dictionary<UIElement, Storyboard> Animations = new Dictionary<UIElement, Storyboard>();
-                    var Item = e.OldItems[0];
-                    //foreach (ItemsControl ItemsControl in CollectionWrapper.RegisteredControls.Where(this.GetIsFadeAnimationEnabled))
-                    //{
-                    //    UIElement Element = ItemsControl.ItemContainerGenerator.ContainerFromItem(Item) as UIElement;
-                    //    if (Element != null)
-                    //    {
-                    //        Storyboard Storyboard = CrossThreadCollectionWrapper.GetFadeOutAnimation(Element);
-                    //        if (Storyboard != null)
-                    //        {
-                    //            Storyboard MyStoryboard = Storyboard.Clone();
-                    //            MyStoryboard.Completed += delegate
-                    //                {
-                    //                    Animations.Remove(Element);
-                    //                    if (Animations.Count == 0)
-                    //                    {
-                    //                        this.internalCollection.Remove(Item);
-                    //                    }
-                    //                };
-                    //            MyStoryboard.Freeze();
-                    //            Animations.Add(Element, MyStoryboard);
-                    //        }
-                    //    }
-                    //}
-                    //if (Animations.Count > 0)
-                    //{
-                    //    Animations.ForEach(_ => _.Value.Begin((FrameworkElement)_.Key));
-                    //}
-                    //else
-                    //{
-                    internalCollection.Remove(e.OldItems[0]);
-                    //}
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    throw new InvalidOperationException("Collection Wrapper extension currently supports no replace");
-                case NotifyCollectionChangedAction.Move:
-                    internalCollection.Move(e.OldStartingIndex, e.NewStartingIndex);
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    internalCollection.Clear();
-                    originalCollection.ForEach(item => internalCollection.Add(item));
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                switch (e.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        if (e.NewStartingIndex == internalCollection.Count)
+                            internalCollection.Add(e.NewItems[0]);
+                        else
+                            internalCollection.Insert(e.NewStartingIndex, e.NewItems[0]);
+                        //foreach (ItemsControl ItemsControl in CollectionWrapper.RegisteredControls.Where(this.GetIsFadeAnimationEnabled))
+                        //{
+                        //    UIElement Element = ItemsControl.ItemContainerGenerator.ContainerFromItem(e.NewItems[0]) as UIElement;
+                        //    if (Element != null)
+                        //    {
+                        //        Storyboard Storyboard = CrossThreadCollectionWrapper.GetFadeInAnimation(Element);
+                        //        if (Storyboard != null)
+                        //        {
+                        //            Storyboard MyStoryboard = Storyboard.Clone();
+                        //            MyStoryboard.Freeze();
+                        //            MyStoryboard.Begin((FrameworkElement) Element);
+                        //        }
+                        //    }
+                        //}
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        //Dictionary<UIElement, Storyboard> Animations = new Dictionary<UIElement, Storyboard>();
+                        var Item = e.OldItems[0];
+                        //foreach (ItemsControl ItemsControl in CollectionWrapper.RegisteredControls.Where(this.GetIsFadeAnimationEnabled))
+                        //{
+                        //    UIElement Element = ItemsControl.ItemContainerGenerator.ContainerFromItem(Item) as UIElement;
+                        //    if (Element != null)
+                        //    {
+                        //        Storyboard Storyboard = CrossThreadCollectionWrapper.GetFadeOutAnimation(Element);
+                        //        if (Storyboard != null)
+                        //        {
+                        //            Storyboard MyStoryboard = Storyboard.Clone();
+                        //            MyStoryboard.Completed += delegate
+                        //                {
+                        //                    Animations.Remove(Element);
+                        //                    if (Animations.Count == 0)
+                        //                    {
+                        //                        this.internalCollection.Remove(Item);
+                        //                    }
+                        //                };
+                        //            MyStoryboard.Freeze();
+                        //            Animations.Add(Element, MyStoryboard);
+                        //        }
+                        //    }
+                        //}
+                        //if (Animations.Count > 0)
+                        //{
+                        //    Animations.ForEach(_ => _.Value.Begin((FrameworkElement)_.Key));
+                        //}
+                        //else
+                        //{
+                        internalCollection.Remove(e.OldItems[0]);
+                        //}
+                        break;
+                    case NotifyCollectionChangedAction.Replace:
+                        throw new InvalidOperationException("Collection Wrapper extension currently supports no replace");
+                    case NotifyCollectionChangedAction.Move:
+                        internalCollection.Move(e.OldStartingIndex, e.NewStartingIndex);
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        internalCollection.Clear();
+                        originalCollection.ForEach(item => internalCollection.Add(item));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 
