@@ -162,7 +162,10 @@ namespace WhileTrue.Classes.Forms
                         break;
                     case NotifyCollectionChangedAction.Reset:
                         internalCollection.Clear();
-                        originalCollection.ForEach(item => internalCollection.Add(item));
+                        lock (originalCollection)
+                        {
+                            originalCollection.ForEach(item => internalCollection.Add(item));
+                        }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
