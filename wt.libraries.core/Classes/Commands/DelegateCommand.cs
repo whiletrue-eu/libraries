@@ -11,6 +11,34 @@ using WhileTrue.Classes.Logging;
 namespace WhileTrue.Classes.Commands
 {
     /// <summary>
+    /// Helper class to lock activation of delegate commands against each other.
+    /// </summary>
+    public static class GlobalDelegateCommandLockHelper
+    {
+        private static readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
+        /// <summary>
+        /// if set to <c>true</c>, activations of delegate commands that are run while another command is still executing are ignored
+        /// Only set once at app initialization!
+        /// </summary>
+        private static bool GlobalBlockDelegateCommands { get; set; }
+
+        internal static bool TryEnterGlobalExecutionLock()
+        {
+            return GlobalDelegateCommandLockHelper.GlobalBlockDelegateCommands==false ||
+                   GlobalDelegateCommandLockHelper.executeLock.TryEnterWriteLock(0);
+        }
+
+        internal static void ExitGlobalExecutionLock()
+        {
+            if (GlobalDelegateCommandLockHelper.GlobalBlockDelegateCommands)
+            {
+                GlobalDelegateCommandLockHelper.executeLock.ExitWriteLock();
+            }
+        }
+    }
+
+    /// <summary>
     ///     Provides a class to implement ICommand interface with the use of delegates
     /// </summary>
     /// <remarks>
@@ -248,16 +276,23 @@ namespace WhileTrue.Classes.Commands
         /// </summary>
         public override void Execute(object parameter)
         {
-            try
+            if (GlobalDelegateCommandLockHelper.TryEnterGlobalExecutionLock())
             {
-                executeDelegate((T) (parameter ?? default(T)));
-            }
-            catch (Exception Exception)
-            {
-                if (ExceptionHandler != null)
-                    ExceptionHandler(Exception);
-                else
-                    throw;
+                try
+                {
+                    executeDelegate((T) (parameter ?? default(T)));
+                }
+                catch (Exception Exception)
+                {
+                    if (ExceptionHandler != null)
+                        ExceptionHandler(Exception);
+                    else
+                        throw;
+                }
+                finally
+                {
+                    GlobalDelegateCommandLockHelper.ExitGlobalExecutionLock();
+                }
             }
         }
     }
@@ -322,8 +357,7 @@ namespace WhileTrue.Classes.Commands
     {
         private readonly Func<T, Task> executeDelegate;
 
-        private readonly ReaderWriterLockSlim executeLock =
-            new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
         private bool isExecuting;
 
@@ -363,27 +397,37 @@ namespace WhileTrue.Classes.Commands
         /// </summary>
         public override async void Execute(object parameter)
         {
-            if (executeLock.TryEnterWriteLock(0))
+            if (GlobalDelegateCommandLockHelper.TryEnterGlobalExecutionLock())
             {
-                if (isExecuting == false)
+                try
                 {
-                    isExecuting = true;
-                    try
+                    if (executeLock.TryEnterWriteLock(0))
                     {
-                        await executeDelegate((T) (parameter ?? default(T)));
+                        if (isExecuting == false)
+                        {
+                            isExecuting = true;
+                            try
+                            {
+                                await executeDelegate((T) (parameter ?? default(T)));
+                            }
+                            catch (Exception Exception)
+                            {
+                                if (ExceptionHandler != null)
+                                    ExceptionHandler(Exception);
+                                else
+                                    throw;
+                            }
+                            finally
+                            {
+                                isExecuting = false;
+                                executeLock.ExitWriteLock();
+                            }
+                        }
                     }
-                    catch (Exception Exception)
-                    {
-                        if (ExceptionHandler != null)
-                            ExceptionHandler(Exception);
-                        else
-                            throw;
-                    }
-                    finally
-                    {
-                        isExecuting = false;
-                        executeLock.ExitWriteLock();
-                    }
+                }
+                finally
+                {
+                    GlobalDelegateCommandLockHelper.ExitGlobalExecutionLock();
                 }
             }
         }
