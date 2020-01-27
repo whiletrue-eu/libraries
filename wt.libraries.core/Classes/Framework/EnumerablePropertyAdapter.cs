@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using WhileTrue.Classes.Logging;
 
 namespace WhileTrue.Classes.Framework
@@ -19,6 +20,8 @@ namespace WhileTrue.Classes.Framework
         private readonly ObservableCollection<TPropertyType> collection = new ObservableCollection<TPropertyType>();
         private TSourcePropertyType[] oldValues;
         private Value<IEnumerable<TPropertyType>> value;
+        private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(0, 1);
+
 
 
         internal EnumerablePropertyAdapter(Expression<Func<IEnumerable<TSourcePropertyType>>> getExpression,
@@ -32,9 +35,13 @@ namespace WhileTrue.Classes.Framework
 
         private void AdapterCreationChanged(object sender, EventArgs e)
         {
+            this.collectionLock.Wait();
             //reset cache
             collection.Clear();
             oldValues = new TSourcePropertyType[0];
+            this.collectionLock.Release();
+
+
             //recreate all entries
             var Value = RetrieveValue(PostProcess);
             if (Value.Equals(value) == false)
@@ -73,6 +80,7 @@ namespace WhileTrue.Classes.Framework
         private void UpdateCollectionItems(TSourcePropertyType[] values, ObservableCollection<TPropertyType> collection,
             Func<TSourcePropertyType, TPropertyType> adapterCreation, ref TSourcePropertyType[] oldValues)
         {
+            this.collectionLock.Wait();
             if (values.Length > 0)
             {
                 var OldValues = new List<TSourcePropertyType>(oldValues ?? new TSourcePropertyType[0]);
@@ -128,6 +136,8 @@ namespace WhileTrue.Classes.Framework
                 collection.Clear();
                 oldValues = new TSourcePropertyType[0];
             }
+
+            this.collectionLock.Release();
         }
 
         private IEnumerable<TPropertyType> PostProcess(IEnumerable<TSourcePropertyType> value)
@@ -245,6 +255,7 @@ namespace WhileTrue.Classes.Framework
                 new ObservableCollection<CachedValueCollectionItem>();
 
             private readonly TSource source;
+            private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(0, 1);
 
             public ObservableCachedValueCollection(
                 EnumerablePropertyAdapter<TSource, TSourceEnumerationItem, TTargetEnumerationItem> adapter,
@@ -257,6 +268,7 @@ namespace WhileTrue.Classes.Framework
             [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
             public void Update(IEnumerable<TSourceEnumerationItem> values)
             {
+                this.collectionLock.Wait();
                 TSourceEnumerationItem[] Values;
                 if (values == null)
                 {
@@ -327,6 +339,8 @@ namespace WhileTrue.Classes.Framework
                 {
                     ClearItems();
                 }
+
+                this.collectionLock.Release();
             }
 
             private void Insert(int index, CachedValueCollectionItem newItem)
@@ -355,6 +369,7 @@ namespace WhileTrue.Classes.Framework
 
             private void AdapterCreationCallback(TSourceEnumerationItem sourceValue)
             {
+                this.collectionLock.Wait();
                 try
                 {
                     //Replace item with a newly created adapter
@@ -372,6 +387,8 @@ namespace WhileTrue.Classes.Framework
                     // Something happend while converting and/or adding the item. Reset the colleciton and retry 'from scratch'
                     adapter.NotifyItemUpdateFailed(source);
                 }
+
+                this.collectionLock.Release();
             }
 
             private void Replace(CachedValueCollectionItem oldItem, CachedValueCollectionItem newItem)
