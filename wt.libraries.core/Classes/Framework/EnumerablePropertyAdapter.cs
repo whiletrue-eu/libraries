@@ -132,8 +132,22 @@ namespace WhileTrue.Classes.Framework
 
         private IEnumerable<TPropertyType> PostProcess(IEnumerable<TSourcePropertyType> value)
         {
-            UpdateCollectionItems(value?.ToArray() ?? new TSourcePropertyType[0], collection, adapterCreation,
-                ref oldValues);
+            TSourcePropertyType[] Values;
+            if (value == null)
+            {
+                Values = new TSourcePropertyType[0];
+            }
+            else
+            {
+                // ReSharper disable once PossibleMultipleEnumeration
+                lock (value)
+                {
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    Values = value.ToArray();
+                }
+            }
+
+            UpdateCollectionItems(Values, collection, adapterCreation,ref oldValues);
             return collection;
         }
     }
@@ -243,7 +257,21 @@ namespace WhileTrue.Classes.Framework
             [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
             public void Update(IEnumerable<TSourceEnumerationItem> values)
             {
-                var Values = values != null ? values.ToArray() : new TSourceEnumerationItem[0];
+                TSourceEnumerationItem[] Values;
+                if (values == null)
+                {
+                    Values = new TSourceEnumerationItem[0];
+                }
+                else
+                {
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    lock (values)
+                    {
+                        // ReSharper disable once PossibleMultipleEnumeration
+                        Values = values.ToArray();
+                    }
+                }
+
                 if (Values.Length > 0)
                 {
                     //First delete items to avoid unneeded move operations. save in arraqy to be able to modify the source collection
