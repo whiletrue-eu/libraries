@@ -20,7 +20,7 @@ namespace WhileTrue.Classes.Framework
         private readonly ObservableCollection<TPropertyType> collection = new ObservableCollection<TPropertyType>();
         private TSourcePropertyType[] oldValues;
         private Value<IEnumerable<TPropertyType>> value;
-        private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(0, 1);
+        private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(1, 1);
 
 
 
@@ -36,11 +36,16 @@ namespace WhileTrue.Classes.Framework
         private void AdapterCreationChanged(object sender, EventArgs e)
         {
             this.collectionLock.Wait();
-            //reset cache
-            collection.Clear();
-            oldValues = new TSourcePropertyType[0];
-            this.collectionLock.Release();
-
+            try
+            {
+                //reset cache
+                collection.Clear();
+                oldValues = new TSourcePropertyType[0];
+            }
+            finally
+            {
+                this.collectionLock.Release();
+            }
 
             //recreate all entries
             var Value = RetrieveValue(PostProcess);
@@ -81,63 +86,68 @@ namespace WhileTrue.Classes.Framework
             Func<TSourcePropertyType, TPropertyType> adapterCreation, ref TSourcePropertyType[] oldValues)
         {
             this.collectionLock.Wait();
-            if (values.Length > 0)
+            try
             {
-                var OldValues = new List<TSourcePropertyType>(oldValues ?? new TSourcePropertyType[0]);
-                var Index = 0;
-                for (; Index < values.Length; Index++)
-                    if (OldValues.Count > Index && Equals(OldValues[Index], values[Index]))
-                    {
-                        //Item is still the same -> nothing to do
-                        DebugLogger.WriteLine(this, LoggingLevel.Verbose,
-                            () => $"Collection Update: index {Index} stys unchanged");
-                    }
-                    else
-                    {
-                        //Search for the item from the current item on
-                        var SearchIndex = OldValues.IndexOf(values[Index], Index);
-                        if (SearchIndex != -1)
+                if (values.Length > 0)
+                {
+                    var OldValues = new List<TSourcePropertyType>(oldValues ?? new TSourcePropertyType[0]);
+                    var Index = 0;
+                    for (; Index < values.Length; Index++)
+                        if (OldValues.Count > Index && Equals(OldValues[Index], values[Index]))
                         {
-                            //Found in the list -> move to front
+                            //Item is still the same -> nothing to do
                             DebugLogger.WriteLine(this, LoggingLevel.Verbose,
-                                () => $"Collection Update: Move  index {SearchIndex} to index {Index}");
-
-                            collection.Move(SearchIndex, Index);
-                            OldValues.RemoveAt(SearchIndex);
-                            OldValues.Insert(Index, values[Index]);
+                                () => $"Collection Update: index {Index} stys unchanged");
                         }
                         else
                         {
-                            //Not found -> must be new
-                            DebugLogger.WriteLine(this, LoggingLevel.Verbose,
-                                () => $"Collection Update: Add new item at index {Index}");
+                            //Search for the item from the current item on
+                            var SearchIndex = OldValues.IndexOf(values[Index], Index);
+                            if (SearchIndex != -1)
+                            {
+                                //Found in the list -> move to front
+                                DebugLogger.WriteLine(this, LoggingLevel.Verbose,
+                                    () => $"Collection Update: Move  index {SearchIndex} to index {Index}");
 
-                            collection.Insert(Index, adapterCreation.Invoke(values[Index]));
-                            OldValues.Insert(Index, values[Index]);
+                                collection.Move(SearchIndex, Index);
+                                OldValues.RemoveAt(SearchIndex);
+                                OldValues.Insert(Index, values[Index]);
+                            }
+                            else
+                            {
+                                //Not found -> must be new
+                                DebugLogger.WriteLine(this, LoggingLevel.Verbose,
+                                    () => $"Collection Update: Add new item at index {Index}");
+
+                                collection.Insert(Index, adapterCreation.Invoke(values[Index]));
+                                OldValues.Insert(Index, values[Index]);
+                            }
                         }
+
+                    //Now, the list should be as the new values. All values that are to be deleted
+                    //should be moved to the end. So we just delete
+                    while (collection.Count > Index)
+                    {
+                        DebugLogger.WriteLine(this, LoggingLevel.Verbose,
+                            () => $"Collection Update: Removing item at index {Index}");
+
+                        collection.RemoveAt(Index);
                     }
 
-                //Now, the list should be as the new values. All values that are to be deleted
-                //should be moved to the end. So we just delete
-                while (collection.Count > Index)
-                {
-                    DebugLogger.WriteLine(this, LoggingLevel.Verbose,
-                        () => $"Collection Update: Removing item at index {Index}");
+                    //TODO: It would be better to first delete items to avoid unneeded move operations
 
-                    collection.RemoveAt(Index);
+                    oldValues = values;
                 }
-
-                //TODO: It would be better to first delete items to avoid unneeded move operations
-
-                oldValues = values;
+                else
+                {
+                    collection.Clear();
+                    oldValues = new TSourcePropertyType[0];
+                }
             }
-            else
+            finally
             {
-                collection.Clear();
-                oldValues = new TSourcePropertyType[0];
+                this.collectionLock.Release();
             }
-
-            this.collectionLock.Release();
         }
 
         private IEnumerable<TPropertyType> PostProcess(IEnumerable<TSourcePropertyType> value)
@@ -255,7 +265,7 @@ namespace WhileTrue.Classes.Framework
                 new ObservableCollection<CachedValueCollectionItem>();
 
             private readonly TSource source;
-            private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(0, 1);
+            private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(1, 1);
 
             public ObservableCachedValueCollection(
                 EnumerablePropertyAdapter<TSource, TSourceEnumerationItem, TTargetEnumerationItem> adapter,
@@ -269,78 +279,83 @@ namespace WhileTrue.Classes.Framework
             public void Update(IEnumerable<TSourceEnumerationItem> values)
             {
                 this.collectionLock.Wait();
-                TSourceEnumerationItem[] Values;
-                if (values == null)
+                try
                 {
-                    Values = new TSourceEnumerationItem[0];
-                }
-                else
-                {
-                    // ReSharper disable once PossibleMultipleEnumeration
-                    lock (values)
+                    TSourceEnumerationItem[] Values;
+                    if (values == null)
+                    {
+                        Values = new TSourceEnumerationItem[0];
+                    }
+                    else
                     {
                         // ReSharper disable once PossibleMultipleEnumeration
-                        Values = values.ToArray();
-                    }
-                }
-
-                if (Values.Length > 0)
-                {
-                    //First delete items to avoid unneeded move operations. save in arraqy to be able to modify the source collection
-                    foreach (var ItemToDelete in items
-                        .Where(item => Values.Any(value => Equals(value, item.SourceValue)) == false)
-                        .ToArray()) Remove(ItemToDelete);
-
-                    var OldValues = new ObservableCollection<CachedValueCollectionItem>(items.ToArray());
-
-                    //Move existing entries to new locations and eventually add new entries
-                    for (var Index = 0; Index < Values.Length; Index++)
-                        if (OldValues.Count > Index && Equals(OldValues[Index], Values[Index]))
+                        lock (values)
                         {
-                            //Item is still the same -> nothing to do
-                            DebugLogger.WriteLine(this, LoggingLevel.Verbose,
-                                () => $"Collection Update: index {Index} stays unchanged");
+                            // ReSharper disable once PossibleMultipleEnumeration
+                            Values = values.ToArray();
                         }
-                        else
-                        {
-                            //Search for the item. first we have to find the item in the cache to get the index. Skip already sorted entries to allow handling of equal objects in the same list
-                            var SearchIndex = OldValues.IndexOf(OldValues.Skip(Index)
-                                .FirstOrDefault(_ => Equals(_.SourceValue, Values[Index])));
-                            if (SearchIndex != -1)
-                            {
-                                //Found in the list 
-                                if (Index != SearchIndex)
-                                {
-                                    //-> move to front
-                                    DebugLogger.WriteLine(this, LoggingLevel.Verbose,
-                                        () => $"Collection Update: Move  index {SearchIndex} to index {Index}");
+                    }
 
-                                    Move(SearchIndex, Index);
-                                    OldValues.Move(SearchIndex, Index);
-                                }
+                    if (Values.Length > 0)
+                    {
+                        //First delete items to avoid unneeded move operations. save in arraqy to be able to modify the source collection
+                        foreach (var ItemToDelete in items
+                            .Where(item => Values.Any(value => Equals(value, item.SourceValue)) == false)
+                            .ToArray()) Remove(ItemToDelete);
+
+                        var OldValues = new ObservableCollection<CachedValueCollectionItem>(items.ToArray());
+
+                        //Move existing entries to new locations and eventually add new entries
+                        for (var Index = 0; Index < Values.Length; Index++)
+                            if (OldValues.Count > Index && Equals(OldValues[Index], Values[Index]))
+                            {
+                                //Item is still the same -> nothing to do
+                                DebugLogger.WriteLine(this, LoggingLevel.Verbose,
+                                    () => $"Collection Update: index {Index} stays unchanged");
                             }
                             else
                             {
-                                //Not found -> must be new
-                                DebugLogger.WriteLine(this, LoggingLevel.Verbose,
-                                    () => $"Collection Update: Add new item at index {Index}");
+                                //Search for the item. first we have to find the item in the cache to get the index. Skip already sorted entries to allow handling of equal objects in the same list
+                                var SearchIndex = OldValues.IndexOf(OldValues.Skip(Index)
+                                    .FirstOrDefault(_ => Equals(_.SourceValue, Values[Index])));
+                                if (SearchIndex != -1)
+                                {
+                                    //Found in the list 
+                                    if (Index != SearchIndex)
+                                    {
+                                        //-> move to front
+                                        DebugLogger.WriteLine(this, LoggingLevel.Verbose,
+                                            () => $"Collection Update: Move  index {SearchIndex} to index {Index}");
 
-                                var SourceValue = Values[Index];
-                                var EventSink = new ObservableExpressionFactory.EventSink((sender, e) =>
-                                    AdapterCreationCallback(SourceValue));
-                                var NewItem = new CachedValueCollectionItem(SourceValue,
-                                    adapter.adapterCreation(source, SourceValue, EventSink), EventSink);
-                                Insert(Index, NewItem);
-                                OldValues.Insert(Index, NewItem);
+                                        Move(SearchIndex, Index);
+                                        OldValues.Move(SearchIndex, Index);
+                                    }
+                                }
+                                else
+                                {
+                                    //Not found -> must be new
+                                    DebugLogger.WriteLine(this, LoggingLevel.Verbose,
+                                        () => $"Collection Update: Add new item at index {Index}");
+
+                                    var SourceValue = Values[Index];
+                                    var EventSink = new ObservableExpressionFactory.EventSink((sender, e) =>
+                                        AdapterCreationCallback(SourceValue));
+                                    var NewItem = new CachedValueCollectionItem(SourceValue,
+                                        adapter.adapterCreation(source, SourceValue, EventSink), EventSink);
+                                    Insert(Index, NewItem);
+                                    OldValues.Insert(Index, NewItem);
+                                }
                             }
-                        }
+                    }
+                    else
+                    {
+                        ClearItems();
+                    }
                 }
-                else
+                finally
                 {
-                    ClearItems();
+                    this.collectionLock.Release();
                 }
-
-                this.collectionLock.Release();
             }
 
             private void Insert(int index, CachedValueCollectionItem newItem)
@@ -387,8 +402,10 @@ namespace WhileTrue.Classes.Framework
                     // Something happend while converting and/or adding the item. Reset the colleciton and retry 'from scratch'
                     adapter.NotifyItemUpdateFailed(source);
                 }
-
-                this.collectionLock.Release();
+                finally
+                {
+                    this.collectionLock.Release();
+                }
             }
 
             private void Replace(CachedValueCollectionItem oldItem, CachedValueCollectionItem newItem)
