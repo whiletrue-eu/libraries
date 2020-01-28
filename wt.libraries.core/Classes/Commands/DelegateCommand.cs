@@ -15,7 +15,9 @@ namespace WhileTrue.Classes.Commands
     /// </summary>
     public static class GlobalDelegateCommandLockHelper
     {
-        private static readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private static readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private static bool isExecuting;
+
 
         /// <summary>
         /// if set to <c>true</c>, activations of delegate commands that are run while another command is still executing are ignored
@@ -25,14 +27,31 @@ namespace WhileTrue.Classes.Commands
 
         internal static bool TryEnterGlobalExecutionLock()
         {
-            return GlobalDelegateCommandLockHelper.GlobalBlockDelegateCommands==false ||
-                   GlobalDelegateCommandLockHelper.executeLock.TryEnterWriteLock(0);
+            if (GlobalDelegateCommandLockHelper.GlobalBlockDelegateCommands)
+            {
+                GlobalDelegateCommandLockHelper.executeLock.TryEnterWriteLock(0);
+                if (GlobalDelegateCommandLockHelper.isExecuting)
+                {
+                    GlobalDelegateCommandLockHelper.executeLock.ExitWriteLock();
+                    return false;
+                }
+                else
+                {
+                    GlobalDelegateCommandLockHelper.isExecuting = true;
+                    return true;
+                }
+            }
+            else
+            {
+                return true;
+            }
         }
 
         internal static void ExitGlobalExecutionLock()
         {
             if (GlobalDelegateCommandLockHelper.GlobalBlockDelegateCommands)
             {
+                GlobalDelegateCommandLockHelper.isExecuting = false;
                 GlobalDelegateCommandLockHelper.executeLock.ExitWriteLock();
             }
         }
@@ -357,8 +376,7 @@ namespace WhileTrue.Classes.Commands
     {
         private readonly Func<T, Task> executeDelegate;
 
-        private readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-
+        private readonly ReaderWriterLockSlim executeLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private bool isExecuting;
 
         /// <summary>
