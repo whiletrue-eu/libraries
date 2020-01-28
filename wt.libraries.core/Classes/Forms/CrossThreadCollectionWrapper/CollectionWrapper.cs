@@ -171,7 +171,21 @@ namespace WhileTrue.Classes.Forms
                         break;
                     case NotifyCollectionChangedAction.Reset:
                         this.internalCollection.Clear();
-                        this.originalCollection.ForEach(item => this.internalCollection.Add(item));
+                        int NumberOfTries = 5;
+                        while (NumberOfTries>0)
+                        {
+                            try
+                            {
+                                this.originalCollection.ForEach(item => this.internalCollection.Add(item));
+                                NumberOfTries = 0;
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                //try to compensate 'enumeration could not execute - collection modified' exceptions that occur due to inadequate synchronization
+                                NumberOfTries--;
+                            }
+                        }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
