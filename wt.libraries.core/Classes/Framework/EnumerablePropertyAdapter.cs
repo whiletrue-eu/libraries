@@ -30,7 +30,7 @@ namespace WhileTrue.Classes.Framework
         {
             this.adapterCreation =
                 new NotifyChangeExpression<Func<TSourcePropertyType, TPropertyType>>(adapterCreation);
-            this.adapterCreation.Changed += AdapterCreationChanged;
+            this.adapterCreation.Changed += this.AdapterCreationChanged;
         }
 
         private void AdapterCreationChanged(object sender, EventArgs e)
@@ -39,8 +39,8 @@ namespace WhileTrue.Classes.Framework
             try
             {
                 //reset cache
-                collection.Clear();
-                oldValues = new TSourcePropertyType[0];
+                this.collection.Clear();
+                this.oldValues = new TSourcePropertyType[0];
             }
             finally
             {
@@ -48,11 +48,11 @@ namespace WhileTrue.Classes.Framework
             }
 
             //recreate all entries
-            var Value = RetrieveValue(PostProcess);
-            if (Value.Equals(value) == false)
+            var Value = this.RetrieveValue(this.PostProcess);
+            if (Value.Equals(this.value) == false)
             {
-                value = Value;
-                InvokeChanged();
+                this.value = Value;
+                this.InvokeChanged();
             }
         }
 
@@ -64,11 +64,11 @@ namespace WhileTrue.Classes.Framework
             DebugLogger.WriteLine(this, LoggingLevel.Normal,
                 () => $"Event received on {sender}: {DebugLogger.ToString(e)}");
 
-            var Value = RetrieveValue(PostProcess);
-            if (Value.Equals(value) == false)
+            var Value = this.RetrieveValue(this.PostProcess);
+            if (Value.Equals(this.value) == false)
             {
-                value = Value;
-                InvokeChanged();
+                this.value = Value;
+                this.InvokeChanged();
             }
         }
 
@@ -77,8 +77,8 @@ namespace WhileTrue.Classes.Framework
         /// </summary>
         public IEnumerable<TPropertyType> GetCollection()
         {
-            if (value == null) value = RetrieveValue(PostProcess);
-            return value.GetValue();
+            if (this.value == null) this.value = this.RetrieveValue(this.PostProcess);
+            return this.value.GetValue();
         }
 
         [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
@@ -93,7 +93,7 @@ namespace WhileTrue.Classes.Framework
                     var OldValues = new List<TSourcePropertyType>(oldValues ?? new TSourcePropertyType[0]);
                     var Index = 0;
                     for (; Index < values.Length; Index++)
-                        if (OldValues.Count > Index && Equals(OldValues[Index], values[Index]))
+                        if (OldValues.Count > Index && object.Equals(OldValues[Index], values[Index]))
                         {
                             //Item is still the same -> nothing to do
                             DebugLogger.WriteLine(this, LoggingLevel.Verbose,
@@ -167,8 +167,8 @@ namespace WhileTrue.Classes.Framework
                 }
             }
 
-            UpdateCollectionItems(Values, collection, adapterCreation,ref oldValues);
-            return collection;
+            this.UpdateCollectionItems(Values, this.collection, this.adapterCreation,ref this.oldValues);
+            return this.collection;
         }
     }
 
@@ -205,7 +205,7 @@ namespace WhileTrue.Classes.Framework
                         >(this).GetValue();
 
                 var Collection = new ObservableCachedValueCollection(this, source);
-                var Value = RetrieveValue(source, (sender, e) => UpdateCollection(source, Collection));
+                var Value = this.RetrieveValue(source, (sender, e) => this.UpdateCollection(source, Collection));
                 try
                 {
                     Collection.Update(Value.GetValue());
@@ -228,7 +228,7 @@ namespace WhileTrue.Classes.Framework
             var PropertyValues = source.GetPropertyValueCache();
             lock (PropertyValues)
             {
-                var Value = RetrieveValue(source, (sender, e) => UpdateCollection(source, collection));
+                var Value = this.RetrieveValue(source, (sender, e) => this.UpdateCollection(source, collection));
                 try
                 {
                     collection.Update(Value.GetValue());
@@ -241,7 +241,7 @@ namespace WhileTrue.Classes.Framework
                     PropertyValues.SetValue(this,
                         new ObservableObject.CachedValue<IEnumerable<TTargetEnumerationItem>>(Exception,
                             Value.EventSink)).GetValue();
-                    source.NotifyPropertyChanged(PropertyName);
+                    source.NotifyPropertyChanged(this.PropertyName);
                 }
             }
         }
@@ -254,7 +254,7 @@ namespace WhileTrue.Classes.Framework
                 PropertyValues.ClearValue(this);
             }
 
-            source.NotifyPropertyChanged(PropertyName);
+            source.NotifyPropertyChanged(this.PropertyName);
         }
 
         private class ObservableCachedValueCollection : ObservableCollection<TTargetEnumerationItem>
@@ -299,15 +299,16 @@ namespace WhileTrue.Classes.Framework
                     if (Values.Length > 0)
                     {
                         //First delete items to avoid unneeded move operations. save in arraqy to be able to modify the source collection
-                        foreach (var ItemToDelete in items
-                            .Where(item => Values.Any(value => Equals(value, item.SourceValue)) == false)
-                            .ToArray()) Remove(ItemToDelete);
+                        foreach (var ItemToDelete in this.items
+                            .Where(item => Values.Any(value => object.Equals(value, item.SourceValue)) == false)
+                            .ToArray())
+                            this.Remove(ItemToDelete);
 
-                        var OldValues = new ObservableCollection<CachedValueCollectionItem>(items.ToArray());
+                        var OldValues = new ObservableCollection<CachedValueCollectionItem>(this.items.ToArray());
 
                         //Move existing entries to new locations and eventually add new entries
                         for (var Index = 0; Index < Values.Length; Index++)
-                            if (OldValues.Count > Index && Equals(OldValues[Index], Values[Index]))
+                            if (OldValues.Count > Index && object.Equals(OldValues[Index], Values[Index]))
                             {
                                 //Item is still the same -> nothing to do
                                 DebugLogger.WriteLine(this, LoggingLevel.Verbose,
@@ -317,7 +318,7 @@ namespace WhileTrue.Classes.Framework
                             {
                                 //Search for the item. first we have to find the item in the cache to get the index. Skip already sorted entries to allow handling of equal objects in the same list
                                 var SearchIndex = OldValues.IndexOf(OldValues.Skip(Index)
-                                    .FirstOrDefault(_ => Equals(_.SourceValue, Values[Index])));
+                                    .FirstOrDefault(_ => object.Equals(_.SourceValue, Values[Index])));
                                 if (SearchIndex != -1)
                                 {
                                     //Found in the list 
@@ -327,7 +328,7 @@ namespace WhileTrue.Classes.Framework
                                         DebugLogger.WriteLine(this, LoggingLevel.Verbose,
                                             () => $"Collection Update: Move  index {SearchIndex} to index {Index}");
 
-                                        Move(SearchIndex, Index);
+                                        this.Move(SearchIndex, Index);
                                         OldValues.Move(SearchIndex, Index);
                                     }
                                 }
@@ -338,18 +339,16 @@ namespace WhileTrue.Classes.Framework
                                         () => $"Collection Update: Add new item at index {Index}");
 
                                     var SourceValue = Values[Index];
-                                    var EventSink = new ObservableExpressionFactory.EventSink((sender, e) =>
-                                        AdapterCreationCallback(SourceValue));
-                                    var NewItem = new CachedValueCollectionItem(SourceValue,
-                                        adapter.adapterCreation(source, SourceValue, EventSink), EventSink);
-                                    Insert(Index, NewItem);
+                                    var EventSink = new ObservableExpressionFactory.EventSink((sender, e) => this.AdapterCreationCallback(SourceValue));
+                                    var NewItem = new CachedValueCollectionItem(SourceValue, this.adapter.adapterCreation(this.source, SourceValue, EventSink), EventSink);
+                                    this.Insert(Index, NewItem);
                                     OldValues.Insert(Index, NewItem);
                                 }
                             }
                     }
                     else
                     {
-                        ClearItems();
+                        this.ClearItems();
                     }
                 }
                 finally
@@ -360,25 +359,25 @@ namespace WhileTrue.Classes.Framework
 
             private void Insert(int index, CachedValueCollectionItem newItem)
             {
-                items.Insert(index, newItem);
+                this.items.Insert(index, newItem);
                 base.Insert(index, newItem.TargetValue);
             }
 
             private new void Move(int oldIndex, int newIndex)
             {
-                items.Move(oldIndex, newIndex);
+                this.items.Move(oldIndex, newIndex);
                 base.Move(oldIndex, newIndex);
             }
 
             private void Remove(CachedValueCollectionItem itemToDelete)
             {
-                items.Remove(itemToDelete);
+                this.items.Remove(itemToDelete);
                 base.Remove(itemToDelete.TargetValue);
             }
 
             private new void ClearItems()
             {
-                items.Clear();
+                this.items.Clear();
                 base.ClearItems();
             }
 
@@ -388,19 +387,24 @@ namespace WhileTrue.Classes.Framework
                 try
                 {
                     //Replace item with a newly created adapter
-                    var OldItem = items.First(_ => Equals(_.SourceValue, sourceValue));
+                    var OldItem = this.items.FirstOrDefault(_ => object.Equals(_.SourceValue, sourceValue));
+                    if (OldItem != null)
+                    {
+                        var EventSink =
+                            new ObservableExpressionFactory.EventSink((sender, e) => this.AdapterCreationCallback(sourceValue));
+                        var NewItem = new CachedValueCollectionItem(sourceValue, this.adapter.adapterCreation(this.source, sourceValue, EventSink), EventSink);
 
-                    var EventSink =
-                        new ObservableExpressionFactory.EventSink((sender, e) => AdapterCreationCallback(sourceValue));
-                    var NewItem = new CachedValueCollectionItem(sourceValue,
-                        adapter.adapterCreation(source, sourceValue, EventSink), EventSink);
-
-                    Replace(OldItem, NewItem);
+                        this.Replace(OldItem, NewItem);
+                    }
+                    else
+                    {
+                        //Item was removed while we were waiting for the lock - ignore the event
+                    }
                 }
                 catch (Exception)
                 {
                     // Something happend while converting and/or adding the item. Reset the colleciton and retry 'from scratch'
-                    adapter.NotifyItemUpdateFailed(source);
+                    this.adapter.NotifyItemUpdateFailed(this.source);
                 }
                 finally
                 {
@@ -410,9 +414,9 @@ namespace WhileTrue.Classes.Framework
 
             private void Replace(CachedValueCollectionItem oldItem, CachedValueCollectionItem newItem)
             {
-                var Index = items.IndexOf(oldItem);
-                Insert(Index, newItem);
-                Remove(oldItem);
+                var Index = this.items.IndexOf(oldItem);
+                this.Insert(Index, newItem);
+                this.Remove(oldItem);
             }
         }
 
@@ -426,8 +430,8 @@ namespace WhileTrue.Classes.Framework
                 ObservableExpressionFactory.EventSink eventSink)
             {
                 this.eventSink = eventSink;
-                SourceValue = sourceValue;
-                TargetValue = targetValue;
+                this.SourceValue = sourceValue;
+                this.TargetValue = targetValue;
             }
 
             public TTargetEnumerationItem TargetValue { get; }
