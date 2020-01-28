@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Threading;
 using WhileTrue.Classes.Utilities;
 using Xamarin.Forms;
 
@@ -16,18 +18,24 @@ namespace WhileTrue.Classes.Forms
         internal static List<object> RegisteredControls = new List<object>();
 
         private readonly ObservableCollection<object> internalCollection = new ObservableCollection<object>();
+        private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(1,1);
         private readonly IEnumerable originalCollection;
 
         private CollectionWrapper(IEnumerable collection)
         {
-            lock (collection)
+            this.collectionLock.Wait();
+            try
             {
-                ((INotifyCollectionChanged) collection).CollectionChanged += CollectionWrapper_CollectionChanged;
-                originalCollection = collection;
+                ((INotifyCollectionChanged) collection).CollectionChanged += this.CollectionWrapper_CollectionChanged;
+                this.originalCollection = collection;
                 lock (this.internalCollection)
                 {
-                    originalCollection.ForEach(item => internalCollection.Add(item));
+                    this.originalCollection.ForEach(item => this.internalCollection.Add(item));
                 }
+            }
+            finally
+            {
+                this.collectionLock.Release();
             }
         }
 
@@ -35,12 +43,12 @@ namespace WhileTrue.Classes.Forms
 
         IEnumerator<object> IEnumerable<object>.GetEnumerator()
         {
-            return internalCollection.GetEnumerator();
+            return this.internalCollection.GetEnumerator();
         }
 
         public IEnumerator GetEnumerator()
         {
-            return internalCollection.GetEnumerator();
+            return this.internalCollection.GetEnumerator();
         }
 
         #endregion
@@ -49,8 +57,8 @@ namespace WhileTrue.Classes.Forms
 
         public event NotifyCollectionChangedEventHandler CollectionChanged
         {
-            add => internalCollection.CollectionChanged += value;
-            remove => internalCollection.CollectionChanged -= value;
+            add => this.internalCollection.CollectionChanged += value;
+            remove => this.internalCollection.CollectionChanged -= value;
         }
 
         #endregion
@@ -60,9 +68,9 @@ namespace WhileTrue.Classes.Forms
         {
             //if (shareCollectionPerThread)
             //{
-            lock (collectionWrappers)
+            lock (CollectionWrapper.collectionWrappers)
             {
-                return GetCollectionWrapperInstance(collectionWrappers, collection);
+                return CollectionWrapper.GetCollectionWrapperInstance(CollectionWrapper.collectionWrappers, collection);
             }
 
             //}
@@ -87,7 +95,7 @@ namespace WhileTrue.Classes.Forms
 
         private void CollectionWrapper_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(() => NotifyCollectionChanged(e));
+            Device.BeginInvokeOnMainThread(() => this.NotifyCollectionChanged(e));
         }
 
         private void NotifyCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -97,15 +105,16 @@ namespace WhileTrue.Classes.Forms
                 throw new InvalidOperationException(
                     "Collection Wrapper extension currently supports no batch add/remove/move");
 
-            lock (this.internalCollection)
+            this.collectionLock.Wait();
+            try
             {
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        if (e.NewStartingIndex == internalCollection.Count)
-                            internalCollection.Add(e.NewItems[0]);
+                        if (e.NewStartingIndex == this.internalCollection.Count)
+                            this.internalCollection.Add(e.NewItems[0]);
                         else
-                            internalCollection.Insert(e.NewStartingIndex, e.NewItems[0]);
+                            this.internalCollection.Insert(e.NewStartingIndex, e.NewItems[0]);
                         //foreach (ItemsControl ItemsControl in CollectionWrapper.RegisteredControls.Where(this.GetIsFadeAnimationEnabled))
                         //{
                         //    UIElement Element = ItemsControl.ItemContainerGenerator.ContainerFromItem(e.NewItems[0]) as UIElement;
@@ -152,24 +161,25 @@ namespace WhileTrue.Classes.Forms
                         //}
                         //else
                         //{
-                        internalCollection.Remove(e.OldItems[0]);
+                        this.internalCollection.Remove(e.OldItems[0]);
                         //}
                         break;
                     case NotifyCollectionChangedAction.Replace:
                         throw new InvalidOperationException("Collection Wrapper extension currently supports no replace");
                     case NotifyCollectionChangedAction.Move:
-                        internalCollection.Move(e.OldStartingIndex, e.NewStartingIndex);
+                        this.internalCollection.Move(e.OldStartingIndex, e.NewStartingIndex);
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        internalCollection.Clear();
-                        lock (originalCollection)
-                        {
-                            originalCollection.ForEach(item => internalCollection.Add(item));
-                        }
+                        this.internalCollection.Clear();
+                        this.originalCollection.ForEach(item => this.internalCollection.Add(item));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
+            finally
+            {
+                this.collectionLock.Release();
             }
         }
 
