@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>wt</RootNamespace>
+    <RootNamespace>WhileTrue</RootNamespace>
     <Authors>WhileTrue</Authors>
     <Description>WhileTrue Core Libraries</Description>
     <PackageLicenseUrl>http://www.whiletrue.com/</PackageLicenseUrl>

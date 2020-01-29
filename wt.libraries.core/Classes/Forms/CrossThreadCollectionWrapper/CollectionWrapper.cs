@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Threading;
 using WhileTrue.Classes.Utilities;
 using Xamarin.Forms;
@@ -12,9 +11,6 @@ namespace WhileTrue.Classes.Forms
 {
     internal class CollectionWrapper : IEnumerable<object>, INotifyCollectionChanged
     {
-        private static readonly Dictionary<IEnumerable, CollectionWrapper> collectionWrappers =
-            new Dictionary<IEnumerable, CollectionWrapper>();
-
         internal static List<object> RegisteredControls = new List<object>();
 
         private readonly ObservableCollection<object> internalCollection = new ObservableCollection<object>();
@@ -66,31 +62,8 @@ namespace WhileTrue.Classes.Forms
         public static CollectionWrapper GetCollectionWrapperInstance(
             IEnumerable collection /*, bool shareCollectionPerThread*/)
         {
-            //if (shareCollectionPerThread)
-            //{
-            lock (CollectionWrapper.collectionWrappers)
-            {
-                return CollectionWrapper.GetCollectionWrapperInstance(CollectionWrapper.collectionWrappers, collection);
-            }
-
-            //}
-            //else
-            //{
-            //    return new CollectionWrapper(collection, Dispatcher.CurrentDispatcher);
-            //}
-        }
-
-        private static CollectionWrapper GetCollectionWrapperInstance(
-            IDictionary<IEnumerable, CollectionWrapper> collectionWrappers, IEnumerable collection)
-        {
-            lock (collectionWrappers)
-            {
-                if (collectionWrappers.ContainsKey(collection)) return collectionWrappers[collection];
-
                 var Wrapper = new CollectionWrapper(collection);
-                collectionWrappers.Add(collection, Wrapper);
                 return Wrapper;
-            }
         }
 
         private void CollectionWrapper_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
