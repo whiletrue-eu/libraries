@@ -4,6 +4,7 @@
 #pragma warning disable 1591
 // ReSharper disable InconsistentNaming
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using NUnit.Framework;
 using WhileTrue.Classes.Utilities;
@@ -11,20 +12,17 @@ using WhileTrue.Classes.Utilities;
 namespace WhileTrue.Classes.Framework
 {
     [TestFixture]
-    public class WeakDelegateTest
+    public class WeakDelegateTest_PropertyChanged
     {
-        private delegate void MyEventHandler(object sender, MyEventArgs e);
-        private class MyEventArgs : EventArgs{}
-
         private class EventSource
         {
-            public event MyEventHandler Event;
+            public event PropertyChangedEventHandler Event;
 
             public bool HandlerIsRegistered => this.Event != null;
 
             public void InvokeEvent()
             {
-                this.Event(this, new MyEventArgs());
+                this.Event(this, new PropertyChangedEventArgs(""));
             }
         }
 
@@ -32,13 +30,16 @@ namespace WhileTrue.Classes.Framework
         {
             public EventSink(EventSource eventSource)
             {
-                eventSource.Event += WeakDelegate.Connect<EventSink, EventSource, MyEventHandler, MyEventArgs>(
+                eventSource.Event += WeakDelegate.Connect<EventSink, EventSource, PropertyChangedEventHandler, PropertyChangedEventArgs>(
                     this,
                     eventSource,
                     (target, sender, e) => target.EventInvoked(target, e),
                     (source,handler) => source.Event -= handler
                     );
             }
+
+
+
 
             private void EventInvoked(object sender, EventArgs e)
             {
@@ -103,7 +104,7 @@ namespace WhileTrue.Classes.Framework
             Stopwatch Stopwatch = new Stopwatch();
             EventSource EventSource = new EventSource();
 
-            MyEventHandler[] Delegates = new MyEventHandler[10000];
+            PropertyChangedEventHandler[] Delegates = new PropertyChangedEventHandler[10000];
             for (int Index = 0; Index < Delegates.Length; Index++)
             {
                 Delegates[Index] = delegate { };
@@ -140,7 +141,7 @@ namespace WhileTrue.Classes.Framework
             {
                 Stopwatch.Reset();
                 Stopwatch.Start();
-                Delegates.ForEach(value => EventSource.Event += WeakDelegate.Connect<object, EventSource, MyEventHandler, MyEventArgs>(Target, EventSource, (target, sender, e) => value(sender, e), (source, handler) => source.Event -= handler));
+                Delegates.ForEach(value => EventSource.Event += WeakDelegate.Connect<object, EventSource, PropertyChangedEventHandler, PropertyChangedEventArgs>(Target, EventSource, (target, sender, e) => value(sender, e), (source, handler) => source.Event -= handler));
                 Stopwatch.Stop();
 
                 AddHandlersWeak = Stopwatch.ElapsedTicks;
@@ -172,13 +173,13 @@ namespace WhileTrue.Classes.Framework
 
             long RemoveHandlersWeak = Stopwatch.ElapsedTicks;
 
-            Console.WriteLine($"Add: Normal:{AddHandlers}, Weak: {AddHandlersWeak} / {AddHandlersWeak / (double)AddHandlers:P}");
-            Console.WriteLine($"Invoke: Normal:{InvokeHandlers}, Weak: {InvokeHandlersWeak} / {InvokeHandlersWeak / (double)InvokeHandlers:P}");
-            Console.WriteLine($"Remove: Normal:{RemoveHandlers}, Weak: {RemoveHandlersWeak} / {RemoveHandlersWeak / (double)RemoveHandlers:P}");
+            Console.WriteLine($"Add: Normal:{AddHandlers}, Weak: {AddHandlersWeak} / {AddHandlersWeak / (double) AddHandlers:P}");
+            Console.WriteLine($"Invoke: Normal:{InvokeHandlers}, Weak: {InvokeHandlersWeak} / {InvokeHandlersWeak / (double) InvokeHandlers:P}");
+            Console.WriteLine($"Remove: Normal:{RemoveHandlers}, Weak: {RemoveHandlersWeak} / {RemoveHandlersWeak / (double) RemoveHandlers:P}");
 
-            Assert.Less(AddHandlersWeak / (double)AddHandlers, 1500.0);
-            Assert.Less(InvokeHandlersWeak / (double)InvokeHandlers, 40.0);
-            Assert.Less(RemoveHandlersWeak / (double)RemoveHandlers, 8.0);
+            Assert.Less(AddHandlersWeak / (double)AddHandlers, 5.0);
+            Assert.Less(InvokeHandlersWeak / (double)InvokeHandlers, 10.0);
+            Assert.Less(RemoveHandlersWeak / (double)RemoveHandlers, 1.5);
         }
     }
 }
