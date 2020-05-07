@@ -6,8 +6,18 @@ namespace WhileTrue.Classes.Framework
 {
     public static class WeakObjectCacheKeyHelper
     {
-        public static object Unwrap<T>(WeakReference<T> reference) where T : class => reference.TryGetTarget(out T Target) ? Target : new object();
-        public static T UnwrapOrThrow<T>(WeakReference<T> reference) where T : class => reference.TryGetTarget(out T Target) ? Target : throw new InvalidOperationException("Value already garbage collected");
+        public static WeakReference<T> Wrap<T>(T value) where T : class => value != null ? new WeakReference<T>(value) : null;
+
+        public static object Unwrap<T>(WeakReference<T> reference) where T : class => reference != null
+            ? reference.TryGetTarget(out T Target) 
+                ? Target 
+                : new object()
+        :null;
+        public static T UnwrapOrThrow<T>(WeakReference<T> reference) where T : class => reference != null 
+            ? reference.TryGetTarget(out T Target) 
+                ? Target 
+                : throw new InvalidOperationException("Value already garbage collected")
+            :null;
     }
 
     /// <summary>
@@ -24,7 +34,7 @@ namespace WhileTrue.Classes.Framework
         /// <summary />
         public WeakObjectCacheKey(TParam1Type param1)
         {
-            this.param1 = new WeakReference<TParam1Type>(param1);
+            this.param1 =WeakObjectCacheKeyHelper.Wrap(param1);
         }
 
         /// <summary />
@@ -73,8 +83,8 @@ namespace WhileTrue.Classes.Framework
         /// <summary />
         public WeakObjectCacheKey(TParam1Type param1, TParam2Type param2)
         {
-            this.param1 = new WeakReference<TParam1Type>(param1);
-            this.param2 = new WeakReference<TParam2Type>(param2);
+            this.param1 =WeakObjectCacheKeyHelper.Wrap(param1);
+            this.param2 = WeakObjectCacheKeyHelper.Wrap(param2);
         }
 
         /// <summary />
@@ -138,9 +148,9 @@ namespace WhileTrue.Classes.Framework
         /// <summary />
         public WeakObjectCacheKey(TParam1Type param1, TParam2Type param2, TParam3Type param3)
         {
-            this.param1 = new WeakReference<TParam1Type>(param1);
-            this.param2 = new WeakReference<TParam2Type>(param2);
-            this.param3 = new WeakReference<TParam3Type>(param3);
+            this.param1 =WeakObjectCacheKeyHelper.Wrap(param1);
+            this.param2 = WeakObjectCacheKeyHelper.Wrap(param2);
+            this.param3 = WeakObjectCacheKeyHelper.Wrap(param3);
         }
 
         /// <summary />
@@ -216,10 +226,10 @@ namespace WhileTrue.Classes.Framework
         /// <summary />
         public WeakObjectCacheKey(TParam1Type param1, TParam2Type param2, TParam3Type param3, TParam4Type param4)
         {
-            this.param1 = new WeakReference<TParam1Type>(param1);
-            this.param2 = new WeakReference<TParam2Type>(param2);
-            this.param3 = new WeakReference<TParam3Type>(param3);
-            this.param4 = new WeakReference<TParam4Type>(param4);
+            this.param1 =WeakObjectCacheKeyHelper.Wrap(param1);
+            this.param2 = WeakObjectCacheKeyHelper.Wrap(param2);
+            this.param3 = WeakObjectCacheKeyHelper.Wrap(param3);
+            this.param4 = WeakObjectCacheKeyHelper.Wrap(param4);
         }
 
         /// <summary />
