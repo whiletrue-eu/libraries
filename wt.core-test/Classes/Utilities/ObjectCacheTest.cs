@@ -56,7 +56,7 @@ namespace WhileTrue.Classes.Utilities
             GC.GetTotalMemory(true);
             
             
-            //Object is recreated and chache is cleaned up
+            //Object is recreated and cache is cleaned up
             Cache.GetObject(1);
             Assert.AreEqual(2,CreateCalls);
         }

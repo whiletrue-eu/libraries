@@ -7,6 +7,7 @@ namespace WhileTrue.Classes.Framework
     public static class WeakObjectCacheKeyHelper
     {
         public static object Unwrap<T>(WeakReference<T> reference) where T : class => reference.TryGetTarget(out T Target) ? Target : new object();
+        public static T UnwrapOrThrow<T>(WeakReference<T> reference) where T : class => reference.TryGetTarget(out T Target) ? Target : throw new InvalidOperationException("Value already garbage collected");
     }
 
     /// <summary>
@@ -25,6 +26,9 @@ namespace WhileTrue.Classes.Framework
         {
             this.param1 = new WeakReference<TParam1Type>(param1);
         }
+
+        /// <summary />
+        public TParam1Type Param1 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param1);
 
         /// <summary>
         ///     Serves as the default hash function.
@@ -78,6 +82,12 @@ namespace WhileTrue.Classes.Framework
 
         /// <summary />
         private readonly WeakReference<TParam2Type> param2;
+
+
+        /// <summary />
+        public TParam1Type Param1 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param1);
+        /// <summary />
+        public TParam2Type Param2 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param2);
 
         /// <summary>
         ///     Serves as the default hash function.
@@ -141,6 +151,14 @@ namespace WhileTrue.Classes.Framework
 
         /// <summary />
         private readonly WeakReference<TParam3Type> param3;
+
+
+        /// <summary />
+        public TParam1Type Param1 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param1);
+        /// <summary />
+        public TParam2Type Param2 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param2);
+        /// <summary />
+        public TParam3Type Param3 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param3);
 
         /// <summary>
         ///     Serves as the default hash function.
@@ -215,6 +233,15 @@ namespace WhileTrue.Classes.Framework
 
         /// <summary />
         private readonly WeakReference<TParam4Type> param4;
+
+        /// <summary />
+        public TParam1Type Param1 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param1);
+        /// <summary />
+        public TParam2Type Param2 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param2);
+        /// <summary />
+        public TParam3Type Param3 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param3);
+        /// <summary />
+        public TParam4Type Param4 => WeakObjectCacheKeyHelper.UnwrapOrThrow(this.param4);
 
         /// <summary>
         ///     Serves as the default hash function.
