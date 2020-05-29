@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Threading;
 using WhileTrue.Classes.Utilities;
 using Xamarin.Forms;
@@ -68,10 +69,11 @@ namespace WhileTrue.Classes.Forms
 
         private void CollectionWrapper_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(() => this.NotifyCollectionChanged(e));
+            var Sender = (sender as ICollection<object>)?.ToArray();
+            Device.BeginInvokeOnMainThread(() => this.NotifyCollectionChanged(Sender, e));
         }
 
-        private void NotifyCollectionChanged(NotifyCollectionChangedEventArgs e)
+        private void NotifyCollectionChanged(object[] sender,  NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null && e.NewItems.Count > 1 ||
                 e.OldItems != null && e.OldItems.Count > 1)
@@ -144,12 +146,16 @@ namespace WhileTrue.Classes.Forms
                         break;
                     case NotifyCollectionChangedAction.Reset:
                         this.internalCollection.Clear();
+                        if (sender == null)
+                        {
+                            return;
+                        }
                         int NumberOfTries = 5;
                         while (NumberOfTries>0)
                         {
                             try
                             {
-                                this.originalCollection.ForEach(item => this.internalCollection.Add(item));
+                                sender.ForEach(item => this.internalCollection.Add(item));
                                 NumberOfTries = 0;
                             }
                             catch (InvalidOperationException)
