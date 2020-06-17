@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using WhileTrue.Classes.Utilities;
 using Xamarin.Forms;
@@ -14,19 +16,18 @@ namespace WhileTrue.Classes.Forms
         internal static List<object> RegisteredControls = new List<object>();
 
         private readonly ObservableCollection<object> internalCollection = new ObservableCollection<object>();
-        private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(1,1);
-        private readonly IEnumerable originalCollection;
+        private readonly SemaphoreSlim collectionLock = new SemaphoreSlim(1, 1);
 
         private CollectionWrapper(IEnumerable collection)
         {
             this.collectionLock.Wait();
             try
             {
-                ((INotifyCollectionChanged) collection).CollectionChanged += this.CollectionWrapper_CollectionChanged;
-                this.originalCollection = collection;
+                ((INotifyCollectionChanged)collection).CollectionChanged += this.CollectionWrapper_CollectionChanged;
                 lock (this.internalCollection)
                 {
-                    this.originalCollection.ForEach(item => this.internalCollection.Add(item));
+                    object[] TempArray = (collection as ICollection<object>)?.ToArray();
+                    TempArray.ForEach(item => this.internalCollection.Add(item));
                 }
             }
             finally
@@ -62,13 +63,21 @@ namespace WhileTrue.Classes.Forms
         public static CollectionWrapper GetCollectionWrapperInstance(
             IEnumerable collection /*, bool shareCollectionPerThread*/)
         {
-                var Wrapper = new CollectionWrapper(collection);
-                return Wrapper;
+            var Wrapper = new CollectionWrapper(collection);
+            return Wrapper;
         }
 
         private void CollectionWrapper_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(() => this.NotifyCollectionChanged(e));
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {   // In case of reset, we need the sender to reset the 'internalCollection' asynchronous
+                object[] Sender = (sender as ICollection<object>)?.ToArray();
+                Device.BeginInvokeOnMainThread(() => this.NotifyCollectionChangedReset(Sender));
+            }
+            else
+            {   // Else default event handling
+                Device.BeginInvokeOnMainThread(() => this.NotifyCollectionChanged(e));
+            }
         }
 
         private void NotifyCollectionChanged(NotifyCollectionChangedEventArgs e)
@@ -84,6 +93,8 @@ namespace WhileTrue.Classes.Forms
                 switch (e.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(e.NewItems != null, "e.NewItems != null");
+
                         if (e.NewStartingIndex == this.internalCollection.Count)
                             this.internalCollection.Add(e.NewItems[0]);
                         else
@@ -103,9 +114,11 @@ namespace WhileTrue.Classes.Forms
                         //    }
                         //}
                         break;
+
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(e.OldItems != null, "e.OldItems != null");
                         //Dictionary<UIElement, Storyboard> Animations = new Dictionary<UIElement, Storyboard>();
-                        var Item = e.OldItems[0];
+                        //var Item = e.OldItems[0];
                         //foreach (ItemsControl ItemsControl in CollectionWrapper.RegisteredControls.Where(this.GetIsFadeAnimationEnabled))
                         //{
                         //    UIElement Element = ItemsControl.ItemContainerGenerator.ContainerFromItem(Item) as UIElement;
@@ -137,31 +150,74 @@ namespace WhileTrue.Classes.Forms
                         this.internalCollection.Remove(e.OldItems[0]);
                         //}
                         break;
+
                     case NotifyCollectionChangedAction.Replace:
                         throw new InvalidOperationException("Collection Wrapper extension currently supports no replace");
+
                     case NotifyCollectionChangedAction.Move:
                         this.internalCollection.Move(e.OldStartingIndex, e.NewStartingIndex);
                         break;
-                    case NotifyCollectionChangedAction.Reset:
-                        this.internalCollection.Clear();
-                        int NumberOfTries = 5;
-                        while (NumberOfTries>0)
-                        {
-                            try
-                            {
-                                this.originalCollection.ForEach(item => this.internalCollection.Add(item));
-                                NumberOfTries = 0;
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                //try to compensate 'enumeration could not execute - collection modified' exceptions that occur due to inadequate synchronization
-                                NumberOfTries--;
-                            }
-                        }
+                    //case NotifyCollectionChangedAction.Reset:
+                    //    this.internalCollection.Clear();
+                    //    if (sender == null)
+                    //    {
+                    //        return;
+                    //    }
+                    //    int NumberOfTries = 5;
+                    //    while (NumberOfTries > 0)
+                    //    {
+                    //        try
+                    //        {
+                    //            sender.ForEach(item => this.internalCollection.Add(item));
+                    //            NumberOfTries = 0;
+                    //        }
+                    //        catch (InvalidOperationException)
+                    //        {
+                    //            //try to compensate 'enumeration could not execute - collection modified' exceptions that occur due to inadequate synchronization
+                    //            NumberOfTries--;
+                    //        }
+                    //    }
 
-                        break;
+                    //    break;
                     default:
                         throw new ArgumentOutOfRangeException();
+                }
+            }
+            finally
+            {
+                this.collectionLock.Release();
+            }
+        }
+
+        /// <summary>
+        /// Handle the 'Reset' event of the collection. Need to be done separately, cause we need the sender as Array
+        /// </summary>
+        /// <param name="sender"></param>
+        private void NotifyCollectionChangedReset(object[] sender)
+        {
+            this.collectionLock.Wait();
+            try
+            {
+                this.internalCollection.Clear();
+                if (sender == null)
+                {
+                    return;
+                }
+                // Retry counter
+                int NumberOfTries = 5;
+
+                while (NumberOfTries > 0)
+                {
+                    try
+                    {   // Copy all items from sender into the internal collection
+                        sender.ForEach(item => this.internalCollection.Add(item));
+                        NumberOfTries = 0;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        //try to compensate 'enumeration could not execute - collection modified' exceptions that occur due to inadequate synchronization
+                        NumberOfTries--;
+                    }
                 }
             }
             finally
