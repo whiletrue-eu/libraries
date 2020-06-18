@@ -26,7 +26,7 @@ namespace WhileTrue.Classes.Forms
                 ((INotifyCollectionChanged)collection).CollectionChanged += this.CollectionWrapper_CollectionChanged;
                 lock (this.internalCollection)
                 {
-                    object[] TempArray = (collection as ICollection<object>)?.ToArray();
+                    object[] TempArray = collection.Cast<object>().ToArray();
                     TempArray.ForEach(item => this.internalCollection.Add(item));
                 }
             }
@@ -63,7 +63,7 @@ namespace WhileTrue.Classes.Forms
         public static CollectionWrapper GetCollectionWrapperInstance(
             IEnumerable collection /*, bool shareCollectionPerThread*/)
         {
-            var Wrapper = new CollectionWrapper(collection);
+            CollectionWrapper Wrapper = new CollectionWrapper(collection);
             return Wrapper;
         }
 
@@ -71,7 +71,7 @@ namespace WhileTrue.Classes.Forms
         {
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {   // In case of reset, we need the sender to reset the 'internalCollection' asynchronous
-                object[] Sender = (sender as ICollection<object>)?.ToArray();
+                object[] Sender = ((IEnumerable)sender).Cast<object>().ToArray();
                 Device.BeginInvokeOnMainThread(() => this.NotifyCollectionChangedReset(Sender));
             }
             else
