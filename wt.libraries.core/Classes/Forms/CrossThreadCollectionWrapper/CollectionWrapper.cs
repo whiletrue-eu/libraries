@@ -11,7 +11,7 @@ using Xamarin.Forms;
 
 namespace WhileTrue.Classes.Forms
 {
-    internal class CollectionWrapper : IEnumerable<object>, INotifyCollectionChanged
+    internal class CollectionWrapper : IEnumerable<object>, IList, INotifyCollectionChanged
     {
         internal static List<object> RegisteredControls = new List<object>();
 
@@ -239,5 +239,51 @@ namespace WhileTrue.Classes.Forms
         //               CrossThreadCollectionWrapper.GetEnableItemFadeAnimations(itemsControl);
         //    }
         //}
+        public void CopyTo(Array array, int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public int Count => this.internalCollection.Count;
+        public bool IsSynchronized => throw new NotSupportedException();
+        public object SyncRoot => throw new NotSupportedException();
+        public int Add(object value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool Contains(object value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public int IndexOf(object value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Insert(int index, object value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Remove(object value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool IsFixedSize => throw new NotSupportedException();
+        public bool IsReadOnly => throw new NotSupportedException();
+        public object this[int index] { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
     }
 }
