@@ -245,8 +245,8 @@ namespace WhileTrue.Classes.Forms
         }
 
         public int Count => this.internalCollection.Count;
-        public bool IsSynchronized => throw new NotSupportedException();
-        public object SyncRoot => throw new NotSupportedException();
+        public bool IsSynchronized => false;
+        public object SyncRoot => this;
         public int Add(object value)
         {
             throw new NotSupportedException();
@@ -259,12 +259,12 @@ namespace WhileTrue.Classes.Forms
 
         public bool Contains(object value)
         {
-            throw new NotSupportedException();
+            return this.internalCollection.Contains(value);
         }
 
         public int IndexOf(object value)
         {
-            throw new NotSupportedException();
+            return this.internalCollection.IndexOf(value);
         }
 
         public void Insert(int index, object value)
@@ -282,8 +282,8 @@ namespace WhileTrue.Classes.Forms
             throw new NotSupportedException();
         }
 
-        public bool IsFixedSize => throw new NotSupportedException();
-        public bool IsReadOnly => throw new NotSupportedException();
-        public object this[int index] { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+        public bool IsFixedSize => false;
+        public bool IsReadOnly => true;
+        public object this[int index] { get => this.internalCollection[index]; set => throw new NotSupportedException(); }
     }
 }
