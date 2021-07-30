@@ -183,6 +183,10 @@ namespace WhileTrue.Classes.Forms
                         throw new ArgumentOutOfRangeException();
                 }
             }
+            catch(Exception Error)
+            {
+                Trace.WriteLine($"Exception was swallowed by Collection Wrapper: {Error}");
+            }
             finally
             {
                 this.collectionLock.Release();
@@ -219,6 +223,10 @@ namespace WhileTrue.Classes.Forms
                         NumberOfTries--;
                     }
                 }
+            }
+            catch (Exception Error)
+            {
+                Trace.WriteLine($"Exception was swallowed by Collection Wrapper: {Error}");
             }
             finally
             {

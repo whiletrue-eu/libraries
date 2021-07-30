@@ -57,6 +57,15 @@ namespace WhileTrue.Classes.Commands
         }
     }
 
+
+    public abstract class DelegateCommandBase : ObservableObject
+    {
+        /// <summary>
+        /// Global handler that is called for exceptions that occur when executing commands
+        /// </summary>
+        public static Action<Exception> GlobalExceptionHandler { get; set; }
+    }
+
     /// <summary>
     ///     Provides a class to implement ICommand interface with the use of delegates
     /// </summary>
@@ -72,8 +81,10 @@ namespace WhileTrue.Classes.Commands
     ///         Calls to the delegates are dispatched into the thread the delegatecommand was created in.
     ///     </para>
     /// </remarks>
-    public abstract class DelegateCommandBase<TParameterType> : ObservableObject, ICommand
+    public abstract class DelegateCommandBase<TParameterType> : DelegateCommandBase, ICommand
     {
+
+
         private readonly Func<TParameterType, bool> canExecuteDelegate;
         private readonly NotifyChangeExpression<Func<TParameterType, bool>> canExecuteDelegateExpression;
 
@@ -96,7 +107,7 @@ namespace WhileTrue.Classes.Commands
         {
             canExecuteDelegateExpression = new NotifyChangeExpression<Func<TParameterType, bool>>(canExecuteExpression);
             this.name = name;
-            ExceptionHandler = exceptionHandler;
+            ExceptionHandler = exceptionHandler ?? GlobalExceptionHandler;
             canExecuteDelegate = canExecuteDelegateExpression.Invoke;
 
             AttachRequerySuggestedEvent();
