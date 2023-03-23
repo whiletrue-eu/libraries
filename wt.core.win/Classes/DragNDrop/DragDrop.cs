@@ -12,7 +12,7 @@ namespace WhileTrue.Classes.DragNDrop
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Drag and drop support is given by marking UI ELements in xaml as either drag sources or drag targets.
+    ///         Drag and drop support is given by marking UI Elements in xaml as either drag sources or drag targets.
     ///         At that point, a drag and drop source and target handler are set on the UI control that can be implmented
     ///         in the model. The handler interfaces is complete UI less, allowing the clean separation of UI and the logic
     ///         behind.

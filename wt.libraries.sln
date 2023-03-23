@@ -15,9 +15,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{6DDD8A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F1DCEAFF-557D-4903-8620-464B104035DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wt.core.win", "wt.core.win\wt.core.win.csproj", "{59CA7151-0CFB-458B-8388-EC73221D3E69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "wt.core.win", "wt.core.win\wt.core.win.csproj", "{59CA7151-0CFB-458B-8388-EC73221D3E69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wt.core.win-test", "wt.core.win-test\wt.core.win-test.csproj", "{37A84D33-BB65-4112-B83A-70CA36FA03D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E37A862A-885A-4356-AE2E-A225965AEA88}"
+	ProjectSection(SolutionItems) = preProject
+		..\wtlibraries.goconfig = ..\wtlibraries.goconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

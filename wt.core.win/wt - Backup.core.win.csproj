@@ -16,6 +16,10 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Windows" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\wt.libraries.core\wt.libraries.core.csproj" />
   </ItemGroup>
   <ItemGroup>
